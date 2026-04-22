@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink, MessageCircle, User, Save, Rocket, ShieldCheck } from 'lucide-react';
 import { Card, Button, SectionHeading } from '../../components/UI';
@@ -82,33 +82,47 @@ export default function AdminDashboard() {
 }
 
 function AdminProfileTab() {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState({ name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '' });
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const { user, login } = useAuth();
+  const [profile, setProfile] = useState({ name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '', role: '' });
+  const [loading, setLoading] = useState(false);
 
   const fetchProfile = async () => {
+    const uid = user?.id || (user as any)?._id;
+    if (!uid) return;
     try {
-      const res = await axios.get(`/api/users/${user?.id}`);
+      setLoading(true);
+      const res = await axios.get(`/api/users/${uid}`);
       setProfile(prev => ({
         ...prev,
         ...res.data
       }));
     } catch (err) {
       toast.error('Failed to load profile');
+    } finally {
+      setLoading(false);
     }
   };
 
-  React.useEffect(() => { fetchProfile(); }, []);
+  useEffect(() => { fetchProfile(); }, []);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user?.id) {
+    const uid = user?.id || (user as any)?._id;
+    if (!uid) {
       toast.error('Admin identity lost. Please re-login.');
       return;
     }
     try {
-      await axios.put(`/api/admin/users/${user.id}`, profile);
+      console.log('AdminDashboard: Updating profile for UID', uid);
+      await axios.put(`/api/admin/users/${uid}`, profile);
+      
+      // Update local context so Navbar reflects changes
+      if (user) {
+        login({ ...user, ...profile });
+      }
+      
       toast.success('Admin profile updated');
+      await fetchProfile();
     } catch (err) {
       console.error('Admin update error:', err);
       toast.error('Update failed');
@@ -157,6 +171,17 @@ function AdminProfileTab() {
     readerForBase64.readAsDataURL(file);
   };
 
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
+        <p className="text-[10px] font-mono text-primary uppercase tracking-widest animate-pulse">Fetching Admin Profile...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center mb-10">
@@ -172,8 +197,20 @@ function AdminProfileTab() {
           <Input label="Email Address (Locked)" value={profile.email || ''} onChange={() => {}} disabled />
           <Input label="Tech ID" value={profile.memberId || ''} onChange={v => setProfile({...profile, memberId: v})} />
           <Input label="Designation" value={profile.designation || ''} onChange={v => setProfile({...profile, designation: v})} />
-          <Input label="Phone Number" value={profile.phone || ''} onChange={v => setProfile({...profile, phone: v})} />
+           <Input label="Phone Number" value={profile.phone || ''} onChange={v => setProfile({...profile, phone: v})} />
           <Input label="Squad Team" value={profile.team || ''} onChange={v => setProfile({...profile, team: v})} />
+          <Input label="Squad Role" value={profile.role || ''} onChange={v => setProfile({...profile, role: v})} />
+          
+          <div className="md:col-span-2">
+            <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Leadership Bio</label>
+            <textarea 
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-white text-sm"
+              rows={3}
+              value={profile.bio || ''}
+              onChange={e => setProfile({...profile, bio: e.target.value})}
+              placeholder="Tell the squad about yourself..."
+            />
+          </div>
           
           <div className="md:col-span-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Leadership Avatar</label>
@@ -228,20 +265,28 @@ function ProjectForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('/api/projects', {
-        ...data,
-        techStack: data.techStack.split(',').map(s => s.trim()),
-        userId: user?.id,
-        developerName: user?.name || 'Admin'
-      });
-      toast.success('Project added successfully!');
+      if ((data as any)._id) {
+        await axios.put(`/api/projects/${(data as any)._id}`, {
+          ...data,
+          techStack: Array.isArray(data.techStack) ? data.techStack : data.techStack.split(',').map(s => s.trim())
+        });
+        toast.success('Project updated successfully!');
+      } else {
+        await axios.post('/api/projects', {
+          ...data,
+          techStack: data.techStack.split(',').map(s => s.trim()),
+          userId: user?.id,
+          developerName: user?.name || 'Admin'
+        });
+        toast.success('Project added successfully!');
+      }
       setData({ 
         title: '', description: '', image: '', techStack: '', liveLink: '',
         orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo'
       });
       fetchList();
     } catch (err) {
-      toast.error('Failed to add project');
+      toast.error('Failed to save project');
     } finally {
       setLoading(false);
     }
@@ -396,6 +441,20 @@ function ProjectForm() {
                     <ExternalLink size={18} />
                   </button>
                 </Link>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setData({
+                      ...item,
+                      techStack: Array.isArray(item.techStack) ? item.techStack.join(', ') : item.techStack
+                    });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }} 
+                  className="p-2 text-white/20 hover:text-primary transition-all"
+                  title="Edit Project"
+                >
+                  <Plus className="rotate-45" size={18} />
+                </button>
                 <button onClick={() => handleDelete(item._id)} className="p-2 text-white/20 hover:text-red-500 transition-colors">
                   <Trash2 size={18} />
                 </button>

@@ -52,6 +52,7 @@ export default function Dashboard() {
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
@@ -75,6 +76,7 @@ export default function Dashboard() {
     }
     const uid = user?.id || (user as any)?._id;
     try {
+      setLoading(true);
       console.log(`Dashboard: Fetching data for UID ${uid}`);
       const [uRes, pRes, rRes, dRes] = await Promise.all([
         axios.get(`/api/users/${uid}`),
@@ -92,6 +94,8 @@ export default function Dashboard() {
     } catch (err) {
       console.error('Dashboard Fetch Error:', err);
       toast.error('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -189,16 +193,21 @@ export default function Dashboard() {
   const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('/api/reviews', {
-        ...newReview,
-        userId: user?.id,
-        developerName: profile.name || user?.name || 'Team Member'
-      });
-      toast.success('Review added successfully');
+      if ((newReview as any)._id) {
+        await axios.put(`/api/reviews/${(newReview as any)._id}`, newReview);
+        toast.success('Review updated successfully');
+      } else {
+        await axios.post('/api/reviews', {
+          ...newReview,
+          userId: user?.id,
+          developerName: profile.name || user?.name || 'Team Member'
+        });
+        toast.success('Review added successfully');
+      }
       setNewReview({ title: '', clientName: '', orderId: '', feedback: '', rating: 5 });
       refreshData();
     } catch (err) {
-      toast.error('Failed to add review');
+      toast.error('Failed to save review');
     }
   };
 
@@ -245,6 +254,29 @@ export default function Dashboard() {
       toast.error('Delete failed');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-bg relative overflow-hidden">
+        {/* Decorative Background for Loader */}
+        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-primary/20 blur-[120px] rounded-full animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-purple-600/10 blur-[120px] rounded-full animate-pulse" />
+        
+        <div className="relative text-center">
+          <div className="relative inline-block">
+            <div className="w-24 h-24 border-2 border-white/5 border-t-primary rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-12 h-12 bg-primary/20 rounded-full animate-ping"></div>
+            </div>
+          </div>
+          <div className="mt-8 space-y-2">
+            <h2 className="text-xl font-display font-bold tracking-tight text-white italic">EleSquad Dashboard</h2>
+            <p className="text-[10px] font-mono text-primary uppercase tracking-[0.4em] animate-pulse">Initializing Secure Session...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) return null;
 
@@ -753,9 +785,24 @@ export default function Dashboard() {
                             <h4 className="font-bold text-lg">{r.title}</h4>
                             <p className="text-[10px] text-primary font-mono uppercase tracking-widest">{r.clientName}</p>
                           </div>
-                          <button onClick={() => deleteItem('reviews', r._id)} className="text-white/20 hover:text-red-500 transition-colors">
-                            <Trash2 size={16} />
-                          </button>
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => {
+                                setNewReview({
+                                  ...r,
+                                  _id: r._id // Keep ID for update logic
+                                });
+                                // Scroll to top of reviews tab or just let the form update
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }} 
+                              className="text-white/20 hover:text-primary transition-colors"
+                            >
+                              <Plus className="rotate-45" size={16} /> 
+                            </button>
+                            <button onClick={() => deleteItem('reviews', r._id)} className="text-white/20 hover:text-red-500 transition-colors">
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
                         <div className="flex gap-1 mb-4">
                             {[...Array(5)].map((_, i) => (

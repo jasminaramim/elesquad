@@ -216,7 +216,11 @@ async function startServer() {
       res.json({ success: true, modifiedCount: updateResult.modifiedCount });
     } catch (err: any) {
       console.error('Admin User Update Error:', err);
-      res.status(500).json({ error: 'Update failed', details: err.message });
+      res.status(500).json({ 
+        error: 'Update failed', 
+        details: err.message,
+        stack: err.stack 
+      });
     }
   });
 
@@ -286,9 +290,12 @@ async function startServer() {
         return res.status(404).json({ error: 'User not found' });
       }
       res.json({ success: true, modifiedCount: result.modifiedCount });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Update User Error:', err);
-      res.status(500).json({ error: 'Update failed' });
+      res.status(500).json({ 
+        error: 'Update failed', 
+        details: err.message 
+      });
     }
   });
 
@@ -333,6 +340,19 @@ async function startServer() {
       res.json({ id: result.insertedId });
     } catch (err) {
       res.status(500).json({ error: 'Creation failed' });
+    }
+  });
+
+  app.put('/api/projects/:id', async (req, res) => {
+    const { id } = req.params;
+    const { _id, ...updateData } = req.body;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+    try {
+      await projects.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+      res.json({ success: true });
+    } catch (err) {
+      console.error('Project Update Error:', err);
+      res.status(500).json({ error: 'Update failed' });
     }
   });
 
@@ -417,8 +437,21 @@ async function startServer() {
 
   // Reviews
   app.get('/api/reviews', async (req, res) => {
-    const revs = await reviews.find().sort({ _id: -1 }).toArray();
-    res.json(revs);
+    const allReviews = await reviews.find().toArray();
+    res.json(allReviews);
+  });
+
+  app.put('/api/reviews/:id', async (req, res) => {
+    const { id } = req.params;
+    const { _id, ...updateData } = req.body;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+    try {
+      await reviews.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+      res.json({ success: true });
+    } catch (err) {
+      console.error('Review Update Error:', err);
+      res.status(500).json({ error: 'Update failed' });
+    }
   });
 
   app.post('/api/reviews', async (req, res) => {
