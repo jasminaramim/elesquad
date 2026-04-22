@@ -83,10 +83,15 @@ export default function Team() {
                   {/* Info Box */}
                   <div className="p-8 text-center relative z-10">
                     <div className="w-10 h-[1px] bg-primary/30 mx-auto mb-4 group-hover:w-20 transition-all" />
-                    <h3 className="text-xl font-display font-bold mb-1 group-hover:text-primary transition-colors tracking-tight">
+                    <h3 className="text-xl font-display font-bold mb-1 group-hover:text-primary transition-colors tracking-tight flex items-center justify-center gap-2">
                       {member.name}
+                      {member.isVerified && (
+                        <div className="w-4 h-4 bg-primary text-white rounded-full flex items-center justify-center shadow-lg" title="Verified Member">
+                          <Star size={8} fill="currentColor" />
+                        </div>
+                      )}
                       {member.role === 'Leader' && (
-                        <span className="ml-2 inline-block px-2 py-0.5 bg-primary/20 text-primary text-[8px] font-mono rounded border border-primary/20 align-middle">
+                        <span className="inline-block px-2 py-0.5 bg-primary/20 text-primary text-[8px] font-mono rounded border border-primary/20 align-middle">
                           LEADER
                         </span>
                       )}
