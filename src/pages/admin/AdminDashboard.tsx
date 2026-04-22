@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink, MessageCircle } from 'lucide-react';
 import { Card, Button, SectionHeading } from '../../components/UI';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import ChatHub from '../../components/ChatHub';
 
 const tabs = [
   { id: 'projects', label: 'Projects', icon: LayoutDashboard },
   { id: 'team', label: 'Team', icon: Users },
   { id: 'reviews', label: 'Reviews', icon: Star },
   { id: 'documents', label: 'Sheets', icon: FileText },
-  { id: 'messages', label: 'Messages', icon: Mail },
+  { id: 'chat', label: 'Squad Chat', icon: MessageCircle },
 ];
 
 export default function AdminDashboard() {
@@ -66,9 +67,9 @@ export default function AdminDashboard() {
               <Card className="p-8 md:p-12" tiltEnabled={false}>
                 {activeTab === 'projects' && <ProjectForm />}
                 {activeTab === 'team' && <TeamForm />}
+                {activeTab === 'chat' && <ChatHub />}
                 {activeTab === 'reviews' && <ReviewForm />}
                 {activeTab === 'documents' && <DocumentForm />}
-                {activeTab === 'messages' && <MessagesList />}
               </Card>
             </motion.div>
           </AnimatePresence>
@@ -160,7 +161,37 @@ function ProjectForm() {
              <Input label="Sheet / Document Link" value={data.sheetLink} onChange={v => setData({ ...data, sheetLink: v })} placeholder="https://docs.google.com/..." />
           </div>
           <div className="md:col-span-2 lg:col-span-3">
-            <Input label="Image URL" value={data.image} onChange={v => setData({ ...data, image: v })} placeholder="https://..." />
+             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Project Image</label>
+             <div className="flex items-center gap-6 p-4 bg-white/5 border border-white/10 rounded-xl">
+               <div className="w-20 h-20 bg-white/5 rounded-lg overflow-hidden flex items-center justify-center border border-white/10">
+                 {data.image ? <img src={data.image} className="w-full h-full object-cover" /> : <LayoutDashboard size={24} className="text-white/10" />}
+               </div>
+               <div className="flex-grow">
+                 <input 
+                   type="file" 
+                   accept="image/*"
+                   className="hidden" 
+                   id="project-image-upload"
+                   onChange={async (e) => {
+                     const file = e.target.files?.[0];
+                     if (!file) return;
+                     const formData = new FormData();
+                     formData.append('image', file);
+                     try {
+                       const res = await axios.post('/api/upload', formData);
+                       setData({ ...data, image: res.data.imageUrl });
+                       toast.success('Image uploaded!');
+                     } catch (err) {
+                       toast.error('Upload failed');
+                     }
+                   }}
+                 />
+                 <label htmlFor="project-image-upload" className="cursor-pointer inline-flex items-center gap-2 px-6 py-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-sm font-bold transition-all">
+                    <Plus size={16} /> Choose Local Device
+                 </label>
+                 <p className="text-[10px] text-white/20 mt-2">JPG, PNG or WEBP. Max 5MB.</p>
+               </div>
+             </div>
           </div>
           <div className="md:col-span-2 lg:col-span-3">
             <Input label="Live Link" value={data.liveLink} onChange={v => setData({ ...data, liveLink: v })} placeholder="https://..." />
@@ -208,11 +239,11 @@ function ProjectForm() {
                 </div>
               </div>
               <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                {item.liveLink && (
-                  <a href={item.liveLink} target="_blank" rel="noopener noreferrer" className="p-2 text-white/20 hover:text-primary transition-all">
+                <Link to={`/projects/${item._id}`}>
+                  <button className="p-2 text-white/20 hover:text-primary transition-all" title="View Full Page">
                     <ExternalLink size={18} />
-                  </a>
-                )}
+                  </button>
+                </Link>
                 <button onClick={() => handleDelete(item._id)} className="p-2 text-white/20 hover:text-red-500 transition-colors">
                   <Trash2 size={18} />
                 </button>
@@ -335,12 +366,17 @@ function TeamForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('/api/auth/register', data);
-      toast.success('Member added successfully!');
+      if (data._id) {
+        await axios.put(`/api/admin/users/${data._id}`, data);
+        toast.success('Member updated successfully!');
+      } else {
+        await axios.post('/api/auth/register', data);
+        toast.success('Member added successfully!');
+      }
       setData({ email: '', password: 'password123', name: '', memberId: '', designation: '', team: '', phone: '', role: 'Member' });
       fetchList();
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Failed to add member');
+      toast.error(err.response?.data?.error || 'Operation failed');
     } finally {
       setLoading(false);
     }
@@ -415,6 +451,17 @@ function TeamForm() {
               
               <div className="flex flex-wrap items-center gap-3">
                 <button 
+                  onClick={() => {
+                    setData({ ...item, password: '' });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    toast.success(`Editing ${item.name}`);
+                  }}
+                  className="px-3 py-1.5 bg-white/5 text-white/40 hover:bg-primary hover:text-white rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all"
+                >
+                  Edit Details
+                </button>
+
+                <button 
                   onClick={() => handleVerifyToggle(item._id, item.isVerified)}
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all ${
                     item.isVerified ? 'bg-primary text-white' : 'bg-white/5 text-white/40 hover:bg-white/10'
@@ -445,110 +492,7 @@ function TeamForm() {
     </div>
   );
 }
-    </div>
-  );
-}
 
-function TeamForm() {
-  const [loading, setLoading] = useState(false);
-  const [list, setList] = useState<any[]>([]);
-  const [data, setData] = useState({
-    email: '', password: 'password123', name: '', memberId: '', designation: '', team: '', phone: '', role: 'Member'
-  });
-
-  const fetchList = async () => {
-    const res = await axios.get('/api/admin/users');
-    setList(res.data);
-  };
-
-  React.useEffect(() => { fetchList(); }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await axios.post('/api/auth/register', data);
-      toast.success('Member added successfully!');
-      setData({ email: '', password: 'password123', name: '', memberId: '', designation: '', team: '', phone: '', role: 'Member' });
-      fetchList();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Failed to add member');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure? This will permanently remove the member.')) return;
-    try {
-      await axios.delete(`/api/admin/users/${id}`);
-      toast.success('Member removed');
-      fetchList();
-    } catch (err) {
-      toast.error('Failed to delete');
-    }
-  };
-
-  return (
-    <div className="space-y-12">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <h3 className="text-2xl font-bold mb-8">Add New Member</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input label="Full Name" value={data.name} onChange={v => setData({ ...data, name: v })} placeholder="John Doe" />
-          <Input label="Email Address" type="email" value={data.email} onChange={v => setData({ ...data, email: v })} placeholder="member@elesquad.com" />
-          <Input label="Member ID" value={data.memberId} onChange={v => setData({ ...data, memberId: v })} placeholder="ES-001" />
-          <Input label="Designation" value={data.designation} onChange={v => setData({ ...data, designation: v })} placeholder="Lead Developer" />
-          <Input label="Team Name" value={data.team} onChange={v => setData({ ...data, team: v })} placeholder="Alpha" />
-          <Input label="Phone Number" value={data.phone} onChange={v => setData({ ...data, phone: v })} placeholder="+880..." />
-          <div className="space-y-2">
-            <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Role</label>
-            <select 
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none transition-all text-white"
-              value={data.role}
-              onChange={e => setData({ ...data, role: e.target.value })}
-            >
-              <option value="Member" className="bg-bg">Member</option>
-              <option value="Leader" className="bg-bg">Leader (Admin)</option>
-            </select>
-          </div>
-          <Input label="Default Password" type="text" value={data.password} onChange={v => setData({ ...data, password: v })} />
-        </div>
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? <Loader2 className="animate-spin mx-auto" /> : 'Register Member'}
-        </Button>
-      </form>
-
-      <div className="space-y-4 pt-12 border-t border-white/5">
-        <h3 className="text-xl font-bold mb-6">EleSquad Members ({list.length})</h3>
-        <div className="grid grid-cols-1 gap-4">
-          {list.map(item => (
-            <div key={item._id} className="flex items-center justify-between p-6 glass rounded-2xl group hover:border-primary/30 transition-all">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center font-bold text-primary">
-                  {item.name?.[0] || 'U'}
-                </div>
-                <div>
-                  <h4 className="font-bold flex items-center gap-2">
-                    {item.name}
-                    {item.role === 'Leader' && <span className="text-[8px] bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase tracking-widest">Leader</span>}
-                  </h4>
-                  <p className="text-xs text-white/40">{item.email} • {item.designation || 'Squad Member'}</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => handleDelete(item._id)} 
-                className="p-2 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-                disabled={item.email === 'thenaimrana@gmail.com'}
-              >
-                <Trash2 size={18} />
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function ReviewForm() {
   const { user } = useAuth();
@@ -625,14 +569,25 @@ function ReviewForm() {
       </form>
 
       <div className="space-y-4 pt-12 border-t border-white/5">
-        <h3 className="text-xl font-bold mb-6">Testimonials</h3>
+        <h3 className="text-xl font-bold mb-6">Testimonials ({list.length})</h3>
         {list.map(item => (
-          <div key={item._id} className="flex items-center justify-between p-4 glass rounded-xl">
-            <div>
-              <h4 className="font-bold">{item.clientName}</h4>
-              <p className="text-xs text-white/40 leading-relaxed line-clamp-1">{item.feedback}</p>
+          <div key={item._id} className="flex items-center justify-between p-6 glass rounded-2xl group hover:border-primary/30 transition-all gap-4">
+            <div className="flex-grow">
+              <div className="flex items-center gap-2 mb-2">
+                <h4 className="font-bold">{item.clientName}</h4>
+                <div className="flex gap-0.5">
+                   {[...Array(5)].map((_, i) => (
+                     <Star key={i} size={10} fill={i < item.rating ? "currentColor" : "none"} className={i < item.rating ? "text-yellow-500" : "text-white/10"} />
+                   ))}
+                </div>
+              </div>
+              <p className="text-sm text-white/60 leading-relaxed italic line-clamp-2">"{item.feedback}"</p>
+              <div className="flex gap-4 mt-2 text-[10px] text-white/20 font-mono uppercase">
+                <span>By: {item.developerName}</span>
+                {item.orderId && <span>Order: {item.orderId}</span>}
+              </div>
             </div>
-            <button onClick={() => handleDelete(item._id)} className="text-white/20 hover:text-red-500 transition-colors">
+            <button onClick={() => handleDelete(item._id)} className="p-2 text-white/20 hover:text-red-500 transition-colors">
               <Trash2 size={18} />
             </button>
           </div>
@@ -702,68 +657,7 @@ function DocumentForm() {
   );
 }
 
-function MessagesList() {
-  const [list, setList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchList = async () => {
-    try {
-      const res = await axios.get('/api/contact');
-      setList(res.data);
-    } catch (err) {
-      toast.error('Failed to load messages');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  React.useEffect(() => { fetchList(); }, []);
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure?')) return;
-    try {
-      await axios.delete(`/api/contact/${id}`);
-      toast.success('Message deleted');
-      fetchList();
-    } catch (err) {
-      toast.error('Failed to delete');
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <h3 className="text-2xl font-bold mb-8">Client Messages</h3>
-      {loading ? (
-        <Loader2 className="animate-spin mx-auto" />
-      ) : list.length === 0 ? (
-        <p className="text-center text-white/40 py-12">No messages yet</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6">
-          {list.map(msg => (
-            <div key={msg._id} className="p-6 glass rounded-2xl relative group">
-              <button 
-                onClick={() => handleDelete(msg._id)}
-                className="absolute top-6 right-6 text-white/20 hover:text-red-500 transition-colors"
-              >
-                <Trash2 size={18} />
-              </button>
-              <div className="mb-4">
-                <h4 className="text-lg font-bold">{msg.name}</h4>
-                <p className="text-sm text-primary font-mono">{msg.email}</p>
-                <p className="text-[10px] text-white/20 uppercase mt-1">
-                  {new Date(msg.createdAt).toLocaleString()}
-                </p>
-              </div>
-              <p className="text-white/60 leading-relaxed bg-white/5 p-4 rounded-xl">
-                {msg.message}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function Input({ label, value, onChange, placeholder = '', type = 'text' }: { label: string, value: any, onChange: (v: string) => void, placeholder?: string, type?: string }) {
   return (

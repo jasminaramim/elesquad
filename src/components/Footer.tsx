@@ -24,21 +24,24 @@ export default function Footer() {
 
         <div>
           <h4 className="text-xl font-display font-semibold mb-6">Quick Links</h4>
-          <ul className="space-y-4 text-white/60">
+          <ul className="space-y-4 text-white/60 text-sm">
             <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
             <li><Link to="/projects" className="hover:text-primary transition-colors">Our Projects</Link></li>
             <li><Link to="/team" className="hover:text-primary transition-colors">Our Team</Link></li>
-            <li><Link to="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
+            <li><Link to="/auth" className="hover:text-primary transition-colors">Member Portal</Link></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-xl font-display font-semibold mb-6">Contact Us</h4>
-          <ul className="space-y-4 text-white/60">
-            <li className="flex items-center gap-3"><Mail size={18} className="text-primary" /> hello@elesquad.com</li>
-            <li className="flex items-center gap-3"><Phone size={18} className="text-primary" /> +880 1234 567 890</li>
-            <li className="flex items-center gap-3"><MapPin size={18} className="text-primary" /> Dhaka, Bangladesh</li>
-          </ul>
+          <h4 className="text-xl font-display font-semibold mb-6">Collaborate</h4>
+          <p className="text-white/60 text-sm leading-relaxed mb-6">
+            Ready to push the boundaries of digital innovation? Join our elite squad of developers.
+          </p>
+          <Link to="/auth">
+            <button className="px-6 py-2 bg-white/5 border border-white/10 rounded-lg text-xs font-bold hover:bg-primary hover:border-primary transition-all">
+              Join The Squad
+            </button>
+          </Link>
         </div>
       </div>
 

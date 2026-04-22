@@ -11,7 +11,6 @@ const navLinks = [
   { name: 'About', path: '/about' },
   { name: 'Projects', path: '/projects' },
   { name: 'Team', path: '/team' },
-  { name: 'Contact', path: '/contact' },
 ];
 
   export default function Navbar() {
@@ -123,11 +122,11 @@ const navLinks = [
                 </Link>
               ))}
               <Link
-                to="/contact"
+                to={user ? (user.role === 'Leader' ? "/admin/dashboard" : "/dashboard") : "/auth"}
                 className="w-full py-4 bg-primary rounded-xl text-center font-bold"
                 onClick={() => setIsOpen(false)}
               >
-                Hire Us
+                {user ? 'Dashboard' : 'Hire Us'}
               </Link>
             </div>
           </motion.div>

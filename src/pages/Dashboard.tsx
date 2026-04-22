@@ -1,32 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { Button, Card, SectionHeading } from '../components/UI';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   User, 
   FileText, 
   Briefcase, 
   Star, 
-  Settings, 
   LogOut, 
   Plus, 
   Trash2, 
-  Edit3, 
   ChevronRight,
   ExternalLink,
-  Code,
   DollarSign,
   Calendar,
-  BarChart3
+  BarChart3,
+  MessageCircle
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import ChatHub from '../components/ChatHub';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'reviews' | 'documents' | 'finance'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'reviews' | 'documents' | 'finance' | 'messages'>('profile');
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toLocaleString('default', { month: 'long', year: 'numeric' }));
   const [showAddProject, setShowAddProject] = useState(false);
   const [newProject, setNewProject] = useState({
@@ -137,14 +136,25 @@ export default function Dashboard() {
   const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const techStackArray = newProject.techStack.split(',').map(s => s.trim()).filter(s => s !== '');
-      await axios.post('/api/projects', {
-        ...newProject,
-        techStack: techStackArray,
-        userId: user?.id,
-        developerName: profile.name || user?.name || 'Team Member'
-      });
-      toast.success('Project added successfully');
+      const techStackArray = typeof newProject.techStack === 'string' 
+        ? newProject.techStack.split(',').map(s => s.trim()).filter(s => s !== '')
+        : newProject.techStack;
+
+      if ((newProject as any)._id) {
+        await axios.put(`/api/projects/${(newProject as any)._id}`, {
+          ...newProject,
+          techStack: techStackArray
+        });
+        toast.success('Project updated successfully');
+      } else {
+        await axios.post('/api/projects', {
+          ...newProject,
+          techStack: techStackArray,
+          userId: user?.id,
+          developerName: profile.name || user?.name || 'Team Member'
+        });
+        toast.success('Project added successfully');
+      }
       setShowAddProject(false);
       setNewProject({
         title: '', description: '', image: '', techStack: '', liveLink: '', githubLink: '',
@@ -152,7 +162,7 @@ export default function Dashboard() {
       });
       refreshData();
     } catch (err) {
-      toast.error('Failed to add project');
+      toast.error('Operation failed');
     }
   };
 
@@ -190,6 +200,7 @@ export default function Dashboard() {
               { id: 'profile', icon: User, label: 'Profile Settings' },
               { id: 'projects', icon: Briefcase, label: 'My Projects' },
               { id: 'finance', icon: DollarSign, label: 'Financial Overview' },
+              { id: 'messages', icon: MessageCircle, label: 'Squad Messages' },
               { id: 'reviews', icon: Star, label: 'My Reviews' },
               { id: 'documents', icon: FileText, label: 'My Sheets' },
             ].map((tab) => (
@@ -223,13 +234,16 @@ export default function Dashboard() {
 
       {/* Content Area */}
       <div className="lg:col-span-9">
-        <motion.div
-           key={activeTab}
-           initial={{ opacity: 0, x: 20 }}
-           animate={{ opacity: 1, x: 0 }}
-           transition={{ duration: 0.3 }}
-        >
-          {activeTab === 'finance' && (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeTab === 'messages' && <ChatHub />}
+            {activeTab === 'finance' && (
             <div className="space-y-8">
                <div className="flex justify-between items-center mb-8">
                   <div>
@@ -382,12 +396,36 @@ export default function Dashboard() {
                     />
                   </div>
                   <div>
-                    <label className="label-style">Profile Photo URL</label>
-                    <input 
-                      className="input-style" 
-                      value={profile.image || ''} 
-                      onChange={e => setProfile({...profile, image: e.target.value})}
-                    />
+                    <label className="label-style">Profile Photo</label>
+                    <div className="flex items-center gap-4 p-3 bg-white/5 border border-white/10 rounded-xl">
+                      <div className="w-12 h-12 rounded-lg bg-white/5 overflow-hidden flex items-center justify-center border border-white/10">
+                        {profile.image ? <img src={profile.image} className="w-full h-full object-cover" /> : <User size={20} className="opacity-20" />}
+                      </div>
+                      <div className="flex-grow">
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          className="hidden" 
+                          id="profile-upload"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const formData = new FormData();
+                            formData.append('image', file);
+                            try {
+                              const res = await axios.post('/api/upload', formData);
+                              setProfile({ ...profile, image: res.data.imageUrl });
+                              toast.success('Photo uploaded!');
+                            } catch (err) {
+                              toast.error('Upload failed');
+                            }
+                          }}
+                        />
+                        <label htmlFor="profile-upload" className="cursor-pointer px-4 py-1.5 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-[10px] font-bold transition-all uppercase tracking-widest">
+                           Upload Image
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -454,10 +492,38 @@ export default function Dashboard() {
                              <label className="label-style">Sheet Link</label>
                              <input className="input-style" value={newProject.sheetLink} onChange={e => setNewProject({...newProject, sheetLink: e.target.value})} placeholder="https://docs.google.com/..." />
                           </div>
-                          <div className="md:col-span-2 lg:col-span-3">
-                             <label className="label-style">Image URL</label>
-                             <input className="input-style" value={newProject.image} onChange={e => setNewProject({...newProject, image: e.target.value})} />
-                          </div>
+                           <div className="md:col-span-2 lg:col-span-3">
+                              <label className="label-style">Project Image</label>
+                              <div className="flex items-center gap-6 p-4 bg-white/5 border border-white/10 rounded-xl">
+                                <div className="w-16 h-16 bg-white/5 rounded-lg overflow-hidden flex items-center justify-center border border-white/10">
+                                  {newProject.image ? <img src={newProject.image} className="w-full h-full object-cover" /> : <Briefcase size={20} className="opacity-10" />}
+                                </div>
+                                <div className="flex-grow">
+                                  <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    className="hidden" 
+                                    id="dashboard-project-upload"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+                                      const formData = new FormData();
+                                      formData.append('image', file);
+                                      try {
+                                        const res = await axios.post('/api/upload', formData);
+                                        setNewProject({ ...newProject, image: res.data.imageUrl });
+                                        toast.success('Image uploaded!');
+                                      } catch (err) {
+                                        toast.error('Upload failed');
+                                      }
+                                    }}
+                                  />
+                                  <label htmlFor="dashboard-project-upload" className="cursor-pointer px-6 py-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-xs font-bold transition-all uppercase">
+                                     Select From Local Device
+                                  </label>
+                                </div>
+                              </div>
+                           </div>
                        </div>
                        <div>
                           <label className="label-style">Description</label>
@@ -474,10 +540,27 @@ export default function Dashboard() {
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {projects.map((p: any) => (
                       <Card key={p._id} className="p-0 overflow-hidden border-white/5 hover:border-primary/50 transition-all flex flex-col">
-                        <div className="aspect-video relative">
+                        <Link to={`/projects/${p._id}`} className="aspect-video relative block">
                           <img src={p.image} className="w-full h-full object-cover" alt="" />
                           <div className="absolute top-4 right-4 flex gap-2">
-                             <button onClick={() => deleteItem('projects', p._id)} className="p-2 bg-red-500/80 backdrop-blur rounded-lg text-white hover:bg-red-600 transition-colors">
+                             <button 
+                               onClick={(e) => {
+                                 e.preventDefault();
+                                 setNewProject({ ...p, techStack: p.techStack.join(', ') });
+                                 setShowAddProject(true);
+                                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                               }}
+                               className="p-2 bg-primary/80 backdrop-blur rounded-lg text-white hover:bg-primary transition-colors"
+                             >
+                               <Edit3 size={16} />
+                             </button>
+                             <button 
+                               onClick={(e) => {
+                                 e.preventDefault();
+                                 deleteItem('projects', p._id);
+                               }} 
+                               className="p-2 bg-red-500/80 backdrop-blur rounded-lg text-white hover:bg-red-600 transition-colors"
+                             >
                                <Trash2 size={16} />
                              </button>
                           </div>
@@ -488,7 +571,7 @@ export default function Dashboard() {
                                </span>
                             </div>
                           )}
-                        </div>
+                        </Link>
                         <div className="p-6 flex-grow">
                            <div className="flex justify-between items-start mb-2">
                               <h4 className="text-xl font-bold">{p.title}</h4>
@@ -626,6 +709,7 @@ export default function Dashboard() {
             </div>
           )}
         </motion.div>
+        </AnimatePresence>
       </div>
 
       <style>{`

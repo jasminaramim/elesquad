@@ -1,11 +1,43 @@
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { MongoClient, ObjectId } from 'mongodb';
+import cors from 'cors';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { Server } from 'socket.io';
+import http from 'http';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: "*", methods: ["GET", "POST", "PUT", "PATCH", "DELETE"] }
+});
+
 const PORT = 3000;
+
+// Ensure uploads directory exists
+const uploadDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer Storage Configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname));
+  }
+});
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
+app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static(uploadDir));
 
 // Safely encode MongoDB credentials to avoid unescaped character errors
 const DB_USER = "elesquad";
@@ -28,6 +60,7 @@ async function startServer() {
   const projects = db.collection('projects');
   const reviews = db.collection('reviews');
   const documents = db.collection('documents');
+  const messages = db.collection('messages');
   const contact = db.collection('contact');
 
   // Seed Data if empty
@@ -79,15 +112,63 @@ async function startServer() {
     res.json({ success: true, user: { id: user._id, email: user.email, name: user.name, role: user.role } });
   });
 
+  // File Upload
+  app.post('/api/upload', upload.single('image'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    const imageUrl = `/uploads/${req.file.filename}`;
+    res.json({ imageUrl });
+  });
+
+  // Messaging API
+  app.get('/api/messages/:room', async (req, res) => {
+    const { room } = req.params;
+    const history = await messages.find({ room }).sort({ timestamp: 1 }).toArray();
+    res.json(history);
+  });
+
+  app.post('/api/messages', async (req, res) => {
+    const msg = { ...req.body, timestamp: new Date() };
+    await messages.insertOne(msg);
+    io.to(msg.room).emit('new_message', msg);
+    res.json({ success: true });
+  });
+
+  // Socket.io Events
+  io.on('connection', (socket) => {
+    socket.on('join_room', (room) => {
+      socket.join(room);
+    });
+
+    socket.on('send_message', async (data) => {
+      const msg = { ...data, timestamp: new Date() };
+      await messages.insertOne(msg);
+      io.to(data.room).emit('new_message', msg);
+    });
+  });
+
   // Admin User Management
   app.get('/api/admin/users', async (req, res) => {
     const allUsers = await users.find().toArray();
     res.json(allUsers);
   });
 
+  app.put('/api/admin/users/:id', async (req, res) => {
+    const { id } = req.params;
+    const { _id, password, ...updateData } = req.body;
+    if (password && password.trim() !== '') {
+      // In a real app, hash this!
+      (updateData as any).password = password;
+    }
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+    await users.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+    res.json({ success: true });
+  });
+
   app.delete('/api/admin/users/:id', async (req, res) => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
-      await users.deleteOne({ _id: new ObjectId(req.params.id) });
+      await users.deleteOne({ _id: new ObjectId(id) });
       res.json({ success: true });
     } catch (err) {
       res.status(500).json({ error: 'Deletion failed' });
@@ -95,9 +176,11 @@ async function startServer() {
   });
 
   app.patch('/api/admin/users/:id/role', async (req, res) => {
+    const { id } = req.params;
     const { role } = req.body;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
-      await users.updateOne({ _id: new ObjectId(req.params.id) }, { $set: { role } });
+      await users.updateOne({ _id: new ObjectId(id) }, { $set: { role } });
       res.json({ success: true });
     } catch (err) {
       res.status(500).json({ error: 'Update failed' });
@@ -151,10 +234,12 @@ async function startServer() {
 
   app.get('/api/projects/:id', async (req, res) => {
     try {
-      const proj = await projects.findOne({ _id: new ObjectId(req.params.id) });
+      const { id } = req.params;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+      const proj = await projects.findOne({ _id: new ObjectId(id) });
       res.json(proj);
     } catch (err) {
-      res.status(404).json({ error: 'Project not found' });
+      res.status(500).json({ error: 'Project fetch failed' });
     }
   });
 
@@ -192,6 +277,13 @@ async function startServer() {
   });
 
 
+
+  app.put('/api/projects/:id', async (req, res) => {
+    const { id } = req.params;
+    const { _id, ...updateData } = req.body;
+    await projects.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+    res.json({ success: true });
+  });
 
   app.delete('/api/projects/:id', async (req, res) => {
     try {
@@ -265,26 +357,21 @@ async function startServer() {
     res.json({ success: true });
   });
 
-  // Contact
-  app.post('/api/contact', async (req, res) => {
-    const { name, email, message } = req.body;
-    await contact.insertOne({ name, email, message, createdAt: new Date() });
-    res.json({ success: true });
-  });
-
   // Team
   app.get('/api/team', async (req, res) => {
-    // Registered members are the team
-    const teamMembers = await users.find({ role: 'Member' }).toArray();
-    res.json(teamMembers);
+    // Return all users for chat (Admin + Members)
+    const allSquad = await users.find().toArray();
+    res.json(allSquad);
   });
 
   app.get('/api/team/:id', async (req, res) => {
     try {
-      const member = await users.findOne({ _id: new ObjectId(req.params.id) });
+      const { id } = req.params;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+      const member = await users.findOne({ _id: new ObjectId(id) });
       res.json(member);
     } catch (err) {
-      res.status(404).json({ error: 'Member not found' });
+      res.status(500).json({ error: 'Server error' });
     }
   });
 
@@ -303,9 +390,20 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
+  // Global Error Handler
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('SERVER ERROR:', err);
+    res.status(err.status || 500).json({ 
+      error: err.message || 'Internal Server Error',
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+  });
+
+  server.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
   });
 }
 
-startServer().catch(console.error);
+startServer().catch(err => {
+  console.error('FATAL SERVER START ERROR:', err);
+});

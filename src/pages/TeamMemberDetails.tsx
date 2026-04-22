@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowLeft, Mail, Globe, MessageSquare, Loader2 } from 'lucide-react';
+import { ArrowLeft, Mail, Globe, MessageSquare, Loader2, Star } from 'lucide-react';
 import { Button, Card } from '../components/UI';
 import axios from 'axios';
 
@@ -42,9 +42,20 @@ export default function TeamMemberDetails() {
                  <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse shadow-[0_0_8px_#6C4DF6]"></span>
                  <p className="text-white/20 text-[10px] uppercase tracking-widest">{member.team || 'Elesquad Core'}</p>
               </div>
-              <h1 className="text-5xl md:text-8xl font-display font-bold leading-tight mb-8">
-                {member.name}
-              </h1>
+              <motion.h1 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-6xl md:text-8xl font-display font-bold mb-6 flex items-center flex-wrap gap-4"
+                >
+                  {member.name}
+                  {member.isVerified && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-2xl">
+                      <Star className="text-primary" size={14} fill="currentColor" />
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-primary">Verified</span>
+                    </div>
+                  )}
+                </motion.h1>
             </motion.div>
             
             <motion.div
@@ -186,11 +197,5 @@ function LatestProjects({ userId }: { userId: string }) {
         ))}
       </div>
     </motion.div>
-  );
-}
-          </div>
-        </div>
-      </section>
-    </div>
   );
 }

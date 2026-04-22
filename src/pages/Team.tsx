@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Globe, Mail, MessageSquare } from 'lucide-react';
+import { Globe, Mail, MessageSquare, Star } from 'lucide-react';
 import { Card, SectionHeading, Button } from '../components/UI';
 import axios from 'axios';
 

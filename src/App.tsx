@@ -16,7 +16,6 @@ import ProjectDetails from './pages/ProjectDetails';
 import Team from './pages/Team';
 import TeamMemberDetails from './pages/TeamMemberDetails';
 import Reviews from './pages/Reviews';
-import Contact from './pages/Contact';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -62,7 +61,7 @@ export default function App() {
               <Route path="/team" element={<Team />} />
               <Route path="/team/:id" element={<TeamMemberDetails />} />
               <Route path="/reviews" element={<Reviews />} />
-              <Route path="/contact" element={<Contact />} />
+
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/editor/:id" element={<DocumentEditor />} />

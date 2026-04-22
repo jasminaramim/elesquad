@@ -319,18 +319,24 @@ export default function Home() {
           <SectionHeading title="Client Testimonials" subtitle="15+ Success Stories" centered />
         </div>
         
-        <div className="relative">
-          <div className="flex overflow-x-auto gap-8 px-4 pb-20 no-scrollbar snap-x">
-             {reviews.map((review, i) => (
+        <div className="relative overflow-hidden group">
+          <motion.div 
+            animate={{ 
+              x: reviews.length > 0 ? ["0%", `-${(reviews.length * 450) / 15}%`] : "0%"
+            }}
+            transition={{ 
+              duration: 40, 
+              repeat: Infinity, 
+              ease: "linear" 
+            }}
+            className="flex gap-8 px-4 pb-20 no-scrollbar select-none"
+          >
+             {[...reviews, ...reviews].map((review, i) => (
                <motion.div
-                 key={review._id}
-                 initial={{ opacity: 0, x: 20 }}
-                 whileInView={{ opacity: 1, x: 0 }}
-                 viewport={{ once: true }}
-                 transition={{ delay: (i % 5) * 0.1 }}
-                 className="min-w-[350px] md:min-w-[450px] snap-center"
+                 key={`${review._id}-${i}`}
+                 className="min-w-[350px] md:min-w-[450px]"
                >
-                 <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative group hover:border-primary/30 transition-all">
+                 <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 transition-all">
                     <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
                     
                     <div className="flex text-primary gap-1">
@@ -341,8 +347,8 @@ export default function Home() {
                     <p className="text-white/60 leading-relaxed italic text-lg">"{review.feedback}"</p>
                     
                     <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
-                       <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
-                          {(review.clientName || 'C')[0]}
+                       <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
+                          {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
                        </div>
                        <div>
                           <h5 className="font-bold">{review.clientName}</h5>
@@ -352,7 +358,7 @@ export default function Home() {
                  </Card>
                </motion.div>
              ))}
-          </div>
+          </motion.div>
           
           {/* Subtle gradient fades for the carousel */}
           <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
@@ -419,31 +425,18 @@ export default function Home() {
       </section>
 
       {/* Final CTA Footer */}
-      <section className="max-w-7xl mx-auto px-4 md:px-10 pt-20">
+      <section className="max-w-7xl mx-auto px-4 md:px-10 pt-20 pb-32">
          <Card className="p-20 md:p-32 rounded-[4rem] text-center bg-gradient-to-br from-white/5 to-primary/5 border-white/10 overflow-hidden relative">
             <div className="absolute top-0 right-0 p-12 opacity-10">
                <Globe size={300} strokeWidth={0.5} />
             </div>
             <div className="relative z-10 max-w-4xl mx-auto">
-               <h2 className="text-5xl md:text-8xl font-display font-bold italic mb-10 tracking-tight leading-[0.9]">Contact Us And Bring Your <span className="text-white/40">Ideas To Life</span></h2>
-               <Link to="/contact">
+               <h2 className="text-5xl md:text-8xl font-display font-bold italic mb-10 tracking-tight leading-[0.9]">Collaborate With <span className="text-white/40">The Best</span></h2>
+               <Link to="/auth">
                  <button className="px-12 py-6 bg-white text-[#050505] rounded-full font-bold text-xl hover:bg-primary hover:text-white transition-all shadow-[0_20px_50px_rgba(255,255,255,0.1)]">
-                   Contact Us <MessageSquare size={24} className="inline ml-3" />
+                   Join The Squad <ArrowRight size={24} className="inline ml-3" />
                  </button>
                </Link>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-20 mt-32 text-left">
-                  <div>
-                    <h4 className="text-primary text-[10px] font-mono uppercase tracking-[0.2em] mb-4">California</h4>
-                    <p className="text-2xl font-bold mb-2">211 Tretel Parks, Port Celia California</p>
-                    <p className="text-white/40">43448</p>
-                  </div>
-                  <div>
-                    <h4 className="text-primary text-[10px] font-mono uppercase tracking-[0.2em] mb-4">Carolina</h4>
-                    <p className="text-2xl font-bold mb-2">503 Blue Ridge, Manchester Carolina</p>
-                    <p className="text-white/40">591</p>
-                  </div>
-               </div>
             </div>
          </Card>
       </section>
