@@ -18,7 +18,12 @@ import {
   DollarSign,
   Calendar,
   BarChart3,
-  MessageCircle
+  MessageCircle,
+  Edit2,
+  LayoutDashboard,
+  Save,
+  ShieldCheck,
+  Rocket
 } from 'lucide-react';
 import ChatHub from '../components/ChatHub';
 
@@ -43,16 +48,7 @@ export default function Dashboard() {
     totalValue: '',
     projectType: 'solo'
   });
-  const [profile, setProfile] = useState({ 
-    name: '', 
-    email: '',
-    memberId: '',
-    designation: '',
-    team: '',
-    phone: '',
-    bio: '', 
-    image: '' 
-  });
+  const [profile, setProfile] = useState({ name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '', role: '' });
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
@@ -73,30 +69,103 @@ export default function Dashboard() {
   }, [projects]);
 
   const refreshData = async () => {
+    if (!user?.id && !(user as any)?._id) {
+      console.warn('Dashboard: No valid User ID found for refreshData');
+      return;
+    }
+    const uid = user?.id || (user as any)?._id;
     try {
+      console.log(`Dashboard: Fetching data for UID ${uid}`);
       const [uRes, pRes, rRes, dRes] = await Promise.all([
-        axios.get(`/api/users/${user?.id}`),
-        axios.get(`/api/projects?userId=${user?.id}`),
+        axios.get(`/api/users/${uid}`),
+        axios.get(`/api/projects?userId=${uid}`),
         axios.get('/api/reviews'),
-        axios.get(`/api/documents?userId=${user?.id}`)
+        axios.get(`/api/documents?userId=${uid}`)
       ]);
-      setProfile(uRes.data);
+      setProfile(prev => ({
+        ...prev,
+        ...uRes.data
+      }));
       setProjects(pRes.data);
-      setReviews(rRes.data.filter((r: any) => r.userId === user?.id));
+      setReviews(rRes.data.filter((r: any) => r.userId === uid));
       setDocuments(dRes.data);
     } catch (err) {
+      console.error('Dashboard Fetch Error:', err);
       toast.error('Failed to load dashboard data');
     }
   };
 
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    const uid = user?.id || (user as any)?._id;
+    if (!uid) {
+      toast.error('Identity lost. Please re-login.');
+      return;
+    }
     try {
-      await axios.put(`/api/users/${user?.id}`, profile);
+      console.log('Dashboard: Updating profile for UID', uid);
+      await axios.put(`/api/users/${uid}`, profile);
+      
+      // Update local context so Navbar and other components reflect changes
+      if (user) {
+        login({ ...user, ...profile });
+      }
+      
       toast.success('Profile updated');
+      refreshData();
     } catch (err) {
+      console.error('Profile update error:', err);
       toast.error('Update failed');
     }
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Local Preview
+    const reader = new FileReader();
+    reader.onloadend = () => setPreviewImage(reader.result as string);
+    reader.readAsDataURL(file);
+
+    // Upload Strategy: 1. ImgBB (Cloud) -> 2. Local Server (Multer)
+    const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0'; 
+    
+    const readerForBase64 = new FileReader();
+    readerForBase64.onloadend = async () => {
+      const base64String = (readerForBase64.result as string).split(',')[1];
+      const formDataImgBB = new FormData();
+      formDataImgBB.append('image', base64String);
+
+      try {
+        const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
+        if (res.data.success) {
+          setProfile(prev => ({ ...prev, image: res.data.data.url }));
+          toast.success('Synced to Cloud');
+          return; // Success!
+        }
+      } catch (err) {
+        console.warn('ImgBB Cloud upload failed, trying local fallback...', err);
+      }
+
+      // Fallback to local server
+      const formDataLocal = new FormData();
+      formDataLocal.append('image', file);
+      try {
+        const resLocal = await axios.post('/api/upload', formDataLocal);
+        if (resLocal.data.imageUrl) {
+          setProfile(prev => ({ ...prev, image: resLocal.data.imageUrl }));
+          toast.success('Synced to Local Storage');
+        }
+      } catch (errLocal) {
+        console.error('Upload error:', errLocal);
+        toast.error('Identity sync failed completely');
+      }
+    };
+    readerForBase64.readAsDataURL(file);
   };
 
   const togglePublish = async (id: string, currentStatus: boolean) => {
@@ -370,6 +439,15 @@ export default function Dashboard() {
                     />
                   </div>
                   <div>
+                    <label className="label-style">Tech ID (Member ID)</label>
+                    <input 
+                      className="input-style" 
+                      placeholder="e.g. 1176876"
+                      value={profile.memberId || ''} 
+                      onChange={e => setProfile({...profile, memberId: e.target.value})}
+                    />
+                  </div>
+                  <div>
                     <label className="label-style">Designation</label>
                     <input 
                       className="input-style" 
@@ -379,27 +457,46 @@ export default function Dashboard() {
                     />
                   </div>
                   <div>
-                    <label className="label-style">Team</label>
-                    <input 
-                      className="input-style" 
-                      placeholder="e.g. Alpha Squad"
-                      value={profile.team || ''} 
-                      onChange={e => setProfile({...profile, team: e.target.value})}
-                    />
-                  </div>
-                  <div>
                     <label className="label-style">Phone Number</label>
                     <input 
                       className="input-style" 
+                      placeholder="e.g. +88017..."
                       value={profile.phone || ''} 
                       onChange={e => setProfile({...profile, phone: e.target.value})}
                     />
                   </div>
                   <div>
+                    <label className="label-style">Squad Team</label>
+                    <input 
+                      className="input-style" 
+                      placeholder="e.g. Elesquad"
+                      value={profile.team || ''} 
+                      onChange={e => setProfile({...profile, team: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="label-style">Squad Role</label>
+                    <input 
+                      className="input-style" 
+                      placeholder="e.g. Member / Leader"
+                      value={profile.role || ''} 
+                      onChange={e => setProfile({...profile, role: e.target.value})}
+                    />
+                  </div>
+                  <div>
                     <label className="label-style">Profile Photo</label>
                     <div className="flex items-center gap-4 p-3 bg-white/5 border border-white/10 rounded-xl">
-                      <div className="w-12 h-12 rounded-lg bg-white/5 overflow-hidden flex items-center justify-center border border-white/10">
-                        {profile.image ? <img src={profile.image} className="w-full h-full object-cover" /> : <User size={20} className="opacity-20" />}
+                      <div className="w-12 h-12 rounded-lg bg-white/5 overflow-hidden flex items-center justify-center border border-white/10 relative">
+                        {previewImage || profile.image ? (
+                          <img src={previewImage || profile.image || undefined} className="w-full h-full object-cover" />
+                        ) : (
+                          <User size={20} className="opacity-20" />
+                        )}
+                        {previewImage && (
+                          <div className="absolute inset-0 bg-primary/40 flex items-center justify-center">
+                            <Rocket size={16} className="animate-bounce" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex-grow">
                         <input 
@@ -407,37 +504,28 @@ export default function Dashboard() {
                           accept="image/*"
                           className="hidden" 
                           id="profile-upload"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-                            const formData = new FormData();
-                            formData.append('image', file);
-                            try {
-                              const res = await axios.post('/api/upload', formData);
-                              setProfile({ ...profile, image: res.data.imageUrl });
-                              toast.success('Photo uploaded!');
-                            } catch (err) {
-                              toast.error('Upload failed');
-                            }
-                          }}
+                          onChange={handleImageChange}
                         />
                         <label htmlFor="profile-upload" className="cursor-pointer px-4 py-1.5 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-[10px] font-bold transition-all uppercase tracking-widest">
-                           Upload Image
+                           Upload Avatar
                         </label>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div>
-                   <label className="label-style">Bio</label>
+                   <label className="label-style">Professional Bio</label>
                    <textarea 
                      rows={4} 
                      className="input-style" 
+                     placeholder="Tell us about your tech stack and experience..."
                      value={profile.bio || ''} 
                      onChange={e => setProfile({...profile, bio: e.target.value})}
                    />
                 </div>
-                <Button type="submit" className="w-full md:w-auto px-12">Update Professional Record</Button>
+                <Button type="submit" className="w-full md:w-auto px-12 flex items-center gap-2">
+                  <Save size={18} /> Update Professional Record
+                </Button>
               </form>
             </Card>
           )}
@@ -529,7 +617,7 @@ export default function Dashboard() {
                           <label className="label-style">Description</label>
                           <textarea rows={3} className="input-style" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} />
                        </div>
-                       <Button type="submit">Submit Project</Button>
+                       <Button type="submit">{(newProject as any)._id ? 'Update Project Masterpiece' : 'Submit Project'}</Button>
                     </form>
                  </Card>
                )}
@@ -539,20 +627,27 @@ export default function Dashboard() {
                ) : (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {projects.map((p: any) => (
-                      <Card key={p._id} className="p-0 overflow-hidden border-white/5 hover:border-primary/50 transition-all flex flex-col">
-                        <Link to={`/projects/${p._id}`} className="aspect-video relative block">
-                          <img src={p.image} className="w-full h-full object-cover" alt="" />
-                          <div className="absolute top-4 right-4 flex gap-2">
+                      <Card key={p._id} className="p-0 overflow-hidden border-white/5 hover:border-primary/50 transition-all flex flex-col group/card">
+                        <div 
+                          onClick={() => setSelectedProject(p)}
+                          className="aspect-video relative cursor-pointer overflow-hidden"
+                        >
+                          <img src={p.image} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110" alt="" />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="px-4 py-2 bg-primary rounded-full text-xs font-bold shadow-xl">View Details</span>
+                          </div>
+                          
+                          <div className="absolute top-4 right-4 flex gap-2 z-10" onClick={e => e.stopPropagation()}>
                              <button 
                                onClick={(e) => {
                                  e.preventDefault();
-                                 setNewProject({ ...p, techStack: p.techStack.join(', ') });
+                                 setNewProject({ ...p, techStack: p.techStack?.join(', ') || '' });
                                  setShowAddProject(true);
                                  window.scrollTo({ top: 0, behavior: 'smooth' });
                                }}
                                className="p-2 bg-primary/80 backdrop-blur rounded-lg text-white hover:bg-primary transition-colors"
                              >
-                               <Edit3 size={16} />
+                               <Edit2 size={16} />
                              </button>
                              <button 
                                onClick={(e) => {
@@ -565,13 +660,13 @@ export default function Dashboard() {
                              </button>
                           </div>
                           {p.projectType && (
-                            <div className="absolute bottom-4 left-4">
+                            <div className="absolute bottom-4 left-4 z-10">
                                <span className="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-full uppercase tracking-tighter">
                                   {p.projectType}
                                </span>
                             </div>
                           )}
-                        </Link>
+                        </div>
                         <div className="p-6 flex-grow">
                            <div className="flex justify-between items-start mb-2">
                               <h4 className="text-xl font-bold">{p.title}</h4>
@@ -711,6 +806,86 @@ export default function Dashboard() {
         </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Project Details Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedProject(null)}
+              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-4xl glass border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
+            >
+              <div className="md:w-1/2 relative bg-black">
+                <img src={selectedProject.image} className="w-full h-full object-contain" alt={selectedProject.title} />
+                <button 
+                  onClick={() => setSelectedProject(null)}
+                  className="absolute top-6 left-6 p-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full text-white hover:bg-primary transition-colors"
+                >
+                  <Plus size={20} className="rotate-45" />
+                </button>
+              </div>
+              <div className="md:w-1/2 p-10 overflow-y-auto bg-black/20">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h2 className="text-4xl font-display font-bold text-white mb-2">{selectedProject.title}</h2>
+                    <div className="flex gap-2">
+                      <span className="px-3 py-1 bg-primary/20 text-primary border border-primary/30 text-[10px] font-bold rounded-full uppercase tracking-widest">{selectedProject.projectType}</span>
+                      <span className="px-3 py-1 bg-white/5 text-white/40 border border-white/10 text-[10px] font-bold rounded-full uppercase tracking-widest">Order: {selectedProject.orderId || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-8">
+                  <div>
+                    <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-3">Project Narrative</h4>
+                    <p className="text-white/60 text-sm leading-relaxed">{selectedProject.description}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Investment</h4>
+                      <p className="text-xl font-bold text-white">${selectedProject.value || '0.00'}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Delivery Date</h4>
+                      <p className="text-sm font-bold text-white">{new Date(selectedProject.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-3">Technology Arsenal</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProject.techStack?.map((tech: string) => (
+                        <span key={tech} className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs text-white/80">{tech}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-8 border-t border-white/5 flex gap-4">
+                    {selectedProject.sheetLink && (
+                      <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
+                        <Button className="w-full py-4 flex items-center justify-center gap-2">
+                          Access Project Sheet <ExternalLink size={18} />
+                        </Button>
+                      </a>
+                    )}
+                    <Button variant="outline" onClick={() => setSelectedProject(null)}>Dismiss</Button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {

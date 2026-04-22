@@ -291,12 +291,15 @@ export default function Home() {
                        </div>
                     </div>
                     <div className="lg:col-span-5 relative order-1 lg:order-2 overflow-hidden aspect-[4/3] lg:aspect-auto h-full">
-                       <img src={project.image} alt={project.title} className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-105 transition-all duration-700" />
+                       <img src={project.image && project.image !== "" ? project.image : undefined} alt={project.title} className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-105 transition-all duration-700" />
                     </div>
                     <div className="lg:col-span-3 p-12 order-3">
                        <div className="flex justify-between items-center mb-6">
                          <span className="text-primary font-mono select-none">0{i+1}</span>
-                         <span className="text-[10px] uppercase tracking-widest font-bold">{project.projectType} Project</span>
+                         <div className="flex flex-col items-end">
+                            <span className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-1">{project.developerName || 'Elesquad Admin'}</span>
+                            <span className="text-[10px] uppercase tracking-widest font-bold text-primary">{project.projectType} Project</span>
+                         </div>
                        </div>
                        <p className="text-sm text-white/40 mb-10 leading-relaxed">{project.description?.slice(0, 80)}...</p>
                        <Link to={`/projects`}>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink, MessageCircle } from 'lucide-react';
+import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink, MessageCircle, User, Save, Rocket, ShieldCheck } from 'lucide-react';
 import { Card, Button, SectionHeading } from '../../components/UI';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
@@ -14,6 +14,7 @@ const tabs = [
   { id: 'reviews', label: 'Reviews', icon: Star },
   { id: 'documents', label: 'Sheets', icon: FileText },
   { id: 'chat', label: 'Squad Chat', icon: MessageCircle },
+  { id: 'profile', label: 'Profile', icon: User },
 ];
 
 export default function AdminDashboard() {
@@ -70,11 +71,138 @@ export default function AdminDashboard() {
                 {activeTab === 'chat' && <ChatHub />}
                 {activeTab === 'reviews' && <ReviewForm />}
                 {activeTab === 'documents' && <DocumentForm />}
+                {activeTab === 'profile' && <AdminProfileTab />}
               </Card>
             </motion.div>
           </AnimatePresence>
         </main>
       </div>
+    </div>
+  );
+}
+
+function AdminProfileTab() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState({ name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '' });
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get(`/api/users/${user?.id}`);
+      setProfile(prev => ({
+        ...prev,
+        ...res.data
+      }));
+    } catch (err) {
+      toast.error('Failed to load profile');
+    }
+  };
+
+  React.useEffect(() => { fetchProfile(); }, []);
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.id) {
+      toast.error('Admin identity lost. Please re-login.');
+      return;
+    }
+    try {
+      await axios.put(`/api/admin/users/${user.id}`, profile);
+      toast.success('Admin profile updated');
+    } catch (err) {
+      console.error('Admin update error:', err);
+      toast.error('Update failed');
+    }
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setPreviewImage(reader.result as string);
+    reader.readAsDataURL(file);
+    
+    const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0';
+    const readerForBase64 = new FileReader();
+    readerForBase64.onloadend = async () => {
+      const base64String = (readerForBase64.result as string).split(',')[1];
+      const formDataImgBB = new FormData();
+      formDataImgBB.append('image', base64String);
+
+      try {
+        const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
+        if (res.data.success) {
+          setProfile(prev => ({ ...prev, image: res.data.data.url }));
+          toast.success('Admin identity synced to Cloud');
+          return;
+        }
+      } catch (err) { 
+        console.warn('Admin ImgBB failed, trying local...', err);
+      }
+
+      // Local fallback
+      const formDataLocal = new FormData();
+      formDataLocal.append('image', file);
+      try {
+        const resLocal = await axios.post('/api/upload', formDataLocal);
+        if (resLocal.data.imageUrl) {
+          setProfile(prev => ({ ...prev, image: resLocal.data.imageUrl }));
+          toast.success('Admin identity synced Locally');
+        }
+      } catch (localErr) {
+        console.error('All Admin uploads failed:', localErr);
+        toast.error('Identity sync failed');
+      }
+    };
+    readerForBase64.readAsDataURL(file);
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center mb-10">
+        <div>
+          <h3 className="text-3xl font-display font-bold">Admin Profile</h3>
+          <p className="text-white/40 text-xs">Manage your squad leadership identity</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleUpdate} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input label="Admin Name" value={profile.name || ''} onChange={v => setProfile({...profile, name: v})} />
+          <Input label="Email Address (Locked)" value={profile.email || ''} onChange={() => {}} disabled />
+          <Input label="Tech ID" value={profile.memberId || ''} onChange={v => setProfile({...profile, memberId: v})} />
+          <Input label="Designation" value={profile.designation || ''} onChange={v => setProfile({...profile, designation: v})} />
+          <Input label="Phone Number" value={profile.phone || ''} onChange={v => setProfile({...profile, phone: v})} />
+          <Input label="Squad Team" value={profile.team || ''} onChange={v => setProfile({...profile, team: v})} />
+          
+          <div className="md:col-span-2">
+            <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Leadership Avatar</label>
+            <div className="flex items-center gap-6 p-4 bg-white/5 border border-white/10 rounded-xl">
+              <div className="w-16 h-16 bg-white/5 rounded-full overflow-hidden flex items-center justify-center border border-white/10 relative">
+                {previewImage || profile.image ? <img src={previewImage || profile.image || undefined} className="w-full h-full object-cover" /> : <User size={24} className="text-white/10" />}
+                {previewImage && <div className="absolute inset-0 bg-primary/40 flex items-center justify-center"><Rocket size={16} className="animate-bounce" /></div>}
+              </div>
+              <div className="flex-grow">
+                <input type="file" accept="image/*" className="hidden" id="admin-photo-upload" onChange={handleImageChange} />
+                <label htmlFor="admin-photo-upload" className="cursor-pointer inline-flex items-center gap-2 px-4 py-1.5 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-[10px] font-bold transition-all uppercase tracking-widest">
+                  Update Avatar
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Professional Bio</label>
+          <textarea 
+            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 focus:border-primary/50 outline-none h-32"
+            value={profile.bio || ''}
+            onChange={e => setProfile({...profile, bio: e.target.value})}
+          />
+        </div>
+        <Button type="submit" className="flex items-center gap-2 px-8">
+          <Save size={18} /> Update Admin Identity
+        </Button>
+      </form>
     </div>
   );
 }
@@ -136,13 +264,13 @@ function ProjectForm() {
         <h3 className="text-2xl font-bold mb-8">Add New Project</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="md:col-span-2">
-            <Input label="Project Title" value={data.title} onChange={v => setData({ ...data, title: v })} placeholder="e.g. Nexus Dashboard" />
+            <Input label="Project Title" value={data.title || ''} onChange={v => setData({ ...data, title: v })} placeholder="e.g. Nexus Dashboard" />
           </div>
           <div className="space-y-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Type</label>
             <select 
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-white"
-              value={data.projectType}
+              value={data.projectType || 'solo'}
               onChange={e => setData({ ...data, projectType: e.target.value })}
             >
               <option value="solo" className="bg-bg">Solo</option>
@@ -151,20 +279,21 @@ function ProjectForm() {
               <option value="squad" className="bg-bg">Squad</option>
             </select>
           </div>
-          <Input label="Order ID" value={data.orderId} onChange={v => setData({ ...data, orderId: v })} placeholder="ORD-123" />
-          <Input label="Client Name" value={data.clientName} onChange={v => setData({ ...data, clientName: v })} placeholder="John Doe" />
-          <Input label="Profile Name" value={data.profileName} onChange={v => setData({ ...data, profileName: v })} placeholder="Fiverr / Upwork" />
-          <Input label="Project Value ($)" value={data.value} onChange={v => setData({ ...data, value: v })} placeholder="500" />
-          <Input label="Total Value ($)" value={data.totalValue} onChange={v => setData({ ...data, totalValue: v })} placeholder="1000" />
-          <Input label="Tech Stack (comma separated)" value={data.techStack} onChange={v => setData({ ...data, techStack: v })} placeholder="React, Node, MongoDB" />
+          <Input label="Order ID" value={data.orderId || ''} onChange={v => setData({ ...data, orderId: v })} placeholder="ORD-123" />
+          <Input label="Client Name" value={data.clientName || ''} onChange={v => setData({ ...data, clientName: v })} placeholder="John Doe" />
+          <Input label="Profile Name" value={data.profileName || ''} onChange={v => setData({ ...data, profileName: v })} placeholder="Fiverr / Upwork" />
+          <Input label="Project Value ($)" value={data.value || ''} onChange={v => setData({ ...data, value: v })} placeholder="500" />
+          <Input label="Total Value ($)" value={data.totalValue || ''} onChange={v => setData({ ...data, totalValue: v })} placeholder="1000" />
+          <Input label="Tech Stack (comma separated)" value={data.techStack || ''} onChange={v => setData({ ...data, techStack: v })} placeholder="React, Node, MongoDB" />
+          <Input label="Developer Name" value={data.developerName || ''} onChange={v => setData({ ...data, developerName: v })} placeholder="e.g. John Doe / Admin" />
           <div className="md:col-span-2 lg:col-span-3">
-             <Input label="Sheet / Document Link" value={data.sheetLink} onChange={v => setData({ ...data, sheetLink: v })} placeholder="https://docs.google.com/..." />
+             <Input label="Sheet / Document Link" value={data.sheetLink || ''} onChange={v => setData({ ...data, sheetLink: v })} placeholder="https://docs.google.com/..." />
           </div>
           <div className="md:col-span-2 lg:col-span-3">
              <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Project Image</label>
              <div className="flex items-center gap-6 p-4 bg-white/5 border border-white/10 rounded-xl">
                <div className="w-20 h-20 bg-white/5 rounded-lg overflow-hidden flex items-center justify-center border border-white/10">
-                 {data.image ? <img src={data.image} className="w-full h-full object-cover" /> : <LayoutDashboard size={24} className="text-white/10" />}
+                 {data.image ? <img src={data.image || undefined} className="w-full h-full object-cover" /> : <LayoutDashboard size={24} className="text-white/10" />}
                </div>
                <div className="flex-grow">
                  <input 
@@ -175,15 +304,38 @@ function ProjectForm() {
                    onChange={async (e) => {
                      const file = e.target.files?.[0];
                      if (!file) return;
-                     const formData = new FormData();
-                     formData.append('image', file);
-                     try {
-                       const res = await axios.post('/api/upload', formData);
-                       setData({ ...data, image: res.data.imageUrl });
-                       toast.success('Image uploaded!');
-                     } catch (err) {
-                       toast.error('Upload failed');
-                     }
+                     const readerForBase64 = new FileReader();
+                     readerForBase64.onloadend = async () => {
+                       const base64String = (readerForBase64.result as string).split(',')[1];
+                       const formDataImgBB = new FormData();
+                       formDataImgBB.append('image', base64String);
+                       const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0';
+                       try {
+                         const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
+                         if (res.data.success) {
+                           setData({ ...data, image: res.data.data.url });
+                           toast.success('Project hosted on Cloud!');
+                           return;
+                         }
+                       } catch (err) {
+                         console.warn('Project ImgBB failed, trying local...', err);
+                       }
+
+                       // Local fallback
+                       const formDataLocal = new FormData();
+                       formDataLocal.append('image', file);
+                       try {
+                         const resLocal = await axios.post('/api/upload', formDataLocal);
+                         if (resLocal.data.imageUrl) {
+                           setData({ ...data, image: resLocal.data.imageUrl });
+                           toast.success('Project hosted Locally!');
+                         }
+                       } catch (localErr) {
+                         console.error('All project uploads failed:', localErr);
+                         toast.error('Project image sync failed');
+                       }
+                     };
+                     readerForBase64.readAsDataURL(file);
                    }}
                  />
                  <label htmlFor="project-image-upload" className="cursor-pointer inline-flex items-center gap-2 px-6 py-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-sm font-bold transition-all">
@@ -194,7 +346,7 @@ function ProjectForm() {
              </div>
           </div>
           <div className="md:col-span-2 lg:col-span-3">
-            <Input label="Live Link" value={data.liveLink} onChange={v => setData({ ...data, liveLink: v })} placeholder="https://..." />
+            <Input label="Live Link" value={data.liveLink || ''} onChange={v => setData({ ...data, liveLink: v })} placeholder="https://..." />
           </div>
         </div>
         <div className="space-y-2">
@@ -397,6 +549,24 @@ function TeamForm() {
     }
   };
 
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+
+  const handleUpdateMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUser) return;
+    setLoading(true);
+    try {
+      await axios.put(`/api/admin/users/${selectedUser._id}`, selectedUser);
+      toast.success('Member updated successfully!');
+      setSelectedUser(null);
+      fetchList();
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Update failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-12">
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -430,10 +600,14 @@ function TeamForm() {
         <h3 className="text-xl font-bold mb-6">EleSquad Members ({list.length})</h3>
         <div className="grid grid-cols-1 gap-4">
           {list.map(item => (
-            <div key={item._id} className="flex flex-col md:flex-row md:items-center justify-between p-6 glass rounded-2xl group hover:border-primary/30 transition-all gap-6">
+            <div 
+              key={item._id} 
+              className="flex flex-col md:flex-row md:items-center justify-between p-6 glass rounded-2xl group hover:border-primary/30 transition-all gap-6 cursor-pointer"
+              onClick={() => setSelectedUser(item)}
+            >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center font-bold text-primary relative">
-                  {item.name?.[0] || 'U'}
+                <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center font-bold text-primary relative overflow-hidden">
+                  {item.image ? <img src={item.image} className="w-full h-full object-cover" /> : (item.name?.[0] || 'U')}
                   {item.isVerified && (
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white rounded-full flex items-center justify-center shadow-lg">
                       <Star size={8} fill="currentColor" />
@@ -449,34 +623,16 @@ function TeamForm() {
                 </div>
               </div>
               
-              <div className="flex flex-wrap items-center gap-3">
-                <button 
-                  onClick={() => {
-                    setData({ ...item, password: '' });
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    toast.success(`Editing ${item.name}`);
-                  }}
-                  className="px-3 py-1.5 bg-white/5 text-white/40 hover:bg-primary hover:text-white rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all"
-                >
-                  Edit Details
-                </button>
-
-                <button 
+              <div className="flex flex-wrap items-center gap-3" onClick={e => e.stopPropagation()}>
+                 <button 
                   onClick={() => handleVerifyToggle(item._id, item.isVerified)}
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all ${
                     item.isVerified ? 'bg-primary text-white' : 'bg-white/5 text-white/40 hover:bg-white/10'
                   }`}
                 >
-                  {item.isVerified ? 'Verified' : 'Verify Member'}
+                  {item.isVerified ? 'Verified' : 'Verify'}
                 </button>
                 
-                <button 
-                  onClick={() => handleRoleChange(item._id, item.role)}
-                  className="px-3 py-1.5 bg-white/5 text-white/40 hover:bg-primary hover:text-white rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all"
-                >
-                  {item.role === 'Leader' ? 'Make Member' : 'Make Admin'}
-                </button>
-
                 <button 
                   onClick={() => handleDelete(item._id, item.email)} 
                   className="p-2 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
@@ -489,6 +645,76 @@ function TeamForm() {
           ))}
         </div>
       </div>
+
+      {/* Member Details Popup */}
+      <AnimatePresence>
+        {selectedUser && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-bg/90 backdrop-blur-md" onClick={() => setSelectedUser(null)} />
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-xl glass border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-8"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="text-2xl font-bold">Edit Member Data</h3>
+                <button onClick={() => setSelectedUser(null)}><Plus className="rotate-45 text-white/20 hover:text-white" /></button>
+              </div>
+
+              <form onSubmit={handleUpdateMember} className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <Input label="Name" value={selectedUser.name || ''} onChange={v => setSelectedUser({...selectedUser, name: v})} />
+                  <Input label="Email" value={selectedUser.email || ''} onChange={() => {}} disabled />
+                  <Input label="Tech ID" value={selectedUser.memberId || ''} onChange={v => setSelectedUser({...selectedUser, memberId: v})} />
+                  <Input label="Designation" value={selectedUser.designation || ''} onChange={v => setSelectedUser({...selectedUser, designation: v})} />
+                  <Input label="Team" value={selectedUser.team || ''} onChange={v => setSelectedUser({...selectedUser, team: v})} />
+                  <Input label="Phone" value={selectedUser.phone || ''} onChange={v => setSelectedUser({...selectedUser, phone: v})} />
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Squad Role</label>
+                    <select 
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"
+                      value={selectedUser.role || 'Member'}
+                      onChange={e => setSelectedUser({...selectedUser, role: e.target.value})}
+                    >
+                      <option value="Member" className="bg-bg">Member</option>
+                      <option value="Leader" className="bg-bg">Leader (Admin)</option>
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Verification Status</label>
+                    <button 
+                      type="button"
+                      onClick={() => setSelectedUser({...selectedUser, isVerified: !selectedUser.isVerified})}
+                      className={`w-full py-3 rounded-xl border transition-all text-xs font-bold uppercase tracking-widest ${
+                        selectedUser.isVerified ? 'bg-primary/20 border-primary text-primary' : 'bg-white/5 border-white/10 text-white/40'
+                      }`}
+                    >
+                      {selectedUser.isVerified ? 'Verified Member' : 'Unverified'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Member Bio</label>
+                  <textarea 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white h-24"
+                    value={selectedUser.bio || ''}
+                    onChange={e => setSelectedUser({...selectedUser, bio: e.target.value})}
+                  />
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <Button type="submit" disabled={loading} className="flex-grow flex items-center justify-center gap-2">
+                    {loading ? <Loader2 className="animate-spin" /> : <><ShieldCheck size={18} /> Update Data</>}
+                  </Button>
+                  <Button variant="outline" type="button" onClick={() => setSelectedUser(null)}>Cancel</Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -659,7 +885,7 @@ function DocumentForm() {
 
 
 
-function Input({ label, value, onChange, placeholder = '', type = 'text' }: { label: string, value: any, onChange: (v: string) => void, placeholder?: string, type?: string }) {
+function Input({ label, value, onChange, placeholder = '', type = 'text', disabled = false }: { label: string, value: any, onChange: (v: string) => void, placeholder?: string, type?: string, disabled?: boolean }) {
   return (
     <div className="space-y-2">
       <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">{label}</label>
@@ -669,7 +895,8 @@ function Input({ label, value, onChange, placeholder = '', type = 'text' }: { la
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none transition-all"
+        disabled={disabled}
+        className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       />
     </div>
   );

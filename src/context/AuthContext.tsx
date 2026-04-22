@@ -5,6 +5,7 @@ interface User {
   email: string;
   name: string;
   role: string;
+  image?: string;
 }
 
 interface AuthContextType {
@@ -24,7 +25,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const savedUser = localStorage.getItem('elesquad_user');
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsed = JSON.parse(savedUser);
+        // Normalize _id to id if necessary
+        if (parsed._id && !parsed.id) parsed.id = parsed._id;
+        setUser(parsed);
       } catch (e) {
         localStorage.removeItem('elesquad_user');
       }
@@ -32,9 +36,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem('elesquad_user', JSON.stringify(userData));
+  const login = (userData: any) => {
+    // Ensure id is present
+    const normalizedUser = { ...userData, id: userData.id || userData._id };
+    setUser(normalizedUser);
+    localStorage.setItem('elesquad_user', JSON.stringify(normalizedUser));
   };
 
   const logout = () => {

@@ -82,10 +82,24 @@ const navLinks = [
           ))}
           <Link
             to={user ? (user.role === 'Leader' ? "/admin/dashboard" : "/dashboard") : "/auth"}
-            className="px-6 py-2 bg-white text-black font-bold rounded-full text-sm hover:bg-primary hover:text-white transition-all shadow-lg flex items-center gap-2"
+            className="group/navbtn relative px-1 py-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full hover:bg-primary transition-all duration-500 flex items-center min-w-[50px] overflow-hidden"
           >
-            {user && <User size={14} />}
-            {user ? (user.role === 'Leader' ? 'Admin Hub' : 'Dashboard') : 'Hire Us'}
+            {user ? (
+              <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-white/10">
+                  {user.image && user.image !== "" ? (
+                    <img src={user.image} className="w-full h-full object-cover" alt={user.name} />
+                  ) : (
+                    <span className="text-white font-bold">{user.name[0]}</span>
+                  )}
+                </div>
+                <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover/navbtn:max-w-[150px] group-hover/navbtn:ml-3 group-hover/navbtn:mr-4 transition-all duration-500 text-sm font-bold text-white">
+                  {user.name}
+                </span>
+              </div>
+            ) : (
+              <span className="px-6 py-2 text-white font-bold text-sm">Hire Us</span>
+            )}
           </Link>
         </div>
 
@@ -123,10 +137,17 @@ const navLinks = [
               ))}
               <Link
                 to={user ? (user.role === 'Leader' ? "/admin/dashboard" : "/dashboard") : "/auth"}
-                className="w-full py-4 bg-primary rounded-xl text-center font-bold"
+                className="w-full py-4 bg-primary rounded-xl text-center font-bold text-white flex items-center justify-center gap-3"
                 onClick={() => setIsOpen(false)}
               >
-                {user ? 'Dashboard' : 'Hire Us'}
+                {user ? (
+                  <>
+                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/10">
+                      {user.image ? <img src={user.image} className="w-full h-full object-cover" /> : user.name[0]}
+                    </div>
+                    {user.name}
+                  </>
+                ) : 'Hire Us'}
               </Link>
             </div>
           </motion.div>

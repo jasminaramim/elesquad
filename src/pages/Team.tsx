@@ -45,11 +45,60 @@ export default function Team() {
         </motion.p>
       </div>
 
+      {/* Leadership Section */}
+      <div className="mb-32">
+        <div className="flex items-center gap-4 mb-12">
+          <div className="h-[1px] flex-grow bg-white/10" />
+          <h2 className="text-2xl font-display font-bold text-primary tracking-widest uppercase">The Leadership</h2>
+          <div className="h-[1px] flex-grow bg-white/10" />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+          {team.filter(m => m.role === 'Leader').map((member, i) => (
+            <motion.div
+              key={member._id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="relative group"
+            >
+              <Link to={`/team/${member._id}`}>
+                <Card className="p-0 overflow-hidden border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all duration-500 shadow-[0_0_50px_rgba(180,60,255,0.1)]">
+                  <div className="aspect-[4/5] overflow-hidden relative">
+                    <img 
+                      src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/150?u=${member._id}`} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60" />
+                    <div className="absolute top-6 right-6">
+                      <div className="px-4 py-1.5 bg-primary text-white text-[10px] font-bold rounded-full shadow-xl animate-pulse">
+                        SQUAD LEADER
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-10 text-center">
+                    <h3 className="text-3xl font-display font-bold mb-2 text-white">{member.name}</h3>
+                    <p className="text-primary font-mono text-xs uppercase tracking-[0.3em] mb-4">{member.designation || 'Head of Squad'}</p>
+                    <p className="text-white/40 text-sm italic line-clamp-2">"{member.bio || 'Leading the squad to digital excellence.'}"</p>
+                  </div>
+                </Card>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Squad Members Section */}
+      <div className="flex items-center gap-4 mb-12">
+        <div className="h-[1px] flex-grow bg-white/10" />
+        <h2 className="text-xl font-display font-bold text-white/40 tracking-widest uppercase">Squad Members</h2>
+        <div className="h-[1px] flex-grow bg-white/10" />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
         {loading ? (
           [1, 2, 3, 4].map(i => <div key={i} className="glass rounded-3xl h-[400px] shimmer" />)
         ) : (
-          team.map((member, i) => (
+          team.filter(m => m.role !== 'Leader').map((member, i) => (
             <motion.div
               key={member._id}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -63,7 +112,7 @@ export default function Team() {
                   {/* Image Container */}
                   <div className="aspect-[4/5] overflow-hidden relative">
                     <img 
-                      src={member.image || `https://i.pravatar.cc/150?u=${member._id}`} 
+                      src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/150?u=${member._id}`} 
                       alt={member.name} 
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" 
                     />
@@ -83,17 +132,12 @@ export default function Team() {
                   {/* Info Box */}
                   <div className="p-8 text-center relative z-10">
                     <div className="w-10 h-[1px] bg-primary/30 mx-auto mb-4 group-hover:w-20 transition-all" />
-                    <h3 className="text-xl font-display font-bold mb-1 group-hover:text-primary transition-colors tracking-tight flex items-center justify-center gap-2">
+                    <h3 className="text-xl font-display font-bold mb-1 group-hover:text-primary transition-colors tracking-tight flex items-center justify-center gap-2 text-white">
                       {member.name}
                       {member.isVerified && (
                         <div className="w-4 h-4 bg-primary text-white rounded-full flex items-center justify-center shadow-lg" title="Verified Member">
                           <Star size={8} fill="currentColor" />
                         </div>
-                      )}
-                      {member.role === 'Leader' && (
-                        <span className="inline-block px-2 py-0.5 bg-primary/20 text-primary text-[8px] font-mono rounded border border-primary/20 align-middle">
-                          LEADER
-                        </span>
                       )}
                     </h3>
                     <div className="flex flex-col items-center justify-center gap-1">

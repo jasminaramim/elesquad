@@ -38,13 +38,13 @@ export default function CustomCursor() {
     <div className="fixed inset-0 pointer-events-none z-[9999] hidden md:block">
       {/* Outer Circle */}
       <motion.div
-        className="fixed top-0 left-0 w-[60px] h-[60px] border border-primary/10 rounded-full pointer-events-none z-[9999] mix-blend-screen"
+        className="fixed top-0 left-0 w-[70px] h-[70px] border border-primary/20 rounded-full pointer-events-none z-[9999]"
         animate={{
-          x: mousePos.x - 30,
-          y: mousePos.y - 30,
-          scale: isHovering ? 1.5 : 1,
+          x: mousePos.x - 35,
+          y: mousePos.y - 35,
+          scale: isHovering ? 1.3 : 1,
         }}
-        transition={{ type: 'spring', damping: 20, stiffness: 250, mass: 0.5 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
       />
       {/* Main Cursor Dot */}
       <motion.div
@@ -55,10 +55,10 @@ export default function CustomCursor() {
           translateY: '-50%',
         }}
         animate={{
-          scale: isHovering ? 2 : 1,
-          backgroundColor: isHovering ? 'rgba(138, 70, 255, 0.4)' : '#8A46FF',
+          scale: isHovering ? 0.5 : 1,
+          backgroundColor: '#8A46FF',
         }}
-        className="w-3 h-3 rounded-full border border-white/20"
+        className="w-2 h-2 rounded-full"
       />
     </div>
   );

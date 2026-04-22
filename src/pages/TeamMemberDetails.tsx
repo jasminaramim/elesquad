@@ -90,7 +90,7 @@ export default function TeamMemberDetails() {
           >
             <div className="rounded-[3rem] overflow-hidden bg-white/5 border border-white/10 sticky top-32">
               <img 
-                src={member.image || `https://i.pravatar.cc/150?u=${member._id}`} 
+                src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/150?u=${member._id}`} 
                 alt={member.name} 
                 className="w-full aspect-[4/5] object-cover grayscale hover:grayscale-0 transition-all duration-700" 
               />

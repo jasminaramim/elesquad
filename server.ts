@@ -7,6 +7,13 @@ import fs from 'fs';
 import { Server } from 'socket.io';
 import http from 'http';
 
+import { createServer as createViteServer } from 'vite';
+
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -39,7 +46,13 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(uploadDir));
 
-// Safely encode MongoDB credentials to avoid unescaped character errors
+// Request Logger
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// Safely encode MongoDB credentials
 const DB_USER = "elesquad";
 const DB_PASS = "Ele/Sq9?uA.d3Z#6!yR";
 const DEFAULT_MONGODB_URI = `mongodb+srv://${encodeURIComponent(DB_USER)}:${encodeURIComponent(DB_PASS)}@cluster0.ssmpl.mongodb.net/elesquad?retryWrites=true&w=majority&appName=Cluster0`;
@@ -51,9 +64,6 @@ async function startServer() {
   await client.connect();
   const db = client.db("elesquad");
   console.log("Connected to MongoDB");
-
-  const app = express();
-  app.use(express.json());
 
   // Collections
   const users = db.collection('users');
@@ -109,40 +119,70 @@ async function startServer() {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    res.json({ success: true, user: { id: user._id, email: user.email, name: user.name, role: user.role } });
+    res.json({ success: true, user: { id: user._id, email: user.email, name: user.name, role: user.role, image: user.image } });
   });
 
   // File Upload
-  app.post('/api/upload', upload.single('image'), (req, res) => {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    const imageUrl = `/uploads/${req.file.filename}`;
-    res.json({ imageUrl });
+  app.post('/api/upload', (req, res) => {
+    console.log('Upload request received');
+    upload.single('image')(req, res, (err) => {
+      if (err) {
+        console.error('Multer Error:', err);
+        return res.status(500).json({ error: 'Upload process failed', details: err.message });
+      }
+      if (!req.file) {
+        console.warn('Upload failed: No file in request');
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+      const imageUrl = `/uploads/${req.file.filename}`;
+      console.log('Upload successful:', imageUrl);
+      res.json({ imageUrl });
+    });
   });
 
   // Messaging API
   app.get('/api/messages/:room', async (req, res) => {
-    const { room } = req.params;
-    const history = await messages.find({ room }).sort({ timestamp: 1 }).toArray();
-    res.json(history);
+    try {
+      const { room } = req.params;
+      console.log(`[GET] Fetching messages for room: ${room}`);
+      if (!messages) throw new Error('Messages collection not initialized');
+      const history = await messages.find({ room }).sort({ timestamp: 1 }).toArray();
+      console.log(`Found ${history.length} messages for room ${room}`);
+      res.json(history || []);
+    } catch (err: any) {
+      console.error('Messages Fetch Error:', err.message);
+      res.status(500).json({ error: 'Failed to fetch messages', details: err.message });
+    }
   });
 
   app.post('/api/messages', async (req, res) => {
-    const msg = { ...req.body, timestamp: new Date() };
-    await messages.insertOne(msg);
-    io.to(msg.room).emit('new_message', msg);
-    res.json({ success: true });
+    try {
+      const msg = { ...req.body, timestamp: new Date() };
+      await messages.insertOne(msg);
+      io.to(msg.room).emit('new_message', msg);
+      res.json({ success: true });
+    } catch (err: any) {
+      console.error('Messages Post Error:', err);
+      res.status(500).json({ error: 'Failed to send message' });
+    }
   });
 
   // Socket.io Events
   io.on('connection', (socket) => {
+    console.log('New socket client connected');
     socket.on('join_room', (room) => {
+      console.log(`Socket joining room: ${room}`);
       socket.join(room);
     });
 
     socket.on('send_message', async (data) => {
-      const msg = { ...data, timestamp: new Date() };
-      await messages.insertOne(msg);
-      io.to(data.room).emit('new_message', msg);
+      try {
+        const msg = { ...data, timestamp: new Date() };
+        await messages.insertOne(msg);
+        io.to(data.room).emit('new_message', msg);
+      } catch (err) {
+        console.error('Socket message error:', err);
+      }
     });
   });
 
@@ -154,14 +194,30 @@ async function startServer() {
 
   app.put('/api/admin/users/:id', async (req, res) => {
     const { id } = req.params;
+    console.log(`Updating user: ${id}`);
     const { _id, password, ...updateData } = req.body;
-    if (password && password.trim() !== '') {
-      // In a real app, hash this!
-      (updateData as any).password = password;
+    
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid User ID' });
+    
+    try {
+      if (password && password.trim() !== '') {
+        (updateData as any).password = password;
+      }
+      // Ensure no immutable fields are present
+      delete (updateData as any)._id;
+      
+      console.log('Admin Updating User:', id, 'with data:', JSON.stringify(updateData));
+      const updateResult = await users.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+      console.log('Update result:', updateResult);
+      
+      if (updateResult.matchedCount === 0) {
+        return res.status(404).json({ error: 'User not found in database' });
+      }
+      res.json({ success: true, modifiedCount: updateResult.modifiedCount });
+    } catch (err: any) {
+      console.error('Admin User Update Error:', err);
+      res.status(500).json({ error: 'Update failed', details: err.message });
     }
-    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
-    await users.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
-    res.json({ success: true });
   });
 
   app.delete('/api/admin/users/:id', async (req, res) => {
@@ -178,43 +234,60 @@ async function startServer() {
   app.patch('/api/admin/users/:id/role', async (req, res) => {
     const { id } = req.params;
     const { role } = req.body;
-    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+    console.log(`Changing role for ${id} to ${role}`);
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID format' });
     try {
       await users.updateOne({ _id: new ObjectId(id) }, { $set: { role } });
       res.json({ success: true });
     } catch (err) {
+      console.error('Role Update Error:', err);
       res.status(500).json({ error: 'Update failed' });
     }
   });
 
   app.patch('/api/admin/users/:id/verify', async (req, res) => {
+    const { id } = req.params;
     const { isVerified } = req.body;
+    console.log(`Changing verification for ${id} to ${isVerified}`);
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID format' });
     try {
-      await users.updateOne({ _id: new ObjectId(req.params.id) }, { $set: { isVerified } });
+      await users.updateOne({ _id: new ObjectId(id) }, { $set: { isVerified } });
       res.json({ success: true });
     } catch (err) {
+      console.error('Verify Update Error:', err);
       res.status(500).json({ error: 'Update failed' });
     }
   });
 
   app.get('/api/users/:id', async (req, res) => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
-      const user = await users.findOne({ _id: new ObjectId(req.params.id) });
+      const user = await users.findOne({ _id: new ObjectId(id) });
       res.json(user);
     } catch (err) {
+      console.error('Fetch User Error:', err);
       res.status(404).json({ error: 'User not found' });
     }
   });
 
   app.put('/api/users/:id', async (req, res) => {
-    const { name, bio, image, designation, team, phone } = req.body;
+    const { id } = req.params;
+    const { _id, ...updateData } = req.body;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
-      await users.updateOne(
-        { _id: new ObjectId(req.params.id) },
-        { $set: { name, bio, image, designation, team, phone } }
+      console.log('User Updating Profile:', id, 'with:', JSON.stringify(updateData));
+      const result = await users.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updateData }
       );
-      res.json({ success: true });
+      console.log('Update result:', result);
+      if (result.matchedCount === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.json({ success: true, modifiedCount: result.modifiedCount });
     } catch (err) {
+      console.error('Update User Error:', err);
       res.status(500).json({ error: 'Update failed' });
     }
   });
@@ -264,32 +337,43 @@ async function startServer() {
   });
 
   app.put('/api/projects/:id/publish', async (req, res) => {
+    const { id } = req.params;
     const { isPublished } = req.body;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
       await projects.updateOne(
-        { _id: new ObjectId(req.params.id) },
+        { _id: new ObjectId(id) },
         { $set: { isPublished } }
       );
       res.json({ success: true });
     } catch (err) {
+      console.error('Publish Error:', err);
       res.status(500).json({ error: 'Update failed' });
     }
   });
 
 
-
   app.put('/api/projects/:id', async (req, res) => {
     const { id } = req.params;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     const { _id, ...updateData } = req.body;
-    await projects.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
-    res.json({ success: true });
+    try {
+      await projects.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+      res.json({ success: true });
+    } catch (err) {
+      console.error('Project Update Error:', err);
+      res.status(500).json({ error: 'Update failed' });
+    }
   });
 
   app.delete('/api/projects/:id', async (req, res) => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
-      await projects.deleteOne({ _id: new ObjectId(req.params.id) });
+      await projects.deleteOne({ _id: new ObjectId(id) });
       res.json({ success: true });
     } catch (err) {
+      console.error('Project Delete Error:', err);
       res.status(500).json({ error: 'Deletion failed' });
     }
   });

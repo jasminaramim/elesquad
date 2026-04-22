@@ -36,7 +36,7 @@ export default function ProjectDetails() {
         >
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
           <Card className="p-0 overflow-hidden border-white/10 relative" tiltEnabled={true}>
-            <img src={project.image} alt={project.title} className="w-full aspect-[4/5] md:aspect-auto object-cover" />
+            <img src={project.image && project.image !== "" ? project.image : undefined} alt={project.title} className="w-full aspect-[4/5] md:aspect-auto object-cover" />
           </Card>
         </motion.div>
 

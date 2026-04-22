@@ -9,7 +9,7 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/projects/published')
+    axios.get('/api/projects')
       .then(res => setProjects(res.data))
       .finally(() => setLoading(false));
   }, []);
@@ -42,7 +42,7 @@ export default function Projects() {
                 <Card className="p-0 h-full">
                   <div className="aspect-video overflow-hidden relative">
                     <img 
-                      src={project.image} 
+                      src={project.image && project.image !== "" ? project.image : undefined} 
                       alt={project.title} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                     />
