@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 interface NotificationContextType {
   unreadCount: number;
@@ -30,13 +31,20 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
-      // Join user's personal room for global notifications
       newSocket.emit('join_room', `user_${user.id}`);
     });
 
+    // Polling fallback for notifications
+    const pollNotifications = setInterval(async () => {
+      try {
+        const res = await axios.get(`/api/unread-count/${user.id}`);
+        setUnreadCount(res.data.count);
+      } catch (err) {
+        console.error('Notification poll error:', err);
+      }
+    }, 5000);
+
     newSocket.on('new_message', (msg) => {
-      // Increment unread count if user is not on the chat page or if message is for them
-      // We only increment if the message is NOT from themselves
       if (msg.senderId !== user.id) {
         setUnreadCount(prev => prev + 1);
         toast(`New message from ${msg.senderName}`, {
@@ -52,10 +60,14 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
     return () => {
       newSocket.disconnect();
+      clearInterval(pollNotifications);
     };
   }, [user]);
 
-  const resetUnread = () => setUnreadCount(0);
+  const resetUnread = async () => {
+    setUnreadCount(0);
+    // Ideally we would mark all as read here, or per room in ChatHub
+  };
 
   return (
     <NotificationContext.Provider value={{ unreadCount, resetUnread }}>

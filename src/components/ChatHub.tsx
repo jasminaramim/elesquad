@@ -67,10 +67,14 @@ export default function ChatHub() {
       socketRef.current?.emit('join_room', room);
       
       setLoading(true);
+      // Mark as read immediately when room is opened
+      axios.post('/api/messages/read', { room, userId: user.id }).then(() => {
+        resetUnread();
+      });
+
       axios.get(`/api/messages/${room}`).then(res => {
         setMessages(res.data);
         setLoading(false);
-        resetUnread();
       });
     }
   }, [selectedUser, user]);

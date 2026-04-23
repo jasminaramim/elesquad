@@ -187,13 +187,43 @@ app.use(async (req, res, next) => {
 
   app.post('/api/messages', async (req, res) => {
     try {
-      const msg = { ...req.body, timestamp: new Date() };
+      const msg = { ...req.body, timestamp: new Date(), isRead: false };
       await messages.insertOne(msg);
       io.to(msg.room).emit('new_message', msg);
       res.json({ success: true });
     } catch (err: any) {
       console.error('Messages Post Error:', err);
       res.status(500).json({ error: 'Failed to send message' });
+    }
+  });
+
+  app.get('/api/unread-count/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      // Count messages where the recipient is the user and isRead is false
+      // Note: room name contains both IDs. senderId is NOT the user.
+      const count = await messages.countDocuments({
+        room: { $regex: userId },
+        senderId: { $ne: userId },
+        isRead: false
+      });
+      res.json({ count });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch unread count' });
+    }
+  });
+
+  // Mark as read
+  app.post('/api/messages/read', async (req, res) => {
+    const { room, userId } = req.body;
+    try {
+      await messages.updateMany(
+        { room, senderId: { $ne: userId }, isRead: false },
+        { $set: { isRead: true } }
+      );
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to mark messages as read' });
     }
   });
 
