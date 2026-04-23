@@ -121,7 +121,7 @@ const navLinks = [
                 </span>
               </div>
             ) : (
-              <span className="px-6 py-2 text-white font-bold text-sm">Hire Us</span>
+              <span className="px-6 py-2 text-white font-bold text-sm">Login</span>
             )}
           </Link>
         </div>
@@ -174,7 +174,7 @@ const navLinks = [
                     </div>
                     {user.name}
                   </>
-                ) : 'Hire Us'}
+                ) : 'Login'}
               </Link>
             </div>
           </motion.div>
