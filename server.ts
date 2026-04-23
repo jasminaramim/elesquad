@@ -60,33 +60,63 @@ const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 
 const client = new MongoClient(MONGODB_URI);
 
-async function startServer() {
-  await client.connect();
-  const db = client.db("elesquad");
-  console.log("Connected to MongoDB");
+let db: any = null;
+let users: any, projects: any, reviews: any, documents: any, messages: any, contact: any;
 
-  // Collections
-  const users = db.collection('users');
-  const projects = db.collection('projects');
-  const reviews = db.collection('reviews');
-  const documents = db.collection('documents');
-  const messages = db.collection('messages');
-  const contact = db.collection('contact');
-
-  // Seed Data if empty
-  const adminEmail = "thenaimrana@gmail.com";
-  const existingAdmin = await users.findOne({ email: adminEmail });
-  if (!existingAdmin) {
-    await users.insertOne({
-      email: adminEmail,
-      password: "password123", // User should change this
-      name: "Main Admin",
-      role: "Leader",
-      designation: "Head of EleSquad",
-      team: "Core"
-    });
-    console.log("Admin seeded");
+async function connectToDatabase() {
+  if (db) return;
+  
+  try {
+    console.log("Attempting to connect to MongoDB...");
+    await client.connect();
+    db = client.db("elesquad");
+    
+    users = db.collection('users');
+    projects = db.collection('projects');
+    reviews = db.collection('reviews');
+    documents = db.collection('documents');
+    messages = db.collection('messages');
+    contact = db.collection('contact');
+    
+    console.log("Connected to MongoDB successfully");
+    
+    // Seed Admin if missing
+    const adminEmail = "thenaimrana@gmail.com";
+    const existingAdmin = await users.findOne({ email: adminEmail });
+    if (!existingAdmin) {
+      await users.insertOne({
+        email: adminEmail,
+        password: "password123",
+        name: "Main Admin",
+        role: "Leader",
+        designation: "Head of EleSquad",
+        team: "Core"
+      });
+      console.log("Admin seeded");
+    }
+  } catch (err: any) {
+    console.error("CRITICAL DATABASE CONNECTION ERROR:", err.message);
+    throw err;
   }
+}
+
+// Database Connection Middleware
+app.use(async (req, res, next) => {
+  if (req.url.startsWith('/api')) {
+    try {
+      await connectToDatabase();
+      next();
+    } catch (err: any) {
+      res.status(500).json({ 
+        error: "Database connection failed", 
+        details: err.message,
+        hint: "Ensure MONGODB_URI is correctly set in your environment variables." 
+      });
+    }
+  } else {
+    next();
+  }
+});
 
   // Auth Routes
   app.post('/api/auth/register', async (req, res) => {
@@ -521,10 +551,5 @@ async function startServer() {
       console.log(`Server running at http://localhost:${PORT}`);
     });
   }
-}
-
-startServer().catch(err => {
-  console.error('FATAL SERVER START ERROR:', err);
-});
 
 export default app;
