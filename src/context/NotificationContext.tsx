@@ -23,16 +23,21 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       return;
     }
 
-    const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '/';
-    const newSocket = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 5
-    });
-    setSocket(newSocket);
+    const isLocal = window.location.hostname === 'localhost';
+    let newSocket: Socket | null = null;
 
-    newSocket.on('connect', () => {
-      newSocket.emit('join_room', `user_${user.id}`);
-    });
+    if (isLocal) {
+      const socketUrl = 'http://localhost:3000';
+      newSocket = io(socketUrl, {
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 5
+      });
+      setSocket(newSocket);
+
+      newSocket.on('connect', () => {
+        newSocket?.emit('join_room', `user_${user.id}`);
+      });
+    }
 
     // Polling fallback for notifications
     const pollNotifications = setInterval(async () => {

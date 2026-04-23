@@ -26,15 +26,18 @@ export default function ChatHub() {
       setUsers(res.data.filter((u: any) => u._id !== user?.id));
     });
 
-    const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '/';
-    socketRef.current = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 5
-    });
-    
-    socketRef.current.on('connect', () => {
-      console.log('Connected to socket server');
-    });
+    const isLocal = window.location.hostname === 'localhost';
+    if (isLocal) {
+      const socketUrl = 'http://localhost:3000';
+      socketRef.current = io(socketUrl, {
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 5
+      });
+      
+      socketRef.current.on('connect', () => {
+        console.log('Connected to socket server');
+      });
+    }
 
     // Polling fallback for production / unstable connections
     const pollInterval = setInterval(() => {
