@@ -40,16 +40,24 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
 
     // Polling fallback for notifications
-    const pollNotifications = setInterval(async () => {
+    const fetchUnread = async () => {
       try {
         const res = await axios.get(`/api/unread-count/${user.id}`);
-        setUnreadCount(res.data.count);
+        setUnreadCount(prev => {
+          if (res.data.count > prev) {
+            toast(`You have ${res.data.count} unread messages`, { icon: '💬' });
+          }
+          return res.data.count;
+        });
       } catch (err) {
         console.error('Notification poll error:', err);
       }
-    }, 5000);
+    };
 
-    newSocket.on('new_message', (msg) => {
+    fetchUnread(); // Initial fetch
+    const pollNotifications = setInterval(fetchUnread, 5000);
+
+    newSocket?.on('new_message', (msg) => {
       if (msg.senderId !== user.id) {
         setUnreadCount(prev => prev + 1);
         toast(`New message from ${msg.senderName}`, {
@@ -64,7 +72,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     });
 
     return () => {
-      newSocket.disconnect();
+      newSocket?.disconnect();
       clearInterval(pollNotifications);
     };
   }, [user]);
