@@ -14,15 +14,19 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/server.ts"
+      "destination": "server.ts"
     },
     {
       "source": "/uploads/(.*)",
-      "destination": "/uploads/$1"
+      "destination": "server.ts"
+    },
+    {
+      "source": "/socket.io/(.*)",
+      "destination": "server.ts"
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/$1"
     }
   ]
 }

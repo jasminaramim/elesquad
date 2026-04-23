@@ -516,11 +516,15 @@ async function startServer() {
     });
   });
 
-  server.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-  });
+  if (process.env.NODE_ENV !== 'production') {
+    server.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
+    });
+  }
 }
 
 startServer().catch(err => {
   console.error('FATAL SERVER START ERROR:', err);
 });
+
+export default app;

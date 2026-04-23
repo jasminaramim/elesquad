@@ -28,7 +28,7 @@ import {
 import ChatHub from '../components/ChatHub';
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, login, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'reviews' | 'documents' | 'finance' | 'messages'>('profile');
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toLocaleString('default', { month: 'long', year: 'numeric' }));

@@ -38,11 +38,11 @@ export default function CustomCursor() {
     <div className="fixed inset-0 pointer-events-none z-[9999] hidden md:block">
       {/* Outer Circle */}
       <motion.div
-        className="fixed top-0 left-0 w-[70px] h-[70px] border border-primary/20 rounded-full pointer-events-none z-[9999]"
+        className="fixed top-0 left-0 w-[40px] h-[40px] border border-primary/20 rounded-full pointer-events-none z-[9999]"
         animate={{
-          x: mousePos.x - 35,
-          y: mousePos.y - 35,
-          scale: isHovering ? 1.3 : 1,
+          x: mousePos.x - 20,
+          y: mousePos.y - 20,
+          scale: isHovering ? 1.2 : 1,
         }}
         transition={{ type: 'spring', damping: 28, stiffness: 220 }}
       />

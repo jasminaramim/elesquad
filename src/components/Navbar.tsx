@@ -4,7 +4,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, User } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { useNotifications } from '../context/NotificationContext';
 import { Button } from './UI';
+import { Sun, Moon, Bell } from 'lucide-react';
 
 const navLinks = [
   { name: 'Home', path: '/' },
@@ -18,6 +21,8 @@ const navLinks = [
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const { unreadCount } = useNotifications();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,7 +35,7 @@ const navLinks = [
   return (
     <nav className={cn(
       "fixed top-0 left-0 right-0 h-[72px] flex items-center z-50 transition-all duration-300 px-4 md:px-10",
-      scrolled ? "bg-bg/80 backdrop-blur-md border-b border-white/10" : "bg-transparent"
+      scrolled ? "bg-bg/80 backdrop-blur-md border-b border-border" : "bg-transparent"
     )}>
       <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2 group">
@@ -54,7 +59,7 @@ const navLinks = [
                />
              </svg>
           </div>
-          <span className="text-2xl font-display font-bold tracking-tighter text-white">
+          <span className="text-2xl font-display font-bold tracking-tighter text-foreground">
             Ele<span className="text-primary italic">Squad</span>
           </span>
         </Link>
@@ -66,8 +71,8 @@ const navLinks = [
               key={link.name}
               to={link.path}
               className={cn(
-                "relative text-sm font-medium transition-colors hover:text-white capitalize",
-                location.pathname === link.path ? "text-white" : "text-gray-400"
+                "relative text-sm font-medium transition-colors hover:text-primary capitalize",
+                location.pathname === link.path ? "text-primary" : "text-foreground/60"
               )}
             >
               {link.name}
@@ -80,6 +85,24 @@ const navLinks = [
               )}
             </Link>
           ))}
+          
+          {/* Theme Toggle */}
+          <button 
+            onClick={toggleTheme}
+            className="p-2 rounded-full hover:bg-surface transition-colors text-foreground"
+          >
+            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
+
+          {/* Notifications */}
+          <div className="relative">
+            <Bell size={20} className="text-foreground/60" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-bounce">
+                {unreadCount}
+              </span>
+            )}
+          </div>
           <Link
             to={user ? (user.role === 'Leader' ? "/admin/dashboard" : "/dashboard") : "/auth"}
             className="group/navbtn relative px-1 py-1 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full hover:bg-primary transition-all duration-500 flex items-center min-w-[50px] overflow-hidden"
@@ -105,10 +128,14 @@ const navLinks = [
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden text-white"
-          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden text-foreground flex items-center gap-4"
         >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
+          <div onClick={toggleTheme}>
+            {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
+          </div>
+          <div onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </div>
         </button>
       </div>
 

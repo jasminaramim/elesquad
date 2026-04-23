@@ -21,7 +21,7 @@ export default function TechBackground() {
   }, [mouseX, mouseY]);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-[-1] bg-[#020205] overflow-hidden">
+    <div ref={containerRef} className="fixed inset-0 z-[-1] bg-bg overflow-hidden transition-colors duration-300">
       {/* 3D Grid System */}
       <motion.div 
         style={{ 
@@ -31,7 +31,7 @@ export default function TechBackground() {
         }}
         className="absolute inset-[-10%] opacity-20 transform-gpu"
       >
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
       </motion.div>
 
       {/* Floating Particle/Tech Elements */}

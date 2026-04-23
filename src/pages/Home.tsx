@@ -55,17 +55,17 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full w-fit mb-8"
+              className="inline-flex items-center gap-2 px-3 py-1 bg-surface border border-border rounded-full w-fit mb-8"
             >
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></span>
-              <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-white/80">Expert Squad</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-foreground/80">Expert Squad</span>
             </motion.div>
             
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.8 }}
-              style={{ x: mousePos.x * 0.2, y: mousePos.y * 0.2 }}
+              style={{ x: mousePos.x * 0.1, y: mousePos.y * 0.1 }}
               className="text-[6vw] md:text-[8vw] lg:text-[110px] font-bold leading-[0.85] tracking-tighter mb-10 font-display"
             >
               WordPress Beyond <br/>
@@ -77,7 +77,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
-              className="text-lg md:text-2xl text-gray-400 max-w-2xl mb-12 leading-relaxed font-light"
+              className="text-lg md:text-2xl text-foreground/60 max-w-2xl mb-12 leading-relaxed font-light"
             >
               We are experts in WordPress Frontend & Backend, WooCommerce Functionality, 
               Woodmart, Gutenberg, and Elementor Pro.
@@ -101,7 +101,7 @@ export default function Home() {
 
             <div className="flex gap-4">
               {[Globe, Mail, Share2].map((Icon, i) => (
-                <a key={i} href="#" className="w-12 h-12 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-primary/20 hover:border-primary transition-all text-white/40 hover:text-white group">
+                <a key={i} href="#" className="w-12 h-12 bg-surface border border-border rounded-full flex items-center justify-center hover:bg-primary/20 hover:border-primary transition-all text-foreground/40 hover:text-foreground group">
                   <Icon size={20} className="group-hover:scale-110 transition-transform" />
                 </a>
               ))}
@@ -112,10 +112,10 @@ export default function Home() {
           <div className="hidden xl:col-span-4 xl:flex justify-center items-center relative">
             <motion.div
               animate={{ 
-                x: mousePos.x * 0.5, 
-                y: mousePos.y * 0.5,
-                rotateX: mousePos.y * -0.5,
-                rotateY: mousePos.x * 0.5,
+                x: mousePos.x * 0.25, 
+                y: mousePos.y * 0.25,
+                rotateX: mousePos.y * -0.25,
+                rotateY: mousePos.x * 0.25,
               }}
               className="relative w-full aspect-square max-w-md transform-gpu"
               style={{ perspective: 1000 }}
@@ -158,9 +158,9 @@ export default function Home() {
                     opacity: { duration: 1, delay: i * 0.2 }
                   }}
                   style={{ position: 'absolute', top: item.top, left: item.left, right: item.right, bottom: item.bottom }}
-                  className="w-16 h-16 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center shadow-2xl hover:bg-primary/20 transition-colors"
+                  className="w-16 h-16 bg-surface backdrop-blur-xl border border-border rounded-2xl flex items-center justify-center shadow-2xl hover:bg-primary/20 transition-colors"
                 >
-                  <item.icon size={28} className="text-white/60" />
+                  <item.icon size={28} className="text-foreground/60" />
                 </motion.div>
               ))}
 
@@ -193,7 +193,7 @@ export default function Home() {
         </div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <SectionHeading title="About EleSquad" subtitle="" centered />
-          <p className="text-xl md:text-2xl text-white/60 leading-relaxed font-light mt-8">
+          <p className="text-xl md:text-2xl text-foreground/60 leading-relaxed font-light mt-8">
             Expert in WordPress Frontend & Backend, WooCommerce Functionality, Woodmart, Gutenberg, and Elementor Pro.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
@@ -279,7 +279,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                <Card className="p-0 border-white/10 group overflow-hidden bg-white/5">
+                <Card className="p-0 border-border group overflow-hidden bg-surface">
                   <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
                     <div className="lg:col-span-4 p-12 order-2 lg:order-1">
                        <p className="text-[10px] font-mono text-primary mb-4 uppercase">{new Date(project.createdAt).getFullYear()}</p>

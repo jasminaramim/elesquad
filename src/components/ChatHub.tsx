@@ -2,12 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, User, Loader2, MessageCircle, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
+import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
 import { io, Socket } from 'socket.io-client';
 import { Button, Card } from './UI';
 
 export default function ChatHub() {
   const { user } = useAuth();
+  const { resetUnread } = useNotifications();
+  const { theme } = useTheme();
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -35,6 +39,10 @@ export default function ChatHub() {
   }, [user]);
 
   useEffect(() => {
+    resetUnread();
+  }, []);
+
+  useEffect(() => {
     if (selectedUser && user) {
       const room = [user.id, selectedUser._id].sort().join('_');
       console.log('Joining room:', room);
@@ -44,6 +52,7 @@ export default function ChatHub() {
       axios.get(`/api/messages/${room}`).then(res => {
         setMessages(res.data);
         setLoading(false);
+        resetUnread();
       });
     }
   }, [selectedUser, user]);
@@ -109,7 +118,7 @@ export default function ChatHub() {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-grow flex flex-col bg-white/5 border border-white/10 rounded-[2rem] overflow-hidden">
+      <div className="flex-grow flex flex-col bg-surface border border-border rounded-[2rem] overflow-hidden">
         {selectedUser ? (
           <>
             <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/5">
