@@ -23,7 +23,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
 
     const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '/';
-    const newSocket = io(socketUrl);
+    const newSocket = io(socketUrl, {
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5
+    });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {

@@ -27,16 +27,34 @@ export default function ChatHub() {
     });
 
     const socketUrl = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '/';
-    socketRef.current = io(socketUrl);
+    socketRef.current = io(socketUrl, {
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5
+    });
     
     socketRef.current.on('connect', () => {
       console.log('Connected to socket server');
     });
 
+    // Polling fallback for production / unstable connections
+    const pollInterval = setInterval(() => {
+      if (selectedUser && user) {
+        const room = [user.id, selectedUser._id].sort().join('_');
+        axios.get(`/api/messages/${room}`).then(res => {
+          // Only update if message count changed
+          setMessages(prev => {
+            if (res.data.length !== prev.length) return res.data;
+            return prev;
+          });
+        }).catch(err => console.error('Polling error:', err));
+      }
+    }, 3000);
+
     return () => {
       socketRef.current?.disconnect();
+      clearInterval(pollInterval);
     };
-  }, [user]);
+  }, [user, selectedUser]);
 
   useEffect(() => {
     resetUnread();
@@ -89,8 +107,20 @@ export default function ChatHub() {
     };
 
     console.log('Sending message to room:', room);
-    socketRef.current?.emit('send_message', msgData);
-    setInput('');
+    
+    try {
+      // Send via HTTP to ensure it hits the serverless function reliably
+      await axios.post('/api/messages', msgData);
+      
+      // Also emit via socket for local/polling speed
+      socketRef.current?.emit('send_message', msgData);
+      
+      // Optimistic update
+      setMessages(prev => [...prev, { ...msgData, timestamp: new Date() }]);
+      setInput('');
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    }
   };
 
   return (

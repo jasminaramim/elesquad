@@ -46,8 +46,8 @@ export default function AdminDashboard() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-display font-semibold ${
-                activeTab === tab.id ? 'bg-primary text-white shadow-lg' : 'bg-white/5 text-white/40 hover:bg-white/10'
-              }`}
+                activeTab === tab.id ? 'bg-primary text-white shadow-lg' : 'bg-surface text-foreground/40 hover:bg-surface/80 border border-border/50'
+              } shadow-sm transition-all duration-300`}
             >
               <tab.icon size={20} />
               {tab.label}
@@ -187,7 +187,7 @@ function AdminProfileTab() {
       <div className="flex justify-between items-center mb-10">
         <div>
           <h3 className="text-3xl font-display font-bold">Admin Profile</h3>
-          <p className="text-white/40 text-xs">Manage your squad leadership identity</p>
+          <p className="text-foreground/40 text-xs">Manage your squad leadership identity</p>
         </div>
       </div>
 
@@ -204,7 +204,7 @@ function AdminProfileTab() {
           <div className="md:col-span-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Leadership Bio</label>
             <textarea 
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-white text-sm"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground text-sm"
               rows={3}
               value={profile.bio || ''}
               onChange={e => setProfile({...profile, bio: e.target.value})}
@@ -214,9 +214,9 @@ function AdminProfileTab() {
           
           <div className="md:col-span-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Leadership Avatar</label>
-            <div className="flex items-center gap-6 p-4 bg-white/5 border border-white/10 rounded-xl">
-              <div className="w-16 h-16 bg-white/5 rounded-full overflow-hidden flex items-center justify-center border border-white/10 relative">
-                {previewImage || profile.image ? <img src={previewImage || profile.image || undefined} className="w-full h-full object-cover" /> : <User size={24} className="text-white/10" />}
+            <div className="flex items-center gap-6 p-4 bg-surface border border-border rounded-xl">
+              <div className="w-16 h-16 bg-surface rounded-full overflow-hidden flex items-center justify-center border border-border relative">
+                {previewImage || profile.image ? <img src={previewImage || profile.image || undefined} className="w-full h-full object-cover" /> : <User size={24} className="text-foreground/10" />}
                 {previewImage && <div className="absolute inset-0 bg-primary/40 flex items-center justify-center"><Rocket size={16} className="animate-bounce" /></div>}
               </div>
               <div className="flex-grow">
@@ -231,7 +231,7 @@ function AdminProfileTab() {
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Professional Bio</label>
           <textarea 
-            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 focus:border-primary/50 outline-none h-32"
+            className="w-full bg-surface border border-border rounded-xl p-4 focus:border-primary/50 outline-none h-32 text-foreground"
             value={profile.bio || ''}
             onChange={e => setProfile({...profile, bio: e.target.value})}
           />
@@ -314,7 +314,7 @@ function ProjectForm() {
           <div className="space-y-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Type</label>
             <select 
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-white"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground"
               value={data.projectType || 'solo'}
               onChange={e => setData({ ...data, projectType: e.target.value })}
             >
@@ -335,11 +335,11 @@ function ProjectForm() {
              <Input label="Sheet / Document Link" value={data.sheetLink || ''} onChange={v => setData({ ...data, sheetLink: v })} placeholder="https://docs.google.com/..." />
           </div>
           <div className="md:col-span-2 lg:col-span-3">
-             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Project Image</label>
-             <div className="flex items-center gap-6 p-4 bg-white/5 border border-white/10 rounded-xl">
-               <div className="w-20 h-20 bg-white/5 rounded-lg overflow-hidden flex items-center justify-center border border-white/10">
-                 {data.image ? <img src={data.image || undefined} className="w-full h-full object-cover" /> : <LayoutDashboard size={24} className="text-white/10" />}
-               </div>
+             <label className="text-xs font-mono uppercase tracking-widest text-foreground/40 block pl-1 mb-2">Project Image</label>
+              <div className="flex items-center gap-6 p-4 bg-surface border border-border rounded-xl">
+                <div className="w-20 h-20 bg-surface rounded-lg overflow-hidden flex items-center justify-center border border-border">
+                  {data.image ? <img src={data.image || undefined} className="w-full h-full object-cover" /> : <LayoutDashboard size={24} className="text-foreground/10" />}
+                </div>
                <div className="flex-grow">
                  <input 
                    type="file" 
@@ -397,7 +397,7 @@ function ProjectForm() {
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Description</label>
           <textarea 
-            className="w-full bg-white/5 border border-white/10 rounded-xl p-4 focus:border-primary/50 outline-none resize-none h-32"
+            className="w-full bg-surface border border-border rounded-xl p-4 focus:border-primary/50 outline-none resize-none h-32 text-foreground"
             value={data.description}
             onChange={e => setData({ ...data, description: e.target.value })}
             placeholder="Describe the project masterpiece..."
@@ -426,12 +426,12 @@ function ProjectForm() {
                       {item.projectType || 'Solo'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-white/40 font-mono">
+                  <div className="flex items-center gap-4 text-xs text-foreground/40 font-mono">
                     <span>ID: {item.orderId || 'N/A'}</span>
                     <span>•</span>
                     <span className="text-primary">${item.value || '0'}</span>
                     <span>•</span>
-                    <span className="text-white/60">Dev: {item.developerName || 'Member'}</span>
+                    <span className="text-foreground/60">Dev: {item.developerName || 'Member'}</span>
                   </div>
                 </div>
               </div>
@@ -503,8 +503,8 @@ function ProjectForm() {
                 </div>
 
                 <div className="mb-8">
-                  <h5 className="text-xs font-mono uppercase text-white/20 mb-3">Description</h5>
-                  <p className="text-white/60 leading-relaxed italic">"{selectedProject.description}"</p>
+                  <h5 className="text-xs font-mono uppercase text-foreground/20 mb-3">Description</h5>
+                  <p className="text-foreground/60 leading-relaxed italic">"{selectedProject.description}"</p>
                 </div>
 
                 <div className="mb-8">
