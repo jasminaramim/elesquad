@@ -7,7 +7,7 @@ import fs from 'fs';
 import { Server } from 'socket.io';
 import http from 'http';
 
-import { createServer as createViteServer } from 'vite';
+// Dynamic Vite import will be handled in the dev block
 
 import { fileURLToPath } from 'url';
 
@@ -522,8 +522,14 @@ app.use(async (req, res, next) => {
     }
   });
 
+  // Health Check
+  app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', environment: process.env.NODE_ENV, timestamp: new Date() });
+  });
+
   // Vite integration
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
