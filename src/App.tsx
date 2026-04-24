@@ -23,6 +23,7 @@ import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import DocumentEditor from './pages/DocumentEditor';
 import TechBackground from './components/TechBackground';
+import QuantumBackground from './components/QuantumBackground';
 import CustomCursor from './components/CustomCursor';
 import ServiceDetails from './pages/ServiceDetails';
 
@@ -55,7 +56,14 @@ export default function App() {
           <Router>
             <div className="relative overflow-x-hidden bg-bg min-h-screen text-foreground cursor-none transition-colors duration-300">
               <CustomCursor />
-              <TechBackground />
+              <QuantumBackground />
+              
+              {/* Global Overlay UI & Scanlines */}
+              <div className="fixed inset-0 pointer-events-none z-10 border-[20px] border-primary/5"></div>
+              <div className="fixed inset-0 pointer-events-none z-20 opacity-20" style={{ 
+                background: 'linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
+                backgroundSize: '100% 4px, 3px 100%'
+              }}></div>
 
               <Navbar />
               <PageTransition>

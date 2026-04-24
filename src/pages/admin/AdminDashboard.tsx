@@ -31,54 +31,54 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-20 min-h-screen">
-      <div className="flex flex-col md:row justify-between items-start md:items-center mb-16 gap-6">
-        <SectionHeading title="Admin Dashboard" subtitle="Control Center" />
-        <Button onClick={handleLogout} variant="outline" className="border-red-500/20 text-red-500 hover:bg-red-500/10">
-          <LogOut size={18} className="mr-2" /> Logout
-        </Button>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-20 relative z-30">
+        <div className="flex flex-col md:row justify-between items-start md:items-center mb-16 gap-6">
+          <SectionHeading title="Admin Dashboard" subtitle="Control Center" />
+          <Button onClick={handleLogout} variant="outline" className="border-red-500/20 text-red-500 hover:bg-red-500/10">
+            <LogOut size={18} className="mr-2" /> Logout
+          </Button>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-        {/* Sidebar */}
-        <aside className="lg:col-span-1 space-y-4">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-display font-semibold ${
-                activeTab === tab.id ? 'bg-primary text-white shadow-lg' : 'bg-surface text-foreground/40 hover:bg-surface/80 border border-border/50'
-              } shadow-sm transition-all duration-300`}
-            >
-              <tab.icon size={20} />
-              {tab.label}
-            </button>
-          ))}
-        </aside>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+          {/* Sidebar */}
+          <aside className="lg:col-span-1 space-y-4">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-display font-semibold ${
+                  activeTab === tab.id ? 'bg-primary text-white shadow-lg' : 'bg-surface text-foreground/40 hover:bg-surface/80 border border-border/50'
+                } shadow-sm transition-all duration-300`}
+              >
+                <tab.icon size={20} />
+                {tab.label}
+              </button>
+            ))}
+          </aside>
 
-        {/* Content Area */}
-        <main className="lg:col-span-3">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="p-8 md:p-12" tiltEnabled={false}>
-                {activeTab === 'projects' && <ProjectForm />}
-                {activeTab === 'services' && <ServiceForm />}
-                {activeTab === 'team' && <TeamForm />}
-                {activeTab === 'chat' && <ChatHub />}
-                {activeTab === 'reviews' && <ReviewForm />}
-                {activeTab === 'documents' && <DocumentForm />}
-                {activeTab === 'profile' && <AdminProfileTab />}
-              </Card>
-            </motion.div>
-          </AnimatePresence>
-        </main>
-      </div>
+          {/* Content Area */}
+          <main className="lg:col-span-3">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="p-8 md:p-12" tiltEnabled={false}>
+                  {activeTab === 'projects' && <ProjectForm />}
+                  {activeTab === 'services' && <ServiceForm />}
+                  {activeTab === 'team' && <TeamForm />}
+                  {activeTab === 'chat' && <ChatHub />}
+                  {activeTab === 'reviews' && <ReviewForm />}
+                  {activeTab === 'documents' && <DocumentForm />}
+                  {activeTab === 'profile' && <AdminProfileTab />}
+                </Card>
+              </motion.div>
+            </AnimatePresence>
+          </main>
+        </div>
     </div>
   );
 }
@@ -249,6 +249,7 @@ function AdminProfileTab() {
 function ServiceForm() {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState<any[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState({
     title: '', subtitle: '', description: '', image: '', images: '', link: ''
   });
@@ -275,6 +276,7 @@ function ServiceForm() {
         await axios.post('/api/services', data);
         toast.success('Service added!');
       }
+      setIsModalOpen(false);
       setData({ title: '', subtitle: '', description: '', image: '', images: '', link: '' });
       fetchList();
     } catch (err) {
@@ -295,59 +297,134 @@ function ServiceForm() {
     }
   };
 
-  return (
-    <div className="space-y-12">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <h3 className="text-2xl font-bold mb-8">Service Management</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input label="Service Title" value={data.title} onChange={v => setData({ ...data, title: v })} placeholder="e.g. Custom WordPress Development" />
-          <Input label="Subtitle" value={data.subtitle} onChange={v => setData({ ...data, subtitle: v })} placeholder="Short catchphrase" />
-          <Input label="Main Image URL" value={data.image} onChange={v => setData({ ...data, image: v })} placeholder="Main service image" />
-          <Input label="Link Path" value={data.link} onChange={v => setData({ ...data, link: v })} placeholder="e.g. wordpress-dev" />
-          <div className="md:col-span-2">
-            <Input label="Carousel Images (comma separated)" value={data.images} onChange={v => setData({ ...data, images: v })} placeholder="url1, url2, url3" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Full Description</label>
-            <textarea 
-              className="w-full bg-surface border border-border rounded-xl p-4 focus:border-primary/50 outline-none h-40 text-foreground"
-              value={data.description}
-              onChange={e => setData({ ...data, description: e.target.value })}
-              placeholder="Detailed service description..."
-            />
-          </div>
-        </div>
-        <Button type="submit" disabled={loading} className="w-full">
-          {(data as any)._id ? 'Update Service' : 'Create Service'}
-        </Button>
-      </form>
+  const openEditModal = (service: any) => {
+    setData(service);
+    setIsModalOpen(true);
+  };
 
-      <div className="space-y-4 pt-12 border-t border-white/5">
-        <h3 className="text-xl font-bold mb-6">Active Services ({list.length})</h3>
-        <div className="grid grid-cols-1 gap-4">
-          {list.map(item => (
-            <div key={item._id} className="flex items-center justify-between p-6 glass rounded-2xl group">
+  const openCreateModal = () => {
+    setData({ title: '', subtitle: '', description: '', image: '', images: '', link: '' });
+    setIsModalOpen(true);
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h3 className="text-3xl font-display font-bold">Elite Services</h3>
+          <p className="text-foreground/40 text-xs mt-1 uppercase tracking-widest font-mono">Quantum Node Management</p>
+        </div>
+        <Button onClick={openCreateModal} className="px-6 py-2 flex items-center gap-2">
+          <Plus size={18} /> Add Service
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {list.map(item => (
+          <motion.div 
+            key={item._id}
+            whileHover={{ scale: 1.02 }}
+            className="group relative"
+          >
+            <div 
+              className="flex items-center justify-between p-6 glass rounded-[2rem] border border-white/5 hover:border-primary/30 transition-all cursor-pointer bg-black/40 backdrop-blur-xl"
+              onClick={() => openEditModal(item)}
+            >
               <div className="flex items-center gap-6">
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/5">
-                  {item.image && <img src={item.image} className="w-full h-full object-cover" />}
+                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-primary/50 transition-colors">
+                  {item.image && <img src={item.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />}
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg">{item.title}</h4>
-                  <p className="text-xs text-foreground/40">{item.subtitle}</p>
+                  <h4 className="font-bold text-xl group-hover:text-primary transition-colors">{item.title}</h4>
+                  <p className="text-[10px] text-foreground/40 uppercase tracking-widest font-mono mt-1">{item.subtitle}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setData(item)} className="p-2 text-white/20 hover:text-primary transition-all">
-                  <Plus className="rotate-45" size={18} />
-                </button>
-                <button onClick={() => handleDelete(item._id)} className="p-2 text-white/20 hover:text-red-500 transition-all">
+              <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                <button onClick={() => handleDelete(item._id)} className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0">
                   <Trash2 size={18} />
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+            
+            {/* Subtle tech border effect */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-transparent rounded-[2.1rem] blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+          </motion.div>
+        ))}
       </div>
+
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-bg/90 backdrop-blur-md"
+              onClick={() => setIsModalOpen(false)}
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 30 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar"
+            >
+              <Card className="p-10 md:p-16 border-primary/20 shadow-[0_0_50px_rgba(0,242,255,0.1)] rounded-[3rem] bg-surface/50 backdrop-blur-2xl relative overflow-hidden">
+                {/* Modal Tech Background Decoration */}
+                <div className="absolute top-0 right-0 p-20 opacity-5 pointer-events-none">
+                  <Rocket size={400} />
+                </div>
+                
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="absolute top-8 right-8 w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <Plus className="rotate-45" size={28} />
+                </button>
+
+                <div className="relative z-10">
+                  <h3 className="text-4xl font-display font-bold mb-2">
+                    {(data as any)._id ? 'Synchronize Service' : 'Initialize Service'}
+                  </h3>
+                  <p className="text-primary/60 font-mono text-xs uppercase tracking-widest mb-12">System Node Configuration</p>
+
+                  <form onSubmit={handleSubmit} className="space-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <Input label="Service Title" value={data.title} onChange={v => setData({ ...data, title: v })} placeholder="e.g. AI-Powered Solutions" />
+                      <Input label="Subtitle" value={data.subtitle} onChange={v => setData({ ...data, subtitle: v })} placeholder="System designation" />
+                      <Input label="Main Interface URL" value={data.image} onChange={v => setData({ ...data, image: v })} placeholder="https://interface.jpg" />
+                      <Input label="Node Link" value={data.link} onChange={v => setData({ ...data, link: v })} placeholder="e.g. ai-solutions" />
+                      
+                      <div className="md:col-span-2">
+                        <Input label="Multi-Node Matrix (Carousel Images)" value={data.images} onChange={v => setData({ ...data, images: v })} placeholder="url1, url2, url3" />
+                      </div>
+                      
+                      <div className="md:col-span-2">
+                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 block pl-1 mb-4">Core Operational Description</label>
+                        <textarea 
+                          className="w-full bg-black/40 border border-white/10 rounded-3xl p-8 focus:border-primary/50 outline-none h-48 text-foreground leading-relaxed transition-all focus:bg-black/60"
+                          value={data.description}
+                          onChange={e => setData({ ...data, description: e.target.value })}
+                          placeholder="Detail the service core functionality..."
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-4">
+                      <Button type="submit" disabled={loading} className="flex-grow py-5 text-lg font-display">
+                        {loading ? <Loader2 className="animate-spin mx-auto" /> : (data as any)._id ? 'Update System Node' : 'Deploy New Node'}
+                      </Button>
+                      <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)} className="px-10">
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              </Card>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
