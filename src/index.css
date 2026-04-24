@@ -100,5 +100,10 @@
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
+
+  /* Global Override for max-w-7xl to 1300px for Desktop Containers */
+  .max-w-7xl {
+    max-width: 1300px !important;
+  }
 }
 
