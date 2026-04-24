@@ -74,34 +74,6 @@ const QuantumBackground: React.FC = () => {
     const onMouseMove = (e: MouseEvent) => {
       mouseX = (e.clientX / window.innerWidth) - 0.5;
       mouseY = (e.clientY / window.innerHeight) - 0.5;
-      createShatterStar(e.pageX, e.pageY);
-    };
-
-    const createShatterStar = (x: number, y: number) => {
-      const star = document.createElement('div');
-      star.className = 'tech-star';
-      star.innerHTML = ['✦', '0', '1', '■', '×'][Math.floor(Math.random() * 5)];
-      star.style.left = x + 'px';
-      star.style.top = y + 'px';
-      star.style.position = 'absolute';
-      star.style.pointerEvents = 'none';
-      star.style.zIndex = '9999';
-      star.style.color = '#00f2ff';
-      star.style.textShadow = '0 0 10px #00f2ff';
-      
-      const mx = (Math.random() - 0.5) * 150 + 'px';
-      const my = (Math.random() * 200) + 100 + 'px'; 
-      const rot = (Math.random() * 360) + 'deg';
-      
-      star.style.setProperty('--mx', mx);
-      star.style.setProperty('--my', my);
-      star.style.setProperty('--rot', rot);
-      
-      // Inline animation style
-      star.style.animation = 'techShatter 1s cubic-bezier(0.1, 0.5, 0.5, 1) forwards';
-      
-      document.body.appendChild(star);
-      setTimeout(() => star.remove(), 1000);
     };
 
     const onResize = () => {
@@ -128,24 +100,10 @@ const QuantumBackground: React.FC = () => {
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('resize', onResize);
 
-    // Add CSS for techShatter
-    const style = document.createElement('style');
-    style.innerHTML = `
-      @keyframes techShatter {
-        0% { transform: translate(0, 0) rotate(0deg) scale(1.5); opacity: 1; }
-        100% { transform: translate(var(--mx), var(--my)) rotate(var(--rot)) scale(0); opacity: 0; }
-      }
-      .tech-star {
-        user-select: none;
-      }
-    `;
-    document.head.appendChild(style);
-
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('resize', onResize);
       containerRef.current?.removeChild(renderer.domElement);
-      document.head.removeChild(style);
     };
   }, []);
 

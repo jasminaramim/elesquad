@@ -37,7 +37,7 @@ export default function Navbar() {
   return (
     <nav className={cn(
       "fixed top-0 left-0 right-0 flex items-center z-50 transition-all duration-300 px-4 py-[15px] md:px-10",
-      scrolled ? "bg-black/90 backdrop-blur-md border-b border-white/10" : "bg-transparent"
+      scrolled ? "bg-white dark:bg-[#020205] md:bg-white/80 md:dark:bg-[#020205]/80 md:backdrop-blur-md border-b border-white/10 shadow-sm" : "bg-transparent"
     )}>
       <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2 group">
@@ -175,22 +175,13 @@ export default function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] md:hidden"
-            />
-
             {/* Sidebar */}
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[50vw] bg-black z-[70] md:hidden shadow-2xl flex flex-col"
+              className="fixed inset-0 bg-black z-[70] md:hidden flex flex-col"
             >
               <div className="flex flex-col h-full p-8">
                 <div className="flex justify-between items-center mb-12">
