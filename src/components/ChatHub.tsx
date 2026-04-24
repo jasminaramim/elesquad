@@ -98,7 +98,12 @@ export default function ChatHub() {
   }, [selectedUser, user]);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (scrollRef.current) {
+      const parent = scrollRef.current.parentElement;
+      if (parent) {
+        parent.scrollTo({ top: parent.scrollHeight, behavior: 'smooth' });
+      }
+    }
   }, [messages]);
 
   const handleSend = async (e: React.FormEvent) => {

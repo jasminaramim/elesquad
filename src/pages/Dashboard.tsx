@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Button, Card, SectionHeading } from '../components/UI';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   User, 
   FileText, 
@@ -30,7 +30,18 @@ import ChatHub from '../components/ChatHub';
 export default function Dashboard() {
   const { user, login, logout } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'reviews' | 'documents' | 'finance' | 'messages'>('profile');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'reviews' | 'documents' | 'finance' | 'messages'>(() => {
+    const params = new URLSearchParams(location.search);
+    return (params.get('tab') as any) || 'profile';
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab) setActiveTab(tab as any);
+  }, [location.search]);
+
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toLocaleString('default', { month: 'long', year: 'numeric' }));
   const [showAddProject, setShowAddProject] = useState(false);
   const [newProject, setNewProject] = useState({

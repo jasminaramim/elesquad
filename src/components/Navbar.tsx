@@ -117,7 +117,7 @@ export default function Navbar() {
                         </div>
                       </div>
                       <Link
-                        to="/dashboard"
+                        to={user && user.role === 'Leader' ? "/admin/dashboard?tab=chat" : "/dashboard?tab=messages"}
                         onClick={() => setShowNotifications(false)}
                         className="block w-full py-2 text-center text-xs font-bold bg-primary rounded-lg text-white hover:opacity-90 transition-opacity"
                       >

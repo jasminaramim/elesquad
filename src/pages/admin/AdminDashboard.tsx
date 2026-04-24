@@ -4,7 +4,7 @@ import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, File
 import { Card, Button, SectionHeading } from '../../components/UI';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ChatHub from '../../components/ChatHub';
 
@@ -19,7 +19,18 @@ const tabs = [
 ];
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('projects');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'projects';
+  });
+  
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab) setActiveTab(tab);
+  }, [location.search]);
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
