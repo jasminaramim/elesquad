@@ -98,13 +98,13 @@ export default function CustomCursor() {
         
         {/* Rounded Circle Tip */}
         <div 
-          className="w-3 h-3 bg-white rounded-full shadow-[0_0_15px_rgba(108,77,246,0.8)] border border-primary/50 relative"
+          className="w-5 h-5 bg-white rounded-full shadow-[0_0_20px_rgba(108,77,246,0.8)] border border-primary/50 relative"
         >
           {/* Inner Blinking Dot */}
           <motion.div 
-            animate={{ opacity: [1, 0.4, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="absolute inset-0.5 bg-primary rounded-full"
+            animate={{ opacity: [1, 0.7, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="absolute inset-1 bg-primary rounded-full"
           />
         </div>
       </motion.div>
