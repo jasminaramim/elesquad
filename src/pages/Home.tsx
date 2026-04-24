@@ -135,14 +135,14 @@ export default function Home() {
 
               {/* Floating Tech Icons */}
               {[
-                { icon: Globe, label: 'WordPress', top: '5%', left: '10%', delay: 0 },
-                { icon: Code, label: 'Code', top: '10%', right: '5%', delay: 0.5 },
-                { icon: Layout, label: 'Elementor', bottom: '15%', left: '5%', delay: 1 },
-                { icon: Palette, label: 'Gutenberg', bottom: '10%', right: '10%', delay: 1.5 },
-                { icon: Globe, label: 'Domain', top: '45%', left: '-15%', delay: 2 },
+                { img: "https://upload.wikimedia.org/wikipedia/commons/9/93/Wordpress_Blue_logo.png", label: 'WordPress', top: '5%', left: '10%', delay: 0 },
+                { img: "https://upload.wikimedia.org/wikipedia/commons/8/82/Elementor_icon.svg", label: 'Elementor', top: '10%', right: '5%', delay: 0.5 },
+                { img: "https://upload.wikimedia.org/wikipedia/commons/1/16/Gutenberg_logo.svg", label: 'Gutenberg', bottom: '15%', left: '5%', delay: 1 },
+                { img: "https://upload.wikimedia.org/wikipedia/commons/2/2a/WooCommerce_logo.svg", label: 'WooCommerce', bottom: '10%', right: '10%', delay: 1.5 },
+                { icon: Code, label: 'Code', top: '45%', left: '-15%', delay: 2 },
                 { icon: Server, label: 'Hosting', top: '40%', right: '-10%', delay: 2.5 },
                 { icon: ShoppingBag, label: 'Woodmart', bottom: '-5%', left: '40%', delay: 3 },
-              ].map((item, i) => (
+              ].map((item: any, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0 }}
@@ -161,8 +161,12 @@ export default function Home() {
                   style={{ position: 'absolute', top: item.top, left: item.left, right: item.right, bottom: item.bottom }}
                   className="group relative"
                 >
-                  <div className="w-20 h-20 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl flex flex-col items-center justify-center shadow-2xl hover:bg-primary/20 hover:border-primary/50 transition-all duration-500">
-                    <item.icon size={32} className="text-white group-hover:scale-110 transition-transform" />
+                  <div className="w-20 h-20 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl flex flex-col items-center justify-center shadow-2xl hover:bg-primary/20 hover:border-primary/50 transition-all duration-500 overflow-hidden">
+                    {item.img ? (
+                      <img src={item.img} alt={item.label} className="w-10 h-10 object-contain group-hover:scale-110 transition-transform bg-white/10 p-1 rounded-xl shadow-lg" />
+                    ) : (
+                      <item.icon size={32} className="text-white group-hover:scale-110 transition-transform" />
+                    )}
                     <span className="absolute -bottom-6 text-[8px] font-black uppercase tracking-widest text-white/20 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{item.label}</span>
                   </div>
                 </motion.div>

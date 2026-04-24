@@ -455,7 +455,7 @@ function ServiceForm() {
                            </div>
                          </div>
                       </div>
-                      <Input label="Node Link" value={data.link} onChange={v => setData({ ...data, link: v })} placeholder="e.g. ai-solutions" />
+                      {/* Node Link removed per user request */}
                       
                       <div className="md:col-span-2">
                          <label className="text-xs font-mono uppercase tracking-widest text-foreground/40 block pl-1 mb-2">Multi-Node Matrix (Carousel Images)</label>

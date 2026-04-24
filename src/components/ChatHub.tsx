@@ -120,18 +120,25 @@ export default function ChatHub() {
 
     console.log('Sending message to room:', room);
     
+    // Clear input immediately to prevent double-sends
+    const sentText = input;
+    setInput('');
+    
+    // Optimistic update
+    const optimisticMsg = { ...msgData, _id: 'temp_' + Date.now(), timestamp: new Date() };
+    setMessages(prev => [...prev, optimisticMsg]);
+    
     try {
       // Send via HTTP to ensure it hits the serverless function reliably
-      await axios.post('/api/messages', msgData);
+      await axios.post('/api/messages', { ...msgData, text: sentText });
       
       // Also emit via socket for local/polling speed
-      socketRef.current?.emit('send_message', msgData);
-      
-      // Optimistic update
-      setMessages(prev => [...prev, { ...msgData, timestamp: new Date() }]);
-      setInput('');
+      socketRef.current?.emit('send_message', { ...msgData, text: sentText });
     } catch (err) {
       console.error('Failed to send message:', err);
+      // Revert if failed
+      setMessages(prev => prev.filter(m => m._id !== optimisticMsg._id));
+      setInput(sentText);
     }
   };
 
