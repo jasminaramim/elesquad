@@ -1,57 +1,106 @@
+import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, ArrowRight } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-bg border-t border-border pt-20 pb-10 overflow-hidden relative">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
-        <div className="col-span-1 md:col-span-2">
-          <Link to="/" className="text-3xl font-display font-bold text-foreground mb-6 block">
-            Elesquad
-          </Link>
-          <p className="text-foreground/60 mb-8 max-w-sm leading-relaxed">
-            We build high-end digital experiences that help brands grow in the modern world.
-            Innovative design meets cutting-edge technology.
-          </p>
-          <div className="flex gap-4">
-            {[Globe, Mail, Globe, Globe].map((Icon, i) => (
-              <a key={i} href="#" className="w-10 h-10 glass rounded-lg flex items-center justify-center hover:bg-primary transition-colors text-foreground">
-                <Icon size={18} />
-              </a>
-            ))}
+    <footer className="relative bg-bg border-t border-border pt-32 pb-12 overflow-hidden group/footer">
+      {/* 3D Tech Moving Background - Engineered for Elegance */}
+      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(108,77,246,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(108,77,246,0.1)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
+        <motion.div 
+          animate={{ 
+            x: [0, 30, -30, 0],
+            y: [0, -20, 20, 0]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full"
+        />
+        <motion.div 
+          animate={{ 
+            x: [0, -20, 20, 0],
+            y: [0, 30, -30, 0]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-purple-500/5 blur-[80px] rounded-full"
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-10 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8">
+          {/* Logo & Info */}
+          <div className="md:col-span-5 space-y-8">
+            <Link to="/" className="flex items-center gap-4 group/logo">
+              <span className="text-3xl font-display font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-pink-500 drop-shadow-[0_0_15px_rgba(108,77,246,0.4)]">
+                EleSquad
+              </span>
+            </Link>
+            <p className="text-lg text-foreground/50 max-w-sm leading-relaxed font-light">
+              We build high-end digital experiences that help brands grow in the modern world. 
+              Innovative design meets elite engineering.
+            </p>
+            <div className="flex gap-4">
+              {[Globe, Globe, Globe, Globe].map((Icon, i) => (
+                <a key={i} href="#" className="w-12 h-12 glass border border-border rounded-2xl flex items-center justify-center hover:bg-primary hover:border-primary transition-all duration-300 text-foreground group">
+                  <Icon size={20} className="group-hover:scale-110 transition-transform" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Links */}
+          <div className="md:col-span-2 space-y-8">
+            <h4 className="text-xs uppercase tracking-[0.3em] font-bold text-white/30">Explore</h4>
+            <ul className="space-y-4">
+              {['Home', 'About', 'Projects', 'Team', 'Reviews'].map((item) => (
+                <li key={item}>
+                  <Link to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="text-foreground/50 hover:text-primary transition-colors text-sm font-medium">
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div className="md:col-span-2 space-y-8">
+            <h4 className="text-xs uppercase tracking-[0.3em] font-bold text-white/30">Connect</h4>
+            <ul className="space-y-4 text-sm text-foreground/50">
+              <li className="flex items-center gap-3"><Mail size={16} className="text-primary" /> hello@elesquad.pro</li>
+              <li className="flex items-center gap-3"><Phone size={16} className="text-primary" /> +880 123 456 789</li>
+              <li className="flex items-center gap-3"><MapPin size={16} className="text-primary" /> Dhaka, Bangladesh</li>
+            </ul>
+          </div>
+
+          {/* Newsletter/CTA */}
+          <div className="md:col-span-3 space-y-8">
+            <h4 className="text-xs uppercase tracking-[0.3em] font-bold text-white/30">Newsletter</h4>
+            <div className="relative group/input">
+              <input 
+                type="email" 
+                placeholder="Your email" 
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-primary transition-colors"
+              />
+              <button className="absolute right-2 top-2 bottom-2 px-4 bg-primary rounded-xl text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-opacity">
+                Join
+              </button>
+            </div>
+            <p className="text-[10px] text-white/20 italic">Join our elite squad of innovators.</p>
           </div>
         </div>
 
-        <div>
-          <h4 className="text-xl font-display font-semibold mb-6">Quick Links</h4>
-          <ul className="space-y-4 text-foreground/60 text-sm">
-            <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-            <li><Link to="/projects" className="hover:text-primary transition-colors">Our Projects</Link></li>
-            <li><Link to="/team" className="hover:text-primary transition-colors">Our Team</Link></li>
-            <li><Link to="/auth" className="hover:text-primary transition-colors">Member Portal</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-xl font-display font-semibold mb-6">Collaborate</h4>
-          <p className="text-foreground/60 text-sm leading-relaxed mb-6">
-            Ready to push the boundaries of digital innovation? Join our elite squad of developers.
+        {/* Bottom Bar */}
+        <div className="mt-24 pt-8 border-t border-white/5 flex flex-col md:row justify-between items-center gap-6">
+          <p className="text-xs text-white/20 font-mono tracking-wider">
+            © {new Date().getFullYear()} ELESQUAD. ENGINEERED FOR EXCELLENCE.
           </p>
-          <Link to="/auth">
-            <button className="px-6 py-2 bg-surface border border-border rounded-lg text-xs font-bold hover:bg-primary hover:border-primary transition-all text-foreground">
-              Join The Squad
-            </button>
-          </Link>
+          <div className="flex gap-8 text-xs text-white/20 uppercase tracking-widest font-bold">
+            <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
+            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
+            <Link to="/admin" className="hover:text-primary transition-colors">Portal</Link>
+          </div>
         </div>
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-20 pt-8 border-t border-border flex flex-col md:row justify-between items-center gap-4 text-foreground/40 text-sm">
-        <p>© {new Date().getFullYear()} Elesquad. All rights reserved.</p>
-        <Link to="/admin" className="hover:text-foreground transition-colors">Admin Access</Link>
-      </div>
-
-      {/* Decorative Blob */}
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-64 h-64 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
     </footer>
   );
 }

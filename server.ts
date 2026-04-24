@@ -1,4 +1,7 @@
 import express from 'express';
+import 'dotenv/config';
+import dns from 'dns';
+dns.setServers(['8.8.8.8']);
 import { MongoClient, ObjectId } from 'mongodb';
 import cors from 'cors';
 import multer from 'multer';
@@ -61,7 +64,7 @@ const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 const client = new MongoClient(MONGODB_URI);
 
 let db: any = null;
-let users: any, projects: any, reviews: any, documents: any, messages: any, contact: any;
+let users: any, projects: any, reviews: any, documents: any, messages: any, contact: any, services: any;
 
 async function connectToDatabase() {
   if (db) return;
@@ -77,6 +80,7 @@ async function connectToDatabase() {
     documents = db.collection('documents');
     messages = db.collection('messages');
     contact = db.collection('contact');
+    services = db.collection('services');
     
     console.log("Connected to MongoDB successfully");
     
@@ -93,6 +97,60 @@ async function connectToDatabase() {
         team: "Core"
       });
       console.log("Admin seeded");
+    }
+
+    // Seed Demo Services if missing
+    const serviceCount = await services.countDocuments();
+    if (serviceCount === 0) {
+      const demoServices = [
+        {
+          title: "AI-Powered Web Apps",
+          subtitle: "Next-Gen Intelligence",
+          description: "We build cutting-edge web applications integrated with advanced AI models like Gemini. Our solutions offer automated workflows, intelligent data processing, and personalized user experiences that give your business a competitive edge.",
+          image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
+          images: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800,https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=800",
+          link: "ai-solutions",
+          createdAt: new Date()
+        },
+        {
+          title: "Ultra-Premium UI/UX",
+          subtitle: "Visual Excellence",
+          description: "Stunning, high-conversion designs featuring 3D visuals, glassmorphism, and smooth interactive animations. We prioritize visual storytelling and user-centric flows to create digital experiences that wow your customers.",
+          image: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=800",
+          images: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=800,https://images.unsplash.com/photo-1586717791821-3f44a563eb4c?auto=format&fit=crop&q=80&w=800",
+          link: "ui-ux-design",
+          createdAt: new Date()
+        },
+        {
+          title: "Scalable E-commerce",
+          subtitle: "Sell Anywhere",
+          description: "Robust online stores built for performance, security, and seamless checkout experiences. From Shopify custom themes to headless commerce solutions, we help you scale your online business globally.",
+          image: "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800",
+          images: "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=800,https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
+          link: "ecommerce",
+          createdAt: new Date()
+        },
+        {
+          title: "Custom SaaS Solutions",
+          subtitle: "Enterprise Grade",
+          description: "Dedicated software-as-a-service platforms designed to scale with your business. We build secure, multi-tenant architectures with real-time analytics and complex backend integrations.",
+          image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
+          images: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800,https://images.unsplash.com/photo-1504868584819-f8e905263543?auto=format&fit=crop&q=80&w=800",
+          link: "saas-development",
+          createdAt: new Date()
+        },
+        {
+          title: "Digital Brand Strategy",
+          subtitle: "Identity First",
+          description: "Comprehensive branding and digital strategy to help your business stand out. We combine data-driven insights with creative excellence to build a powerful online presence for your brand.",
+          image: "https://images.unsplash.com/photo-1557426272-fc759fbbad95?auto=format&fit=crop&q=80&w=800",
+          images: "https://images.unsplash.com/photo-1557426272-fc759fbbad95?auto=format&fit=crop&q=80&w=800,https://images.unsplash.com/photo-1533750349088-cd871a92f312?auto=format&fit=crop&q=80&w=800",
+          link: "branding-strategy",
+          createdAt: new Date()
+        }
+      ];
+      await services.insertMany(demoServices);
+      console.log("Demo services seeded");
     }
   } catch (err: any) {
     console.error("CRITICAL DATABASE CONNECTION ERROR:", err.message);
@@ -532,6 +590,63 @@ app.use(async (req, res, next) => {
   app.delete('/api/reviews/:id', async (req, res) => {
     await reviews.deleteOne({ _id: new ObjectId(req.params.id) });
     res.json({ success: true });
+  });
+
+  // Services CRUD
+  app.get('/api/services', async (req, res) => {
+    try {
+      const allServices = await services.find().toArray();
+      res.json(allServices);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch services' });
+    }
+  });
+
+  app.get('/api/services/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+      const service = await services.findOne({ _id: new ObjectId(id) });
+      res.json(service);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch service' });
+    }
+  });
+
+  app.post('/api/services', async (req, res) => {
+    const { title, subtitle, description, image, images, link } = req.body;
+    try {
+      const result = await services.insertOne({
+        title, subtitle, description, image, images, link,
+        createdAt: new Date()
+      });
+      res.json({ id: result.insertedId });
+    } catch (err) {
+      res.status(500).json({ error: 'Creation failed' });
+    }
+  });
+
+  app.put('/api/services/:id', async (req, res) => {
+    const { id } = req.params;
+    const { _id, ...updateData } = req.body;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+    try {
+      await services.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Update failed' });
+    }
+  });
+
+  app.delete('/api/services/:id', async (req, res) => {
+    const { id } = req.params;
+    if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
+    try {
+      await services.deleteOne({ _id: new ObjectId(id) });
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Deletion failed' });
+    }
   });
 
   // Team

@@ -10,7 +10,7 @@ interface CardProps {
   key?: React.Key;
 }
 
-export function Card({ children, className, tiltEnabled = true }: CardProps) {
+export function Card({ children, className, tiltEnabled = false }: CardProps) {
   const content = (
     <div className={cn(
       "bg-card border border-border rounded-3xl p-6 backdrop-blur-xl hover:shadow-[0_0_40px_rgba(108,77,246,0.15)] transition-all duration-500 overflow-hidden relative group",
@@ -48,20 +48,22 @@ export function Button({
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'outline' }) {
   return (
     <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       className={cn(
-        "px-8 py-4 rounded-xl font-bold text-lg transition-all relative overflow-hidden group",
+        "relative px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden",
         variant === 'primary' 
-          ? "bg-primary text-white shadow-[0_0_30px_rgba(108,77,246,0.5)] border border-white/20" 
-          : "bg-surface backdrop-blur-sm border border-border text-foreground hover:bg-surface/80",
+          ? "bg-white text-bg hover:bg-primary hover:text-white shadow-[0_10px_40px_rgba(108,77,246,0.3)]" 
+          : "bg-transparent border border-white/10 text-white hover:border-primary/50 hover:bg-primary/5",
         className
       )}
       {...props}
     >
-      <span className="relative z-10 flex items-center justify-center gap-2">{children}</span>
+      <span className="relative z-10 flex items-center gap-2">{children}</span>
       {variant === 'primary' && (
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white group-hover:bg-white group-hover:text-primary transition-all duration-500 shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+        </div>
       )}
     </motion.button>
   );

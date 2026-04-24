@@ -24,6 +24,7 @@ import Dashboard from './pages/Dashboard';
 import DocumentEditor from './pages/DocumentEditor';
 import TechBackground from './components/TechBackground';
 import CustomCursor from './components/CustomCursor';
+import ServiceDetails from './pages/ServiceDetails';
 
 import { ThemeProvider } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -66,6 +67,7 @@ export default function App() {
                   <Route path="/team" element={<Team />} />
                   <Route path="/team/:id" element={<TeamMemberDetails />} />
                   <Route path="/reviews" element={<Reviews />} />
+                  <Route path="/services/:id" element={<ServiceDetails />} />
 
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/dashboard" element={<Dashboard />} />

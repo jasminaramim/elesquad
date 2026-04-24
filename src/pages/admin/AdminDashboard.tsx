@@ -10,6 +10,7 @@ import ChatHub from '../../components/ChatHub';
 
 const tabs = [
   { id: 'projects', label: 'Projects', icon: LayoutDashboard },
+  { id: 'services', label: 'Services', icon: Rocket },
   { id: 'team', label: 'Team', icon: Users },
   { id: 'reviews', label: 'Reviews', icon: Star },
   { id: 'documents', label: 'Sheets', icon: FileText },
@@ -67,6 +68,7 @@ export default function AdminDashboard() {
             >
               <Card className="p-8 md:p-12" tiltEnabled={false}>
                 {activeTab === 'projects' && <ProjectForm />}
+                {activeTab === 'services' && <ServiceForm />}
                 {activeTab === 'team' && <TeamForm />}
                 {activeTab === 'chat' && <ChatHub />}
                 {activeTab === 'reviews' && <ReviewForm />}
@@ -240,6 +242,112 @@ function AdminProfileTab() {
           <Save size={18} /> Update Admin Identity
         </Button>
       </form>
+    </div>
+  );
+}
+
+function ServiceForm() {
+  const [loading, setLoading] = useState(false);
+  const [list, setList] = useState<any[]>([]);
+  const [data, setData] = useState({
+    title: '', subtitle: '', description: '', image: '', images: '', link: ''
+  });
+
+  const fetchList = async () => {
+    try {
+      const res = await axios.get('/api/services');
+      setList(res.data);
+    } catch (err) {
+      toast.error('Failed to fetch services');
+    }
+  };
+
+  useEffect(() => { fetchList(); }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if ((data as any)._id) {
+        await axios.put(`/api/services/${(data as any)._id}`, data);
+        toast.success('Service updated!');
+      } else {
+        await axios.post('/api/services', data);
+        toast.success('Service added!');
+      }
+      setData({ title: '', subtitle: '', description: '', image: '', images: '', link: '' });
+      fetchList();
+    } catch (err) {
+      toast.error('Operation failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure?')) return;
+    try {
+      await axios.delete(`/api/services/${id}`);
+      toast.success('Service deleted');
+      fetchList();
+    } catch (err) {
+      toast.error('Deletion failed');
+    }
+  };
+
+  return (
+    <div className="space-y-12">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <h3 className="text-2xl font-bold mb-8">Service Management</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input label="Service Title" value={data.title} onChange={v => setData({ ...data, title: v })} placeholder="e.g. Custom WordPress Development" />
+          <Input label="Subtitle" value={data.subtitle} onChange={v => setData({ ...data, subtitle: v })} placeholder="Short catchphrase" />
+          <Input label="Main Image URL" value={data.image} onChange={v => setData({ ...data, image: v })} placeholder="Main service image" />
+          <Input label="Link Path" value={data.link} onChange={v => setData({ ...data, link: v })} placeholder="e.g. wordpress-dev" />
+          <div className="md:col-span-2">
+            <Input label="Carousel Images (comma separated)" value={data.images} onChange={v => setData({ ...data, images: v })} placeholder="url1, url2, url3" />
+          </div>
+          <div className="md:col-span-2">
+            <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Full Description</label>
+            <textarea 
+              className="w-full bg-surface border border-border rounded-xl p-4 focus:border-primary/50 outline-none h-40 text-foreground"
+              value={data.description}
+              onChange={e => setData({ ...data, description: e.target.value })}
+              placeholder="Detailed service description..."
+            />
+          </div>
+        </div>
+        <Button type="submit" disabled={loading} className="w-full">
+          {(data as any)._id ? 'Update Service' : 'Create Service'}
+        </Button>
+      </form>
+
+      <div className="space-y-4 pt-12 border-t border-white/5">
+        <h3 className="text-xl font-bold mb-6">Active Services ({list.length})</h3>
+        <div className="grid grid-cols-1 gap-4">
+          {list.map(item => (
+            <div key={item._id} className="flex items-center justify-between p-6 glass rounded-2xl group">
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/5">
+                  {item.image && <img src={item.image} className="w-full h-full object-cover" />}
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">{item.title}</h4>
+                  <p className="text-xs text-foreground/40">{item.subtitle}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setData(item)} className="p-2 text-white/20 hover:text-primary transition-all">
+                  <Plus className="rotate-45" size={18} />
+                </button>
+                <button onClick={() => handleDelete(item._id)} className="p-2 text-white/20 hover:text-red-500 transition-all">
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

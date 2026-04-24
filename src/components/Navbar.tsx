@@ -9,6 +9,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { Button } from './UI';
 import { Sun, Moon, Bell } from 'lucide-react';
 
+
 const navLinks = [
   { name: 'Home', path: '/' },
   { name: 'About', path: '/about' },
@@ -16,13 +17,14 @@ const navLinks = [
   { name: 'Team', path: '/team' },
 ];
 
-  export default function Navbar() {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { unreadCount } = useNotifications();
+  const { unreadCount, resetUnread } = useNotifications();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,33 +36,13 @@ const navLinks = [
 
   return (
     <nav className={cn(
-      "fixed top-0 left-0 right-0 h-[72px] flex items-center z-50 transition-all duration-300 px-4 md:px-10",
-      scrolled ? "bg-bg/80 backdrop-blur-md border-b border-border" : "bg-transparent"
+      "fixed top-0 left-0 right-0 flex items-center z-50 transition-all duration-300 px-4 py-[15px] md:px-10",
+      scrolled ? "bg-black/90 backdrop-blur-md border-b border-white/10" : "bg-transparent"
     )}>
       <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="relative w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-             {/* Custom Infinity Logo SVG style */}
-             <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_15px_rgba(180,60,255,0.5)]">
-               <defs>
-                 <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                   <stop offset="0%" stopColor="#8A46FF" />
-                   <stop offset="50%" stopColor="#C43BFF" />
-                   <stop offset="100%" stopColor="#FF3BD0" />
-                 </linearGradient>
-               </defs>
-               <path 
-                 d="M30 50 C 30 35 45 35 50 50 C 55 65 70 65 70 50 C 70 35 55 35 50 50 C 45 65 30 65 30 50" 
-                 fill="none" 
-                 stroke="url(#logoGradient)" 
-                 strokeWidth="10" 
-                 strokeLinecap="round"
-                 className="animate-pulse"
-               />
-             </svg>
-          </div>
-          <span className="text-2xl font-display font-bold tracking-tighter text-foreground">
-            Ele<span className="text-primary italic">Squad</span>
+          <span className="text-3xl font-display font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-pink-500 drop-shadow-[0_0_15px_rgba(108,77,246,0.4)]">
+            EleSquad
           </span>
         </Link>
 
@@ -85,9 +67,9 @@ const navLinks = [
               )}
             </Link>
           ))}
-          
+
           {/* Theme Toggle */}
-          <button 
+          <button
             onClick={toggleTheme}
             className="p-2 rounded-full hover:bg-surface transition-colors text-foreground"
           >
@@ -96,12 +78,61 @@ const navLinks = [
 
           {/* Notifications */}
           <div className="relative">
-            <Bell size={20} className="text-foreground/60" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-bounce">
-                {unreadCount}
-              </span>
-            )}
+            <button
+              onClick={() => {
+                setShowNotifications(!showNotifications);
+                if (unreadCount > 0) resetUnread();
+              }}
+              className="relative p-2 rounded-full hover:bg-surface transition-colors"
+            >
+              <Bell size={20} className={cn("transition-colors", unreadCount > 0 ? "text-primary" : "text-foreground/60")} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-bounce">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-80 glass border border-border rounded-2xl p-4 shadow-2xl z-50"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-sm">Notifications</h3>
+                    <button onClick={() => setShowNotifications(false)} className="text-xs text-foreground/40 hover:text-primary">Close</button>
+                  </div>
+                  {unreadCount > 0 ? (
+                    <div className="space-y-3">
+                      <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+                          <Bell size={14} className="text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">New Messages</p>
+                          <p className="text-xs text-foreground/60">You have {unreadCount} unread messages in your chat room.</p>
+                        </div>
+                      </div>
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setShowNotifications(false)}
+                        className="block w-full py-2 text-center text-xs font-bold bg-primary rounded-lg text-white hover:opacity-90 transition-opacity"
+                      >
+                        View Messages
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <Bell size={32} className="mx-auto text-foreground/10 mb-2" />
+                      <p className="text-sm text-foreground/40">No new notifications</p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           <Link
             to={user ? (user.role === 'Leader' ? "/admin/dashboard" : "/dashboard") : "/auth"}
@@ -127,57 +158,91 @@ const navLinks = [
         </div>
 
         {/* Mobile Toggle */}
-        <button
-          className="md:hidden text-foreground flex items-center gap-4"
-        >
-          <div onClick={toggleTheme}>
-            {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
-          </div>
-          <div onClick={() => setIsOpen(!isOpen)}>
+        <div className="md:hidden flex items-center gap-4">
+          <button onClick={toggleTheme} className="p-2 text-foreground/60">
+            {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
+          </button>
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 text-foreground"
+          >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
-          </div>
-        </button>
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Sidebar */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-bg/95 backdrop-blur-xl border-b border-white/10 overflow-hidden"
-          >
-            <div className="px-4 py-8 flex flex-col gap-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className={cn(
-                    "text-xl font-display font-medium",
-                    location.pathname === link.path ? "text-primary" : "text-white/70"
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              ))}
-              <Link
-                to={user ? (user.role === 'Leader' ? "/admin/dashboard" : "/dashboard") : "/auth"}
-                className="w-full py-4 bg-primary rounded-xl text-center font-bold text-white flex items-center justify-center gap-3"
-                onClick={() => setIsOpen(false)}
-              >
-                {user ? (
-                  <>
-                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/10">
-                      {user.image ? <img src={user.image} className="w-full h-full object-cover" /> : user.name[0]}
-                    </div>
-                    {user.name}
-                  </>
-                ) : 'Login'}
-              </Link>
-            </div>
-          </motion.div>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] md:hidden"
+            />
+
+            {/* Sidebar */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 bottom-0 w-[50vw] bg-black z-[70] md:hidden shadow-2xl flex flex-col"
+            >
+              <div className="flex flex-col h-full p-8">
+                <div className="flex justify-between items-center mb-12">
+                  <span className="text-2xl font-display font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
+                    EleSquad
+                  </span>
+                  <button onClick={() => setIsOpen(false)} className="p-2 text-white">
+                    <X size={28} />
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-8">
+                  {navLinks.map((link, i) => (
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                    >
+                      <Link
+                        to={link.path}
+                        className={cn(
+                          "text-4xl font-display font-bold tracking-tighter transition-colors",
+                          location.pathname === link.path ? "text-primary" : "text-white/40"
+                        )}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="mt-auto pt-8 border-t border-white/10">
+                  <Link
+                    to={user ? (user.role === 'Leader' ? "/admin/dashboard" : "/dashboard") : "/auth"}
+                    className="w-full py-5 bg-primary rounded-2xl text-center font-bold text-lg text-white flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(108,77,246,0.3)]"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {user ? (
+                      <>
+                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/10">
+                          {user.image ? <img src={user.image} className="w-full h-full object-cover" /> : user.name[0]}
+                        </div>
+                        {user.name}
+                      </>
+                    ) : 'Login'}
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </nav>
