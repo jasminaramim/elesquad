@@ -24,7 +24,6 @@ import Dashboard from './pages/Dashboard';
 import DocumentEditor from './pages/DocumentEditor';
 import TechBackground from './components/TechBackground';
 import QuantumBackground from './components/QuantumBackground';
-import CustomCursor from './components/CustomCursor';
 import ServiceDetails from './pages/ServiceDetails';
 
 import { ThemeProvider } from './context/ThemeContext';
@@ -54,8 +53,7 @@ export default function App() {
       <ThemeProvider>
         <NotificationProvider>
           <Router>
-            <div className="relative overflow-x-hidden bg-bg min-h-screen text-foreground cursor-none transition-colors duration-300">
-              <CustomCursor />
+            <div className="relative overflow-x-hidden bg-bg min-h-screen text-foreground transition-colors duration-300">
               <QuantumBackground />
               
               {/* Global Overlay UI & Scanlines */}

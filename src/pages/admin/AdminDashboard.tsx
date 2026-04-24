@@ -392,11 +392,112 @@ function ServiceForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <Input label="Service Title" value={data.title} onChange={v => setData({ ...data, title: v })} placeholder="e.g. AI-Powered Solutions" />
                       <Input label="Subtitle" value={data.subtitle} onChange={v => setData({ ...data, subtitle: v })} placeholder="System designation" />
-                      <Input label="Main Interface URL" value={data.image} onChange={v => setData({ ...data, image: v })} placeholder="https://interface.jpg" />
+                      <div className="md:col-span-1">
+                         <label className="text-xs font-mono uppercase tracking-widest text-foreground/40 block pl-1 mb-2">Main Interface Image</label>
+                          <div className="flex items-center gap-4 p-4 bg-surface border border-border rounded-xl">
+                            <div className="w-16 h-16 bg-surface rounded-lg overflow-hidden flex items-center justify-center border border-border">
+                              {data.image ? <img src={data.image || undefined} className="w-full h-full object-cover" /> : <Rocket size={20} className="text-foreground/10" />}
+                            </div>
+                           <div className="flex-grow">
+                             <input 
+                               type="file" 
+                               accept="image/*"
+                               className="hidden" 
+                               id="service-image-upload"
+                               onChange={async (e) => {
+                                 const file = e.target.files?.[0];
+                                 if (!file) return;
+                                 const readerForBase64 = new FileReader();
+                                 readerForBase64.onloadend = async () => {
+                                   const base64String = (readerForBase64.result as string).split(',')[1];
+                                   const formDataImgBB = new FormData();
+                                   formDataImgBB.append('image', base64String);
+                                   const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0';
+                                   try {
+                                     const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
+                                     if (res.data.success) {
+                                       setData({ ...data, image: res.data.data.url });
+                                       toast.success('Image hosted on Cloud!');
+                                       return;
+                                     }
+                                   } catch (err) {
+                                     console.warn('ImgBB failed, trying local...', err);
+                                   }
+                                   const formDataLocal = new FormData();
+                                   formDataLocal.append('image', file);
+                                   try {
+                                     const resLocal = await axios.post('/api/upload', formDataLocal);
+                                     if (resLocal.data.imageUrl) {
+                                       setData({ ...data, image: resLocal.data.imageUrl });
+                                       toast.success('Image hosted Locally!');
+                                     }
+                                   } catch (localErr) {
+                                     toast.error('Image sync failed');
+                                   }
+                                 };
+                                 readerForBase64.readAsDataURL(file);
+                               }}
+                             />
+                             <label htmlFor="service-image-upload" className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-xs font-bold transition-all">
+                                <Plus size={14} /> Upload
+                             </label>
+                           </div>
+                         </div>
+                      </div>
                       <Input label="Node Link" value={data.link} onChange={v => setData({ ...data, link: v })} placeholder="e.g. ai-solutions" />
                       
                       <div className="md:col-span-2">
-                        <Input label="Multi-Node Matrix (Carousel Images)" value={data.images} onChange={v => setData({ ...data, images: v })} placeholder="url1, url2, url3" />
+                         <label className="text-xs font-mono uppercase tracking-widest text-foreground/40 block pl-1 mb-2">Multi-Node Matrix (Carousel Images)</label>
+                          <div className="flex flex-col gap-4 p-4 bg-surface border border-border rounded-xl">
+                            <div className="flex flex-wrap gap-2">
+                              {data.images ? data.images.split(',').map((img, idx) => (
+                                <div key={idx} className="w-16 h-16 bg-surface rounded-lg overflow-hidden border border-border relative group">
+                                  <img src={img.trim()} className="w-full h-full object-cover" />
+                                  <button type="button" onClick={() => {
+                                    const newImages = data.images.split(',').filter((_, i) => i !== idx).join(',');
+                                    setData({ ...data, images: newImages });
+                                  }} className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Trash2 size={14} className="text-white" />
+                                  </button>
+                                </div>
+                              )) : <p className="text-xs text-foreground/40">No images added</p>}
+                            </div>
+                             <input 
+                               type="file" 
+                               accept="image/*"
+                               multiple
+                               className="hidden" 
+                               id="service-images-upload"
+                               onChange={async (e) => {
+                                 const files = Array.from(e.target.files || []);
+                                 if (!files.length) return;
+                                 toast.loading('Uploading images...', { id: 'multi-upload' });
+                                 let newUrls: string[] = [];
+                                 for (const file of files) {
+                                   const formDataLocal = new FormData();
+                                   formDataLocal.append('image', file);
+                                   try {
+                                     const resLocal = await axios.post('/api/upload', formDataLocal);
+                                     if (resLocal.data.imageUrl) {
+                                       newUrls.push(resLocal.data.imageUrl);
+                                     }
+                                   } catch (err) {
+                                     console.error('Upload failed for a file', err);
+                                   }
+                                 }
+                                 if (newUrls.length > 0) {
+                                   const currentImages = data.images ? data.images.split(',').map(s=>s.trim()).filter(Boolean) : [];
+                                   setData({ ...data, images: [...currentImages, ...newUrls].join(',') });
+                                   toast.success('Images added!', { id: 'multi-upload' });
+                                 } else {
+                                   toast.error('Failed to upload images', { id: 'multi-upload' });
+                                 }
+                               }}
+                             />
+                             <label htmlFor="service-images-upload" className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-xs font-bold transition-all w-max">
+                                <Plus size={14} /> Add Images
+                             </label>
+                         </div>
                       </div>
                       
                       <div className="md:col-span-2">
