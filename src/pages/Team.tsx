@@ -53,35 +53,44 @@ export default function Team() {
           <div className="h-[1px] flex-grow bg-white/10" />
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {team.filter(m => m.role === 'Leader').map((member, i) => (
             <motion.div
               key={member._id}
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              className="relative group"
+              className="relative flex flex-col md:flex-row items-center gap-12 glass p-8 md:p-16 rounded-[3rem] border border-primary/20 overflow-hidden"
             >
-              <Link to={`/team/${member._id}`}>
-                <Card className="p-0 overflow-hidden border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all duration-500 shadow-[0_0_50px_rgba(180,60,255,0.1)]">
-                  <div className="aspect-[4/5] overflow-hidden relative">
-                    <img 
-                      src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/150?u=${member._id}`} 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60" />
-                    <div className="absolute top-6 right-6">
-                      <div className="px-4 py-1.5 bg-primary text-white text-[10px] font-bold rounded-full shadow-xl animate-pulse">
-                        SQUAD LEADER
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-10 text-center">
-                    <h3 className="text-3xl font-display font-bold mb-2 text-white">{member.name}</h3>
-                    <p className="text-primary font-mono text-xs uppercase tracking-[0.3em] mb-4">{member.designation || 'Head of Squad'}</p>
-                    <p className="text-white/40 text-sm italic line-clamp-2">"{member.bio || 'Leading the squad to digital excellence.'}"</p>
-                  </div>
-                </Card>
-              </Link>
+              {/* Image Left */}
+              <div className="w-full md:w-1/2 relative group rounded-[2rem] overflow-hidden aspect-[4/5] md:aspect-[3/4]">
+                <img 
+                  src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/500?u=${member._id}`} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                  alt={member.name}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60" />
+                <div className="absolute bottom-6 left-6 flex gap-3">
+                   {/* Real icons for wordpress and elementor */}
+                   <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Wordpress_Blue_logo.png" alt="WordPress" className="w-8 h-8 rounded-full bg-white p-1 shadow-lg" />
+                   <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Elementor_icon.svg" alt="Elementor" className="w-8 h-8 rounded-full bg-white p-1 shadow-lg" />
+                </div>
+              </div>
+              
+              {/* Info Right */}
+              <div className="w-full md:w-1/2 text-left">
+                <div className="px-4 py-1.5 bg-primary/20 border border-primary text-primary text-[10px] font-bold rounded-full inline-block mb-6 uppercase tracking-widest">
+                  SQUAD LEADER
+                </div>
+                <h3 className="text-4xl md:text-6xl font-display font-bold mb-4 text-white">{member.name}</h3>
+                <p className="text-primary font-mono text-sm md:text-base uppercase tracking-[0.3em] mb-8">{member.designation || 'Head of Squad'}</p>
+                <p className="text-white/60 text-lg leading-relaxed mb-8">
+                  {member.bio || 'Leading the squad to digital excellence. Specializing in high-performance WordPress and Elementor development, turning complex requirements into seamless digital experiences.'}
+                </p>
+                
+                <Link to={`/team/${member._id}`}>
+                   <Button className="px-8 py-4 w-full md:w-auto text-center justify-center">View Full Profile</Button>
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>
