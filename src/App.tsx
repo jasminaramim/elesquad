@@ -25,6 +25,7 @@ import DocumentEditor from './pages/DocumentEditor';
 import TechBackground from './components/TechBackground';
 import QuantumBackground from './components/QuantumBackground';
 import ServiceDetails from './pages/ServiceDetails';
+import Contact from './pages/Contact';
 
 import { ThemeProvider } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -57,7 +58,6 @@ export default function App() {
               <QuantumBackground />
               
               {/* Global Overlay UI & Scanlines */}
-              <div className="fixed inset-0 pointer-events-none z-10 border-[20px] border-primary/5"></div>
               <div className="fixed inset-0 pointer-events-none z-20 opacity-20" style={{ 
                 background: 'linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
                 backgroundSize: '100% 4px, 3px 100%'
@@ -74,6 +74,7 @@ export default function App() {
                   <Route path="/team/:id" element={<TeamMemberDetails />} />
                   <Route path="/reviews" element={<Reviews />} />
                   <Route path="/services/:id" element={<ServiceDetails />} />
+                  <Route path="/contact" element={<Contact />} />
 
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/dashboard" element={<Dashboard />} />

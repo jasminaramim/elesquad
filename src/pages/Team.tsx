@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Globe, Mail, MessageSquare, Star } from 'lucide-react';
 import { Card, SectionHeading, Button } from '../components/UI';
 import axios from 'axios';
+import { Facebook, Instagram, Linkedin, Telegram as TelegramIcon } from '../components/BrandIcons';
 
 export default function Team() {
   const [team, setTeam] = useState<any[]>([]);
@@ -16,7 +17,7 @@ export default function Team() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-20">
+    <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
       {/* Page Header - Pipeline Style */}
       <div className="text-center mb-24 relative">
         <motion.div
@@ -129,11 +130,31 @@ export default function Team() {
                     {/* Social Hover Overlay */}
                     <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-bg/90 to-transparent">
                       <div className="flex justify-center gap-3">
-                        {[Globe, Mail, MessageSquare].map((Icon, idx) => (
-                          <div key={idx} className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
-                            <Icon size={14} />
+                        {member.linkedin && (
+                          <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
+                            <Linkedin size={14} />
+                          </a>
+                        )}
+                        {member.facebook && (
+                          <a href={member.facebook} target="_blank" rel="noopener noreferrer" className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
+                            <Facebook size={14} />
+                          </a>
+                        )}
+                        {member.instagram && (
+                          <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
+                            <Instagram size={14} />
+                          </a>
+                        )}
+                        {member.telegram && (
+                          <a href={`https://t.me/${member.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
+                            <TelegramIcon size={14} />
+                          </a>
+                        )}
+                        {!member.linkedin && !member.facebook && !member.instagram && !member.telegram && (
+                          <div className="w-9 h-9 glass rounded-full flex items-center justify-center text-white/20">
+                            <Globe size={14} />
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
                   </div>
@@ -166,7 +187,7 @@ export default function Team() {
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="mt-40 p-12 md:p-20 glass rounded-[3rem] text-center relative overflow-hidden"
+        className="mt-40 py-[50px] md:py-[70px] lg:py-[120px] px-12 md:px-20 glass rounded-[3rem] text-center relative overflow-hidden"
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
         <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">Want to work with us?</h2>
@@ -174,9 +195,11 @@ export default function Team() {
           We’re always looking for talented individuals who share our passion 
           for building the future of the digital world.
         </p>
-        <Link to="/contact">
-          <Button className="px-10">Get In Touch</Button>
-        </Link>
+        <div className="flex justify-center">
+          <Link to="/contact">
+            <Button className="px-10">Get In Touch</Button>
+          </Link>
+        </div>
       </motion.div>
     </div>
   );

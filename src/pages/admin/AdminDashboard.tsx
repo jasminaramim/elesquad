@@ -548,7 +548,7 @@ function ProjectForm() {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [data, setData] = useState({
     title: '', description: '', image: '', techStack: '', liveLink: '',
-    orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo'
+    orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo'
   });
 
   const fetchList = async () => {
@@ -579,7 +579,7 @@ function ProjectForm() {
       }
       setData({ 
         title: '', description: '', image: '', techStack: '', liveLink: '',
-        orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo'
+        orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo'
       });
       fetchList();
     } catch (err) {
@@ -619,6 +619,20 @@ function ProjectForm() {
               <option value="combine" className="bg-bg">Combine</option>
               <option value="leader" className="bg-bg">Leader</option>
               <option value="squad" className="bg-bg">Squad</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Project Status</label>
+            <select 
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground"
+              value={data.status || 'todo'}
+              onChange={e => setData({ ...data, status: e.target.value })}
+            >
+              <option value="todo" className="bg-bg">Todo</option>
+              <option value="in-progress" className="bg-bg">In Progress</option>
+              <option value="wip" className="bg-bg">WIP</option>
+              <option value="delivered" className="bg-bg">Delivered</option>
+              <option value="completed" className="bg-bg">Completed</option>
             </select>
           </div>
           <Input label="Order ID" value={data.orderId || ''} onChange={v => setData({ ...data, orderId: v })} placeholder="ORD-123" />
@@ -700,7 +714,9 @@ function ProjectForm() {
             placeholder="Describe the project masterpiece..."
           />
         </div>
-        <Button type="submit" disabled={loading} className="w-full">Create Project</Button>
+        <Button type="submit" disabled={loading} className="w-full">
+          {(data as any)._id ? 'Update Project Masterpiece' : 'Create Project Masterpiece'}
+        </Button>
       </form>
 
       <div className="space-y-4 pt-12 border-t border-white/5">
@@ -728,7 +744,29 @@ function ProjectForm() {
                     <span>•</span>
                     <span className="text-primary">${item.value || '0'}</span>
                     <span>•</span>
+                    <span>•</span>
                     <span className="text-foreground/60">Dev: {item.developerName || 'Member'}</span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-3">
+                     <select 
+                        value={item.status || 'todo'} 
+                        onChange={async (e) => {
+                          try {
+                            await axios.put(`/api/projects/${item._id}`, { ...item, status: e.target.value });
+                            toast.success('Status updated');
+                            fetchList();
+                          } catch (err) {
+                            toast.error('Failed to update status');
+                          }
+                        }}
+                        className="bg-white/5 border border-white/10 text-[9px] font-bold text-primary px-3 py-1 rounded-full outline-none cursor-pointer hover:border-primary/50 transition-all uppercase tracking-widest"
+                      >
+                        <option value="todo">Todo</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="wip">WIP</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="completed">Completed</option>
+                      </select>
                   </div>
                 </div>
               </div>

@@ -5,13 +5,14 @@ import { useAuth } from '../context/AuthContext';
 import { Button, Card } from '../components/UI';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { LogIn, UserPlus, ArrowRight } from 'lucide-react';
+import { LogIn, UserPlus, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export default function Auth() {
   const [formData, setFormData] = useState({ 
     email: '', 
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -66,18 +67,27 @@ export default function Auth() {
             </div>
             <div>
               <label className="block text-[10px] font-mono uppercase tracking-widest text-white/50 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 outline-none focus:border-primary transition-all text-white text-sm"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 pr-10 outline-none focus:border-primary transition-all text-white text-sm"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-black hover:text-primary transition-colors flex items-center justify-center"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
-            <Button type="submit" className="w-full flex items-center justify-center mt-6">
-              Login <LogIn className="ml-2" size={18} />
+            <Button type="submit" className="w-full mt-6">
+              Login
             </Button>
           </form>
 

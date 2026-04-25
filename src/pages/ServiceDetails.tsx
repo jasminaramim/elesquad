@@ -45,7 +45,7 @@ export default function ServiceDetails() {
   const carouselImages = service.images ? service.images.split(',').map((s: string) => s.trim()) : [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-10 py-24">
+    <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
         
         {/* Left Content */}

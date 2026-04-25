@@ -22,8 +22,8 @@ export default function TeamMemberDetails() {
   return (
     <div className="min-h-screen pb-32">
       {/* Hero Header */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+      <section className="relative pt-32 pb-[50px] md:pb-[70px] lg:pb-[120px] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-5 md:px-10 relative z-10">
           <Link 
             to="/team" 
             className="inline-flex items-center gap-2 text-white/40 hover:text-primary transition-colors mb-12 group"
@@ -79,7 +79,7 @@ export default function TeamMemberDetails() {
       </section>
 
       {/* Main Content */}
-      <section className="max-w-7xl mx-auto px-4 md:px-8">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           {/* Left Column - Image */}
           <motion.div

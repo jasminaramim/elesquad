@@ -20,7 +20,7 @@ export default function ProjectDetails() {
   if (!project) return <div className="h-screen flex items-center justify-center text-2xl">Project Not Found</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-20">
+    <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
       <Link to="/projects">
         <Button variant="outline" className="mb-12 group">
           <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={18} /> Return to Gallery
@@ -48,6 +48,9 @@ export default function ProjectDetails() {
           <div className="flex items-center gap-3 mb-6">
             <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-mono text-primary uppercase tracking-widest">
               {project.projectType || 'Standard'}
+            </span>
+            <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-mono text-white/40 uppercase tracking-widest">
+              {project.status || 'todo'}
             </span>
             <span className="text-white/20 text-[10px] font-mono">/ ID: {project.orderId || 'UNTRACKED'}</span>
           </div>

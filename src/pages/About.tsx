@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { SectionHeading, Card } from '../components/UI';
-import { Target, Rocket, Users, ShieldCheck, ChevronDown, Star, MessageSquare, Quote } from 'lucide-react';
+import { Target, Rocket, Users, ShieldCheck, ChevronDown, Star, MessageSquare, Quote, Layout, Phone, MapPin, Globe } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
@@ -28,9 +28,9 @@ const faqs = [
 
 export default function About() {
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-20 space-y-32">
+    <div className="max-w-7xl mx-auto px-5 md:px-10 pb-32 pt-20">
       {/* Intro */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="py-[50px] md:py-[70px] lg:py-[120px] grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <motion.div
            initial={{ opacity: 0, x: -50 }}
            whileInView={{ opacity: 1, x: 0 }}
@@ -75,8 +75,8 @@ export default function About() {
         </motion.div>
       </section>
 
-      {/* Values */}
-      <section>
+      {/* Core Values */}
+      <section className="py-[50px] md:py-[70px] lg:py-[120px]">
         <SectionHeading title="Our Core Values" subtitle="What Drives Us" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {values.map((v, i) => (
@@ -97,8 +97,114 @@ export default function About() {
         </div>
       </section>
 
+      {/* New Design-Accurate Process Section */}
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px] overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+          {/* Left Column: Image with Experience Cutout */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="relative order-2 lg:order-1"
+          >
+            <div className="relative rounded-[3rem] overflow-hidden group shadow-2xl">
+              <img 
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop" 
+                alt="Our Process" 
+                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-105" 
+              />
+              
+              {/* Experience Cutout Bottom Left */}
+              <div className="absolute bottom-0 left-0 bg-[#0A0A0A] p-8 md:p-12 rounded-tr-[3rem] border-r border-t border-white/5 z-20 shadow-[10px_-10px_30px_rgba(0,0,0,0.5)]">
+                <div className="flex items-center gap-5">
+                  <span className="text-[35px] md:text-8xl font-black text-[#6C4DF6] tracking-tighter drop-shadow-[0_0_20px_rgba(108, 77, 246,0.3)]">25+</span>
+                  <div className="flex flex-col">
+                    <span className="text-xs md:text-sm font-black text-white uppercase tracking-widest leading-tight">Years Of</span>
+                    <span className="text-xs md:text-sm font-black text-white/40 uppercase tracking-widest leading-tight mt-1">Experience</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Column: Process Steps */}
+          <div className="space-y-16 order-1 lg:order-2">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-[1px] bg-[#6C4DF6]"></div>
+                 <span className="text-[#6C4DF6] font-black uppercase tracking-[0.3em] text-[10px]">Process Step</span>
+              </div>
+              <h2 className="text-[35px] md:text-7xl font-bold leading-[1.05] mb-8 tracking-tighter">
+                Refining Concepts <br/>
+                <span className="text-primary">For Better Outcomes</span>
+              </h2>
+              <p className="text-xl text-white/40 leading-relaxed max-w-xl font-light italic">
+                "We test every element for quality, user experience, and performance to ensure it aligns perfectly with your elite business goals."
+              </p>
+            </div>
+
+            <div className="relative space-y-12 pl-12">
+              {/* Vertical Line Connector */}
+              <div className="absolute left-[23px] top-6 bottom-6 w-[2px] bg-gradient-to-b from-[#6C4DF6] via-primary to-white/5"></div>
+
+              {[
+                { 
+                  title: 'Consultation', 
+                  desc: 'We start with a high-level consultation to understand your business ecosystem and target audience, ensuring a tailored digital solution.',
+                  color: '#6C4DF6',
+                  icon: MessageSquare
+                },
+                { 
+                  title: 'Planning & Development', 
+                  desc: 'Based on your elite needs, we architect a strategic roadmap covering design, full-stack development, and aggressive marketing.',
+                  color: '#6C4DF6',
+                  icon: Layout
+                },
+                { 
+                  title: 'Implementation', 
+                  desc: 'We execute the blueprint, deploy high-performance assets, and continuously monitor performance for peak optimization.',
+                  color: '#ffffff',
+                  icon: Rocket
+                }
+              ].map((step, i) => (
+                <motion.div 
+                  key={step.title}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15 }}
+                  className="relative group"
+                >
+                  {/* Icon Circle */}
+                  <div 
+                    className="absolute -left-[64px] top-0 w-12 h-12 rounded-full border border-white/10 flex items-center justify-center transition-all duration-700 bg-[#0A0A0A] z-10 group-hover:scale-110"
+                    style={{ borderColor: step.color + '33' }}
+                  >
+                    <step.icon size={18} style={{ color: step.color }} className={i === 0 ? "drop-shadow-[0_0_8px_rgba(108, 77, 246,0.5)]" : ""} />
+                    
+                    {/* Pulsing Aura for the active/first step */}
+                    {i === 0 && (
+                      <div className="absolute inset-0 rounded-full bg-[#6C4DF6]/20 animate-ping -z-10"></div>
+                    )}
+                  </div>
+
+                  <div>
+                    <h4 className="text-2xl font-bold mb-3 transition-all duration-500 group-hover:translate-x-2" style={{ color: 'white' }}>
+                      {step.title}
+                    </h4>
+                    <p className="text-white/40 text-sm leading-relaxed max-w-md group-hover:text-white/60 transition-colors">
+                      {step.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
-      <section>
+      <section className="py-[50px] md:py-[70px] lg:py-[120px]">
         <SectionHeading title="Frequently Asked Questions" subtitle="Got Questions?" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {faqs.map((faq, i) => (
@@ -122,20 +228,12 @@ export default function About() {
       </section>
 
       {/* Reviews Section */}
-      <section className="pb-20">
+      <section className="py-[50px] md:py-[70px] lg:py-[120px] pb-20">
         <SectionHeading title="What Our Clients Say" subtitle="Reviews" />
         <ReviewsGrid limit={3} />
       </section>
 
-      {/* Tech Stack */}
-      <section className="bg-white/5 p-12 md:p-20 rounded-[4rem]">
-        <SectionHeading title="Powered by the Best" subtitle="Our Tech Stack" />
-        <div className="flex flex-wrap items-center justify-center gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-           {['WordPress', 'Woodmart', 'Elementor Pro', 'WooCommerce', 'Gutenberg', 'React', 'Node.js', 'Express', 'Tailwind', 'Motion'].map(tech => (
-             <span key={tech} className="text-3xl font-display font-bold hover:text-primary transition-colors cursor-default">{tech}</span>
-           ))}
-        </div>
-      </section>
+
     </div>
   );
 }

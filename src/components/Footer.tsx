@@ -1,30 +1,13 @@
-import { motion } from 'motion/react';
+import ThreeWave from './ThreeWave';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Globe, ArrowRight } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Telegram } from './BrandIcons';
 
 export default function Footer() {
   return (
     <footer className="relative bg-bg border-t border-border pt-32 pb-12 overflow-hidden group/footer">
-      {/* 3D Tech Moving Background - Engineered for Elegance */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(108,77,246,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(108,77,246,0.1)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
-        <motion.div 
-          animate={{ 
-            x: [0, 30, -30, 0],
-            y: [0, -20, 20, 0]
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full"
-        />
-        <motion.div 
-          animate={{ 
-            x: [0, -20, 20, 0],
-            y: [0, 30, -30, 0]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-purple-500/5 blur-[80px] rounded-full"
-        />
-      </div>
+      {/* 3D Interactive Wave Background */}
+      <ThreeWave opacity={0.2} />
 
       <div className="max-w-7xl mx-auto px-4 md:px-10 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8">
@@ -40,7 +23,7 @@ export default function Footer() {
               Innovative design meets elite engineering.
             </p>
             <div className="flex gap-4">
-              {[Globe, Globe, Globe, Globe].map((Icon, i) => (
+              {[Telegram, Facebook, Linkedin, Instagram].map((Icon, i) => (
                 <a key={i} href="#" className="w-12 h-12 glass border border-border rounded-2xl flex items-center justify-center hover:bg-primary hover:border-primary transition-all duration-300 text-foreground group">
                   <Icon size={20} className="group-hover:scale-110 transition-transform" />
                 </a>

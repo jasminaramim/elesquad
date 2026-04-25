@@ -57,9 +57,13 @@ export default function Dashboard() {
     sheetLink: '',
     value: '',
     totalValue: '',
-    projectType: 'solo'
+    projectType: 'solo',
+    status: 'todo'
   });
-  const [profile, setProfile] = useState({ name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '', role: '' });
+  const [profile, setProfile] = useState({ 
+    name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '', role: '',
+    facebook: '', instagram: '', linkedin: '', telegram: ''
+  });
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
@@ -247,7 +251,7 @@ export default function Dashboard() {
       setShowAddProject(false);
       setNewProject({
         title: '', description: '', image: '', techStack: '', liveLink: '', githubLink: '',
-        orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo'
+        orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo'
       });
       refreshData();
     } catch (err) {
@@ -556,6 +560,49 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-white/5">
+                  <div className="md:col-span-2 mb-2">
+                     <h4 className="text-sm font-bold text-primary uppercase tracking-widest">Social Connectivity</h4>
+                     <p className="text-[10px] text-white/20">These links will appear on your public Team Card</p>
+                  </div>
+                  <div>
+                    <label className="label-style">Facebook URL</label>
+                    <input 
+                      className="input-style" 
+                      placeholder="https://facebook.com/yourprofile"
+                      value={profile.facebook || ''} 
+                      onChange={e => setProfile({...profile, facebook: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="label-style">Instagram URL</label>
+                    <input 
+                      className="input-style" 
+                      placeholder="https://instagram.com/yourprofile"
+                      value={profile.instagram || ''} 
+                      onChange={e => setProfile({...profile, instagram: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="label-style">LinkedIn URL</label>
+                    <input 
+                      className="input-style" 
+                      placeholder="https://linkedin.com/in/yourprofile"
+                      value={profile.linkedin || ''} 
+                      onChange={e => setProfile({...profile, linkedin: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="label-style">Telegram Username</label>
+                    <input 
+                      className="input-style" 
+                      placeholder="@yourusername"
+                      value={profile.telegram || ''} 
+                      onChange={e => setProfile({...profile, telegram: e.target.value})}
+                    />
+                  </div>
+                </div>
                 <div>
                    <label className="label-style">Professional Bio</label>
                    <textarea 
@@ -589,8 +636,18 @@ export default function Dashboard() {
                           <div className="md:col-span-2">
                              <label className="label-style">Project Title</label>
                              <input required className="input-style" value={newProject.title} onChange={e => setNewProject({...newProject, title: e.target.value})} />
-                          </div>
-                          <div>
+                           </div>
+                           <div>
+                              <label className="label-style">Project Status</label>
+                              <select className="input-style" value={newProject.status} onChange={e => setNewProject({...newProject, status: e.target.value})}>
+                                 <option value="todo">Todo</option>
+                                 <option value="in-progress">In Progress</option>
+                                 <option value="wip">WIP</option>
+                                 <option value="delivered">Delivered</option>
+                                 <option value="completed">Completed</option>
+                              </select>
+                           </div>
+                           <div>
                              <label className="label-style">Project Type</label>
                              <select className="input-style" value={newProject.projectType} onChange={e => setNewProject({...newProject, projectType: e.target.value})}>
                                 <option value="solo">Solo</option>
@@ -728,6 +785,26 @@ export default function Dashboard() {
                               >
                                 {p.isPublished ? 'Published' : 'Click to Publish'}
                               </button>
+
+                              <select 
+                                value={p.status || 'todo'} 
+                                onChange={async (e) => {
+                                  try {
+                                    await axios.put(`/api/projects/${p._id}`, { ...p, status: e.target.value });
+                                    toast.success('Status updated');
+                                    refreshData();
+                                  } catch (err) {
+                                    toast.error('Failed to update status');
+                                  }
+                                }}
+                                className="bg-white/5 border border-white/10 text-[10px] font-bold text-primary px-2 py-1 rounded-lg outline-none cursor-pointer hover:border-primary/50 transition-all uppercase tracking-widest"
+                              >
+                                <option value="todo">Todo</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="wip">WIP</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="completed">Completed</option>
+                              </select>
                            </div>
 
                            {p.sheetLink && (
@@ -955,12 +1032,16 @@ export default function Dashboard() {
         }
         .input-style {
           width: 100%;
-          background: rgba(255, 255, 255, 0.05);
+          background: #121214;
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 12px;
           padding: 12px 16px;
           outline: none;
           transition: all 0.3s;
+          color: white;
+        }
+        .input-style option {
+          background: #121214;
           color: white;
         }
         .input-style:focus {

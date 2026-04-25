@@ -15,6 +15,7 @@ const navLinks = [
   { name: 'About', path: '/about' },
   { name: 'Projects', path: '/projects' },
   { name: 'Team', path: '/team' },
+  { name: 'Contact', path: '/contact' },
 ];
 
 export default function Navbar() {
@@ -68,13 +69,7 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-surface transition-colors text-foreground"
-          >
-            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-          </button>
+          {/* Theme Toggle Removed */}
 
           {/* Notifications */}
           <div className="relative">
@@ -159,9 +154,7 @@ export default function Navbar() {
 
         {/* Mobile Toggle */}
         <div className="md:hidden flex items-center gap-4">
-          <button onClick={toggleTheme} className="p-2 text-foreground/60">
-            {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
-          </button>
+
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className="p-2 text-foreground"
