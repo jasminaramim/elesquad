@@ -10,7 +10,8 @@ import ChatHub from '../../components/ChatHub';
 import { cn } from '../../lib/utils';
 
 const tabs = [
-  { id: 'projects', label: 'Projects', icon: LayoutDashboard },
+  { id: 'projects', label: 'Master Projects', icon: LayoutDashboard },
+  { id: 'my-projects', label: 'My Projects', icon: Briefcase },
   { id: 'finance', label: 'Finance', icon: BarChart3 },
   { id: 'services', label: 'Services', icon: Rocket },
   { id: 'team', label: 'Team', icon: Users },
@@ -95,6 +96,7 @@ export default function AdminDashboard() {
               >
                 <Card className="p-8 md:p-12" tiltEnabled={false}>
                   {activeTab === 'projects' && <ProjectForm projects={projects} fetchProjects={fetchProjects} />}
+                  {activeTab === 'my-projects' && <ProjectForm projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} fetchProjects={fetchProjects} />}
                   {activeTab === 'finance' && <FinanceTab projects={projects} />}
                   {activeTab === 'services' && <ServiceForm />}
                   {activeTab === 'team' && <TeamForm />}
