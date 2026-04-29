@@ -124,12 +124,17 @@ export default function Reviews() {
                         <div className="w-14 h-14 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center font-display font-black text-white text-xl shadow-lg shadow-primary/20">
                           {(review.clientName || review.name || 'C')[0]}
                         </div>
-                        <div>
-                          <h5 className="font-bold text-white text-lg">{review.clientName || review.name}</h5>
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                        <div className="flex-grow min-w-0">
+                          <h5 className="font-bold text-white text-lg truncate">{review.clientName || review.name}</h5>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shrink-0" />
                             <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">Verified Client</p>
                           </div>
+                          {review.developerName && (
+                            <p className="text-[10px] text-primary/70 font-mono mt-1 truncate">
+                              Handled by: <span className="text-primary font-bold">{review.developerName}</span>
+                            </p>
+                          )}
                         </div>
                       </div>
                     </Card>
