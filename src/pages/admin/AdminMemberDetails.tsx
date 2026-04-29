@@ -18,7 +18,7 @@ function Input({ label, value, onChange, placeholder = '', type = 'text', disabl
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`w-full bg-black border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       />
     </div>
   );
@@ -157,7 +157,7 @@ export default function AdminMemberDetails() {
                 <div className="space-y-2">
                   <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Squad Role</label>
                   <select 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"
+                    className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white"
                     value={member.role || 'Member'}
                     onChange={e => setMember({ ...member, role: e.target.value })}
                   >
@@ -311,21 +311,21 @@ export default function AdminMemberDetails() {
                         </div>
                         <div>
                           <label className="text-[10px] font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Status</label>
-                          <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white" value={tempProject.status} onChange={e => setTempProject({...tempProject, status: e.target.value})}>
-                            <option value="todo">Todo</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="wip">WIP</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="completed">Completed</option>
+                          <select className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white" value={tempProject.status} onChange={e => setTempProject({...tempProject, status: e.target.value})}>
+                            <option value="todo" className="bg-bg">Todo</option>
+                            <option value="in-progress" className="bg-bg">In Progress</option>
+                            <option value="wip" className="bg-bg">WIP</option>
+                            <option value="delivered" className="bg-bg">Delivered</option>
+                            <option value="completed" className="bg-bg">Completed</option>
                           </select>
                         </div>
                         <div>
                            <label className="text-[10px] font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Project Type</label>
-                           <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white" value={tempProject.projectType} onChange={e => setTempProject({...tempProject, projectType: e.target.value})}>
-                             <option value="solo">Solo</option>
-                             <option value="combine">Combine</option>
-                             <option value="leader">Leader</option>
-                             <option value="squad">Squad</option>
+                           <select className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white" value={tempProject.projectType} onChange={e => setTempProject({...tempProject, projectType: e.target.value})}>
+                             <option value="solo" className="bg-bg">Solo</option>
+                             <option value="combine" className="bg-bg">Combine</option>
+                             <option value="leader" className="bg-bg">Leader</option>
+                             <option value="squad" className="bg-bg">Squad</option>
                            </select>
                         </div>
                         <div>
@@ -342,7 +342,7 @@ export default function AdminMemberDetails() {
                         </div>
                         <div className="col-span-2">
                            <label className="text-[10px] font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Description</label>
-                           <textarea className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white h-32" value={tempProject.description} onChange={e => setTempProject({...tempProject, description: e.target.value})} />
+                           <textarea className="w-full bg-black border border-white/10 rounded-xl p-4 text-white h-32" value={tempProject.description} onChange={e => setTempProject({...tempProject, description: e.target.value})} />
                         </div>
                       </div>
                    </div>

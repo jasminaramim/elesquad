@@ -95,7 +95,7 @@ export default function AdminDashboard() {
               >
                 <Card className="p-8 md:p-12" tiltEnabled={false}>
                   {activeTab === 'my-projects' && <ProjectForm projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} fetchProjects={fetchProjects} />}
-                  {activeTab === 'finance' && <FinanceTab projects={projects} />}
+                  {activeTab === 'finance' && <FinanceTab projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} />}
                   {activeTab === 'services' && <ServiceForm />}
                   {activeTab === 'members' && <TeamForm />}
                   {activeTab === 'chat' && <ChatHub />}
@@ -235,7 +235,7 @@ function AdminProfileTab() {
           <div className="md:col-span-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Leadership Bio</label>
             <textarea 
-              className="w-full bg-surface border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground text-sm"
+              className="w-full bg-black border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground text-sm"
               rows={3}
               value={profile.bio || ''}
               onChange={e => setProfile({...profile, bio: e.target.value})}
@@ -262,7 +262,7 @@ function AdminProfileTab() {
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Professional Bio</label>
           <textarea 
-            className="w-full bg-surface border border-border rounded-xl p-4 focus:border-primary/50 outline-none h-32 text-foreground"
+            className="w-full bg-black border border-border rounded-xl p-4 focus:border-primary/50 outline-none h-32 text-foreground"
             value={profile.bio || ''}
             onChange={e => setProfile({...profile, bio: e.target.value})}
           />
@@ -727,7 +727,7 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
           <div className="space-y-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Type</label>
             <select 
-              className="w-full bg-surface border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground"
+              className="w-full bg-black border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground"
               value={data.projectType || 'solo'}
               onChange={e => setData({ ...data, projectType: e.target.value })}
             >
@@ -740,7 +740,7 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
           <div className="space-y-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Project Status</label>
             <select 
-              className="w-full bg-surface border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground"
+              className="w-full bg-black border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground"
               value={data.status || 'todo'}
               onChange={e => setData({ ...data, status: e.target.value })}
             >
@@ -1558,7 +1558,7 @@ function Input({ label, value, onChange, placeholder = '', type = 'text', disabl
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${isPassword ? 'pr-12' : ''}`}
+          className={`w-full bg-black border border-white/10 rounded-xl px-4 py-3 focus:border-primary/50 outline-none transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${isPassword ? 'pr-12' : ''}`}
         />
         {isPassword && (
           <button 
