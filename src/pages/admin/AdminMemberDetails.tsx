@@ -113,26 +113,26 @@ export default function AdminMemberDetails() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-20 relative z-30">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
         <div>
-           <Link to="/admin/dashboard?tab=members" className="inline-flex items-center gap-2 text-white/40 hover:text-primary transition-colors mb-4 group">
+           <Link to="/admin/dashboard?tab=members" className="inline-flex items-center gap-2 text-white/40 hover:text-primary transition-colors mb-3 group">
              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
              <span className="text-[10px] font-mono uppercase tracking-widest">Return to Members Hub</span>
            </Link>
-           <h1 className="text-4xl font-display font-bold">Manage: {member.name}</h1>
+           <h1 className="text-3xl md:text-4xl font-display font-bold">Manage: {member.name}</h1>
            <p className="text-white/40 text-xs uppercase tracking-widest font-mono mt-1">Direct Administrative Override Access</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 shrink-0">
            <div className={`px-4 py-2 rounded-xl border text-[10px] font-bold uppercase tracking-widest ${member.isVerified ? 'bg-primary/20 border-primary text-primary' : 'bg-white/5 border-white/10 text-white/40'}`}>
-              {member.isVerified ? 'Verified System Member' : 'Unverified Identity'}
+              {member.isVerified ? 'Verified' : 'Unverified'}
            </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left: Profile Edit */}
-        <div className="lg:col-span-1 space-y-8">
-          <Card className="p-8 glass sticky top-32">
+        <div className="lg:col-span-1">
+          <Card className="p-6 md:p-8 glass lg:sticky lg:top-32">
             <h3 className="text-xl font-bold mb-8 flex items-center gap-3">
               <User size={20} className="text-primary" />
               Member Profile
@@ -200,27 +200,28 @@ export default function AdminMemberDetails() {
                </Card>
              ) : (
                projects.map(proj => (
-                 <div key={proj._id} className="group relative">
-                   <div 
-                     className="flex flex-col md:flex-row items-center gap-6 p-6 glass rounded-3xl border border-white/5 hover:border-primary/30 transition-all cursor-pointer"
-                     onClick={() => setSelectedProject(proj)}
-                   >
-                     <div className="w-full md:w-32 aspect-video md:aspect-square rounded-2xl overflow-hidden bg-white/5">
-                        <img src={proj.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
-                     </div>
-                     <div className="flex-grow">
-                        <div className="flex items-center gap-3 mb-1">
-                          <h4 className="font-bold text-xl">{proj.title}</h4>
-                          <span className="text-[8px] bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase tracking-widest">{proj.projectType}</span>
+                   <div key={proj._id} className="group relative">
+                    <div 
+                      className="flex flex-col gap-4 p-5 glass rounded-2xl border border-white/5 hover:border-primary/30 transition-all cursor-pointer"
+                      onClick={() => setSelectedProject(proj)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-white/5">
+                           <img src={proj.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
                         </div>
-                        <p className="text-sm text-white/60 mb-4 line-clamp-1">{proj.description}</p>
-                        <div className="flex items-center gap-4 text-[10px] font-mono text-white/40">
-                           <span className="text-primary font-bold">My Achievement Value: ${proj.value || '0'}</span>
-                           <span>•</span>
-                           <span>ID: {proj.orderId || 'N/A'}</span>
+                        <div className="flex-grow min-w-0">
+                           <div className="flex flex-wrap items-center gap-2 mb-1">
+                             <h4 className="font-bold text-lg truncate">{proj.title}</h4>
+                             <span className="text-[8px] bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase tracking-widest shrink-0">{proj.projectType}</span>
+                           </div>
+                           <p className="text-sm text-white/60 mb-3 line-clamp-2">{proj.description}</p>
+                           <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-white/40">
+                              <span className="text-primary font-bold">Achievement: ${proj.value || '0'}</span>
+                              <span>ID: {proj.orderId || 'N/A'}</span>
+                           </div>
                         </div>
-                     </div>
-                     <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                      </div>
+                      <div className="flex items-center gap-2 justify-end" onClick={e => e.stopPropagation()}>
                         <button 
                           onClick={() => {
                             setSelectedProject(proj);
@@ -287,43 +288,13 @@ export default function AdminMemberDetails() {
                         </div>
                       </div>
 
-                      <div className="pt-8 border-t border-white/5 flex flex-wrap gap-4">
-                        {selectedProject.sheetLink && (
-                          <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow min-w-[200px]">
-                            <button className="w-full group relative overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-6 rounded-[2.5rem] transition-all duration-500">
-                               <div className="flex items-center justify-between gap-4">
-                                 <div className="text-left">
-                                   <span className="block text-[8px] uppercase tracking-widest text-white/40 mb-1">Source Data</span>
-                                   <span className="block text-sm font-bold">Access Project Sheet</span>
-                                 </div>
-                                 <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                                   <ExternalLink size={18} />
-                                 </div>
-                               </div>
-                            </button>
-                          </a>
-                        )}
+                      <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row gap-4">
                         {selectedProject.liveLink && (
-                          <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow min-w-[200px]">
-                            <button className="w-full group relative overflow-hidden bg-primary text-white px-8 py-6 rounded-[2.5rem] transition-all duration-500 shadow-lg shadow-primary/20 hover:scale-[1.02]">
-                               <div className="flex items-center justify-between gap-4">
-                                 <div className="text-left">
-                                   <span className="block text-[8px] uppercase tracking-widest text-white/20 mb-1">Production Link</span>
-                                   <span className="block text-sm font-bold">View Live Link</span>
-                                 </div>
-                                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-primary transition-all">
-                                   <Rocket size={18} />
-                                 </div>
-                               </div>
-                            </button>
+                          <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
+                             <Button className="w-full py-4 flex items-center justify-center gap-2"><Rocket size={18} /> View Live Link</Button>
                           </a>
                         )}
-                        <button 
-                          onClick={() => setSelectedProject(null)} 
-                          className="flex-grow min-w-[120px] bg-white/5 hover:bg-white/10 border border-white/10 text-white/40 hover:text-white px-8 py-6 rounded-[2.5rem] text-sm font-bold transition-all"
-                        >
-                          Dismiss
-                        </button>
+                        <Button variant="outline" onClick={() => setSelectedProject(null)} className="flex-grow">Dismiss</Button>
                       </div>
                    </div>
                  ) : (

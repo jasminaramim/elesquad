@@ -59,54 +59,70 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-20 relative z-30">
-        <div className="flex flex-col md:row justify-between items-start md:items-center mb-16 gap-6">
-          <SectionHeading title="Admin Dashboard" subtitle="Control Center" />
-          <Button onClick={handleLogout} variant="outline" className="border-red-500/20 text-red-500 hover:bg-red-500/10">
-            <LogOut size={18} className="mr-2" /> Logout
-          </Button>
-        </div>
+      <div className="flex flex-row justify-between items-center mb-12 gap-4">
+        <SectionHeading title="Admin Dashboard" subtitle="Control Center" />
+        <Button onClick={handleLogout} variant="outline" className="shrink-0 border-red-500/20 text-red-500 hover:bg-red-500/10">
+          <LogOut size={18} className="mr-2" /> Logout
+        </Button>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-          {/* Sidebar */}
-          <aside className="lg:col-span-1 space-y-4">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-display font-semibold ${
-                  activeTab === tab.id ? 'bg-primary text-white shadow-lg' : 'bg-surface text-foreground/40 hover:bg-surface/80 border border-border/50'
-                } shadow-sm transition-all duration-300`}
-              >
-                <tab.icon size={20} />
-                {tab.label}
-              </button>
-            ))}
-          </aside>
+      {/* Mobile Tab Bar */}
+      <div className="flex lg:hidden overflow-x-auto gap-2 pb-4 mb-6 scrollbar-hide">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-shrink-0 flex items-center gap-2 px-4 py-3 rounded-xl transition-all font-display font-semibold text-sm ${
+              activeTab === tab.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-surface text-foreground/40 border border-border/50'
+            }`}
+          >
+            <tab.icon size={16} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-          {/* Content Area */}
-          <main className="lg:col-span-3">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card className="p-8 md:p-12" tiltEnabled={false}>
-                  {activeTab === 'my-projects' && <ProjectForm projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} fetchProjects={fetchProjects} />}
-                  {activeTab === 'finance' && <FinanceTab projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} />}
-                  {activeTab === 'services' && <ServiceForm />}
-                  {activeTab === 'members' && <TeamForm />}
-                  {activeTab === 'chat' && <ChatHub />}
-                  {activeTab === 'reviews' && <ReviewForm />}
-                  {activeTab === 'documents' && <DocumentForm />}
-                  {activeTab === 'profile' && <AdminProfileTab />}
-                </Card>
-              </motion.div>
-            </AnimatePresence>
-          </main>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:block lg:col-span-1 space-y-3">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-display font-semibold ${
+                activeTab === tab.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-surface text-foreground/40 hover:bg-surface/80 border border-border/50'
+              } duration-300`}
+            >
+              <tab.icon size={20} />
+              {tab.label}
+            </button>
+          ))}
+        </aside>
+
+        {/* Content Area */}
+        <main className="lg:col-span-3">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25 }}
+            >
+              <Card className="p-5 md:p-10" tiltEnabled={false}>
+                {activeTab === 'my-projects' && <ProjectForm projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} fetchProjects={fetchProjects} />}
+                {activeTab === 'finance' && <FinanceTab projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} />}
+                {activeTab === 'services' && <ServiceForm />}
+                {activeTab === 'members' && <TeamForm />}
+                {activeTab === 'chat' && <ChatHub />}
+                {activeTab === 'reviews' && <ReviewForm />}
+                {activeTab === 'documents' && <DocumentForm />}
+                {activeTab === 'profile' && <AdminProfileTab />}
+              </Card>
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
     </div>
   );
 }
@@ -720,7 +736,7 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
     <div className="space-y-12">
       <form onSubmit={handleSubmit} className="space-y-6">
         <h3 className="text-2xl font-bold mb-8">Add New Project</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           <div className="md:col-span-2">
             <Input label="Project Title" value={data.title || ''} onChange={v => setData({ ...data, title: v })} placeholder="e.g. Nexus Dashboard" />
           </div>
@@ -1083,43 +1099,22 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
                       </div>
                     </div>
 
-                    <div className="pt-8 border-t border-white/5 flex flex-wrap gap-4">
+                    <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row gap-4">
                       {selectedProject.sheetLink && (
-                        <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow min-w-[200px]">
-                          <button className="w-full group relative overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-6 rounded-[2.5rem] transition-all duration-500">
-                             <div className="flex items-center justify-between gap-4">
-                               <div className="text-left">
-                                 <span className="block text-[8px] uppercase tracking-widest text-white/40 mb-1">Source Data</span>
-                                 <span className="block text-sm font-bold">Access Project Sheet</span>
-                               </div>
-                               <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-                                 <ExternalLink size={18} />
-                               </div>
-                             </div>
-                          </button>
+                        <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
+                          <Button className="w-full py-4 flex items-center justify-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white">
+                            Access Project Sheet <ExternalLink size={18} />
+                          </Button>
                         </a>
                       )}
                       {selectedProject.liveLink && (
-                         <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow min-w-[200px]">
-                           <button className="w-full group relative overflow-hidden bg-primary text-white px-8 py-6 rounded-[2.5rem] transition-all duration-500 shadow-lg shadow-primary/20 hover:scale-[1.02]">
-                             <div className="flex items-center justify-between gap-4">
-                               <div className="text-left">
-                                 <span className="block text-[8px] uppercase tracking-widest text-white/20 mb-1">Production Link</span>
-                                 <span className="block text-sm font-bold">View Live Link</span>
-                               </div>
-                               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-primary transition-all">
-                                 <Rocket size={18} />
-                               </div>
-                             </div>
-                           </button>
+                         <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
+                           <Button className="w-full py-4 flex items-center justify-center gap-2 bg-primary text-white shadow-lg shadow-primary/20">
+                              View Live Link <Rocket size={18} />
+                           </Button>
                          </a>
                       )}
-                      <button 
-                        onClick={() => setSelectedProject(null)} 
-                        className="flex-grow min-w-[120px] bg-white/5 hover:bg-white/10 border border-white/10 text-white/40 hover:text-white px-8 py-6 rounded-[2.5rem] text-sm font-bold transition-all"
-                      >
-                        Dismiss
-                      </button>
+                      <Button variant="outline" onClick={() => setSelectedProject(null)} className="flex-grow">Dismiss</Button>
                     </div>
                   </div>
                 ) : (
