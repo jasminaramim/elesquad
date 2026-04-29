@@ -260,7 +260,7 @@ function AdminProfileTab() {
 function ServiceForm() {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState<any[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [data, setData] = useState({
     title: '', subtitle: '', description: '', image: '', images: '', link: ''
   });
@@ -287,7 +287,7 @@ function ServiceForm() {
         await axios.post('/api/services', data);
         toast.success('Service added!');
       }
-      setIsModalOpen(false);
+      setIsFormOpen(false);
       setData({ title: '', subtitle: '', description: '', image: '', images: '', link: '' });
       fetchList();
     } catch (err) {
@@ -308,233 +308,226 @@ function ServiceForm() {
     }
   };
 
-  const openEditModal = (service: any) => {
+  const openEditForm = (service: any) => {
     setData(service);
-    setIsModalOpen(true);
+    setIsFormOpen(true);
   };
 
-  const openCreateModal = () => {
+  const openCreateForm = () => {
     setData({ title: '', subtitle: '', description: '', image: '', images: '', link: '' });
-    setIsModalOpen(true);
+    setIsFormOpen(true);
   };
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h3 className="text-3xl font-display font-bold">Elite Services</h3>
-          <p className="text-foreground/40 text-xs mt-1 uppercase tracking-widest font-mono">Quantum Node Management</p>
-        </div>
-        <Button onClick={openCreateModal} className="px-6 py-2 flex items-center gap-2">
-          <Plus size={18} /> Add Service
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {list.map(item => (
-          <motion.div 
-            key={item._id}
-            whileHover={{ scale: 1.02 }}
-            className="group relative"
+      <AnimatePresence mode="wait">
+        {!isFormOpen ? (
+          <motion.div
+            key="list"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="space-y-8"
           >
-            <div 
-              className="flex items-center justify-between p-6 glass rounded-[2rem] border border-white/5 hover:border-primary/30 transition-all cursor-pointer bg-black/40 backdrop-blur-xl"
-              onClick={() => openEditModal(item)}
-            >
-              <div className="flex items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-primary/50 transition-colors">
-                  {item.image && <img src={item.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />}
-                </div>
-                <div>
-                  <h4 className="font-bold text-xl group-hover:text-primary transition-colors">{item.title}</h4>
-                  <p className="text-[10px] text-foreground/40 uppercase tracking-widest font-mono mt-1">{item.subtitle}</p>
-                </div>
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h3 className="text-3xl font-display font-bold">Elite Services</h3>
+                <p className="text-foreground/40 text-xs mt-1 uppercase tracking-widest font-mono">Quantum Node Management</p>
               </div>
-              <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                <button onClick={() => handleDelete(item._id)} className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0">
-                  <Trash2 size={18} />
-                </button>
-              </div>
+              <Button onClick={openCreateForm} className="px-6 py-2 flex items-center gap-2">
+                <Plus size={18} /> Add Service
+              </Button>
             </div>
-            
-            {/* Subtle tech border effect */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-transparent rounded-[2.1rem] blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-          </motion.div>
-        ))}
-      </div>
 
-      <AnimatePresence>
-        {isModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-bg/90 backdrop-blur-md"
-              onClick={() => setIsModalOpen(false)}
-            />
-            
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 30 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar"
-            >
-              <Card className="p-10 md:p-16 border-primary/20 shadow-[0_0_50px_rgba(0,242,255,0.1)] rounded-[3rem] bg-surface/50 backdrop-blur-2xl relative overflow-hidden">
-                {/* Modal Tech Background Decoration */}
-                <div className="absolute top-0 right-0 p-20 opacity-5 pointer-events-none">
-                  <Rocket size={400} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {list.map(item => (
+                <motion.div 
+                  key={item._id}
+                  whileHover={{ scale: 1.02 }}
+                  className="group relative"
+                >
+                  <div 
+                    className="flex items-center justify-between p-6 glass rounded-[2rem] border border-white/5 hover:border-primary/30 transition-all cursor-pointer bg-black/40 backdrop-blur-xl"
+                    onClick={() => openEditForm(item)}
+                  >
+                    <div className="flex items-center gap-6">
+                      <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white/5 border border-white/10 group-hover:border-primary/50 transition-colors">
+                        {item.image && <img src={item.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xl group-hover:text-primary transition-colors">{item.title}</h4>
+                        <p className="text-[10px] text-foreground/40 uppercase tracking-widest font-mono mt-1">{item.subtitle}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                      <button onClick={() => handleDelete(item._id)} className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 transition-all opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-transparent rounded-[2.1rem] blur opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                </motion.div>
+              ))}
+            </div>
+            {list.length === 0 && (
+              <div className="text-center py-20 bg-surface/50 rounded-[2rem] border border-dashed border-border/50">
+                <p className="text-foreground/40 italic">No services initialized in the grid.</p>
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-10"
+          >
+            <div className="flex justify-between items-center border-b border-border/50 pb-8">
+              <div>
+                <h3 className="text-3xl font-display font-bold">
+                  {(data as any)._id ? 'Synchronize Service' : 'Initialize Service'}
+                </h3>
+                <p className="text-primary/60 font-mono text-xs uppercase tracking-widest mt-1">System Node Configuration</p>
+              </div>
+              <Button variant="outline" onClick={() => setIsFormOpen(false)} className="px-6 py-2 border-white/10 hover:bg-white/5">
+                Back to List
+              </Button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <Input label="Service Title" value={data.title} onChange={v => setData({ ...data, title: v })} placeholder="e.g. AI-Powered Solutions" />
+                <Input label="Subtitle" value={data.subtitle} onChange={v => setData({ ...data, subtitle: v })} placeholder="System designation" />
+                
+                <div className="md:col-span-1">
+                   <label className="text-xs font-mono uppercase tracking-widest text-foreground/40 block pl-1 mb-2">Main Interface Image</label>
+                    <div className="flex items-center gap-6 p-6 bg-surface border border-border rounded-2xl">
+                      <div className="w-20 h-20 bg-black/40 rounded-xl overflow-hidden flex items-center justify-center border border-border/50">
+                        {data.image ? <img src={data.image || undefined} className="w-full h-full object-cover" /> : <Rocket size={24} className="text-foreground/10" />}
+                      </div>
+                     <div className="flex-grow">
+                       <input 
+                         type="file" 
+                         accept="image/*"
+                         className="hidden" 
+                         id="service-image-upload"
+                         onChange={async (e) => {
+                           const file = e.target.files?.[0];
+                           if (!file) return;
+                           const readerForBase64 = new FileReader();
+                           readerForBase64.onloadend = async () => {
+                             const base64String = (readerForBase64.result as string).split(',')[1];
+                             const formDataImgBB = new FormData();
+                             formDataImgBB.append('image', base64String);
+                             const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0';
+                             try {
+                               const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
+                               if (res.data.success) {
+                                 setData({ ...data, image: res.data.data.url });
+                                 toast.success('Image hosted on Cloud!');
+                                 return;
+                               }
+                             } catch (err) {
+                               console.warn('ImgBB failed, trying local...', err);
+                             }
+                             const formDataLocal = new FormData();
+                             formDataLocal.append('image', file);
+                             try {
+                               const resLocal = await axios.post('/api/upload', formDataLocal);
+                               if (resLocal.data.imageUrl) {
+                                 setData({ ...data, image: resLocal.data.imageUrl });
+                                 toast.success('Image hosted Locally!');
+                               }
+                             } catch (localErr) {
+                               toast.error('Image sync failed');
+                             }
+                           };
+                           readerForBase64.readAsDataURL(file);
+                         }}
+                       />
+                       <label htmlFor="service-image-upload" className="cursor-pointer inline-flex items-center gap-2 px-6 py-2.5 bg-primary/20 hover:bg-primary/30 text-primary rounded-xl text-xs font-bold transition-all uppercase tracking-widest border border-primary/20">
+                          <Plus size={14} /> Upload Image
+                       </label>
+                     </div>
+                   </div>
                 </div>
                 
-                <button 
-                  onClick={() => setIsModalOpen(false)}
-                  className="absolute top-8 right-8 w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/20 hover:text-white hover:bg-white/10 transition-all"
-                >
-                  <Plus className="rotate-45" size={28} />
-                </button>
-
-                <div className="relative z-10">
-                  <h3 className="text-4xl font-display font-bold mb-2">
-                    {(data as any)._id ? 'Synchronize Service' : 'Initialize Service'}
-                  </h3>
-                  <p className="text-primary/60 font-mono text-xs uppercase tracking-widest mb-12">System Node Configuration</p>
-
-                  <form onSubmit={handleSubmit} className="space-y-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <Input label="Service Title" value={data.title} onChange={v => setData({ ...data, title: v })} placeholder="e.g. AI-Powered Solutions" />
-                      <Input label="Subtitle" value={data.subtitle} onChange={v => setData({ ...data, subtitle: v })} placeholder="System designation" />
-                      <div className="md:col-span-1">
-                         <label className="text-xs font-mono uppercase tracking-widest text-foreground/40 block pl-1 mb-2">Main Interface Image</label>
-                          <div className="flex items-center gap-4 p-4 bg-surface border border-border rounded-xl">
-                            <div className="w-16 h-16 bg-surface rounded-lg overflow-hidden flex items-center justify-center border border-border">
-                              {data.image ? <img src={data.image || undefined} className="w-full h-full object-cover" /> : <Rocket size={20} className="text-foreground/10" />}
-                            </div>
-                           <div className="flex-grow">
-                             <input 
-                               type="file" 
-                               accept="image/*"
-                               className="hidden" 
-                               id="service-image-upload"
-                               onChange={async (e) => {
-                                 const file = e.target.files?.[0];
-                                 if (!file) return;
-                                 const readerForBase64 = new FileReader();
-                                 readerForBase64.onloadend = async () => {
-                                   const base64String = (readerForBase64.result as string).split(',')[1];
-                                   const formDataImgBB = new FormData();
-                                   formDataImgBB.append('image', base64String);
-                                   const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0';
-                                   try {
-                                     const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
-                                     if (res.data.success) {
-                                       setData({ ...data, image: res.data.data.url });
-                                       toast.success('Image hosted on Cloud!');
-                                       return;
-                                     }
-                                   } catch (err) {
-                                     console.warn('ImgBB failed, trying local...', err);
-                                   }
-                                   const formDataLocal = new FormData();
-                                   formDataLocal.append('image', file);
-                                   try {
-                                     const resLocal = await axios.post('/api/upload', formDataLocal);
-                                     if (resLocal.data.imageUrl) {
-                                       setData({ ...data, image: resLocal.data.imageUrl });
-                                       toast.success('Image hosted Locally!');
-                                     }
-                                   } catch (localErr) {
-                                     toast.error('Image sync failed');
-                                   }
-                                 };
-                                 readerForBase64.readAsDataURL(file);
-                               }}
-                             />
-                             <label htmlFor="service-image-upload" className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-xs font-bold transition-all">
-                                <Plus size={14} /> Upload
-                             </label>
-                           </div>
-                         </div>
+                <div className="md:col-span-2">
+                   <label className="text-xs font-mono uppercase tracking-widest text-foreground/40 block pl-1 mb-2">Multi-Node Matrix (Carousel Images)</label>
+                    <div className="flex flex-col gap-6 p-6 bg-surface border border-border rounded-2xl">
+                      <div className="flex flex-wrap gap-3">
+                        {data.images ? data.images.split(',').map((img, idx) => (
+                          <div key={idx} className="w-20 h-20 bg-black/40 rounded-xl overflow-hidden border border-border/50 relative group">
+                            <img src={img.trim()} className="w-full h-full object-cover" />
+                            <button type="button" onClick={() => {
+                              const newImages = data.images.split(',').filter((_, i) => i !== idx).join(',');
+                              setData({ ...data, images: newImages });
+                            }} className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Trash2 size={18} className="text-white" />
+                            </button>
+                          </div>
+                        )) : <p className="text-xs text-foreground/30 italic">No matrix nodes initialized...</p>}
                       </div>
-                      {/* Node Link removed per user request */}
-                      
-                      <div className="md:col-span-2">
-                         <label className="text-xs font-mono uppercase tracking-widest text-foreground/40 block pl-1 mb-2">Multi-Node Matrix (Carousel Images)</label>
-                          <div className="flex flex-col gap-4 p-4 bg-surface border border-border rounded-xl">
-                            <div className="flex flex-wrap gap-2">
-                              {data.images ? data.images.split(',').map((img, idx) => (
-                                <div key={idx} className="w-16 h-16 bg-surface rounded-lg overflow-hidden border border-border relative group">
-                                  <img src={img.trim()} className="w-full h-full object-cover" />
-                                  <button type="button" onClick={() => {
-                                    const newImages = data.images.split(',').filter((_, i) => i !== idx).join(',');
-                                    setData({ ...data, images: newImages });
-                                  }} className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Trash2 size={14} className="text-white" />
-                                  </button>
-                                </div>
-                              )) : <p className="text-xs text-foreground/40">No images added</p>}
-                            </div>
-                             <input 
-                               type="file" 
-                               accept="image/*"
-                               multiple
-                               className="hidden" 
-                               id="service-images-upload"
-                               onChange={async (e) => {
-                                 const files = Array.from(e.target.files || []);
-                                 if (!files.length) return;
-                                 toast.loading('Uploading images...', { id: 'multi-upload' });
-                                 let newUrls: string[] = [];
-                                 for (const file of files) {
-                                   const formDataLocal = new FormData();
-                                   formDataLocal.append('image', file);
-                                   try {
-                                     const resLocal = await axios.post('/api/upload', formDataLocal);
-                                     if (resLocal.data.imageUrl) {
-                                       newUrls.push(resLocal.data.imageUrl);
-                                     }
-                                   } catch (err) {
-                                     console.error('Upload failed for a file', err);
-                                   }
-                                 }
-                                 if (newUrls.length > 0) {
-                                   const currentImages = data.images ? data.images.split(',').map(s=>s.trim()).filter(Boolean) : [];
-                                   setData({ ...data, images: [...currentImages, ...newUrls].join(',') });
-                                   toast.success('Images added!', { id: 'multi-upload' });
-                                 } else {
-                                   toast.error('Failed to upload images', { id: 'multi-upload' });
-                                 }
-                               }}
-                             />
-                             <label htmlFor="service-images-upload" className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-xs font-bold transition-all w-max">
-                                <Plus size={14} /> Add Images
-                             </label>
-                         </div>
-                      </div>
-                      
-                      <div className="md:col-span-2">
-                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 block pl-1 mb-4">Core Operational Description</label>
-                        <textarea 
-                          className="w-full bg-black/40 border border-white/10 rounded-3xl p-8 focus:border-primary/50 outline-none h-48 text-foreground leading-relaxed transition-all focus:bg-black/60"
-                          value={data.description}
-                          onChange={e => setData({ ...data, description: e.target.value })}
-                          placeholder="Detail the service core functionality..."
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-4">
-                      <Button type="submit" disabled={loading} className="flex-grow py-5 text-lg font-display">
-                        {loading ? <Loader2 className="animate-spin mx-auto" /> : (data as any)._id ? 'Update System Node' : 'Deploy New Node'}
-                      </Button>
-                      <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)} className="px-10">
-                        Cancel
-                      </Button>
-                    </div>
-                  </form>
+                       <input 
+                         type="file" 
+                         accept="image/*"
+                         multiple
+                         className="hidden" 
+                         id="service-images-upload"
+                         onChange={async (e) => {
+                           const files = Array.from(e.target.files || []);
+                           if (!files.length) return;
+                           toast.loading('Uploading matrix nodes...', { id: 'multi-upload' });
+                           let newUrls: string[] = [];
+                           for (const file of files) {
+                             const formDataLocal = new FormData();
+                             formDataLocal.append('image', file);
+                             try {
+                               const resLocal = await axios.post('/api/upload', formDataLocal);
+                               if (resLocal.data.imageUrl) {
+                                 newUrls.push(resLocal.data.imageUrl);
+                               }
+                             } catch (err) {
+                               console.error('Upload failed for a node', err);
+                             }
+                           }
+                           if (newUrls.length > 0) {
+                             const currentImages = data.images ? data.images.split(',').map(s=>s.trim()).filter(Boolean) : [];
+                             setData({ ...data, images: [...currentImages, ...newUrls].join(',') });
+                             toast.success('Matrix nodes updated!', { id: 'multi-upload' });
+                           } else {
+                             toast.error('Failed to upload nodes', { id: 'multi-upload' });
+                           }
+                         }}
+                       />
+                       <label htmlFor="service-images-upload" className="cursor-pointer inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-primary/20 hover:bg-primary/30 text-primary rounded-xl text-xs font-bold transition-all w-max uppercase tracking-widest border border-primary/20">
+                          <Plus size={14} /> Add Nodes
+                       </label>
+                   </div>
                 </div>
-              </Card>
-            </motion.div>
-          </div>
+                
+                <div className="md:col-span-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 block pl-1 mb-4">Core Operational Description</label>
+                  <textarea 
+                    className="w-full bg-black/20 border border-white/5 rounded-[2rem] p-8 focus:border-primary/50 outline-none h-64 text-foreground leading-relaxed transition-all focus:bg-black/40 text-lg"
+                    value={data.description}
+                    onChange={e => setData({ ...data, description: e.target.value })}
+                    placeholder="Detail the service core functionality and quantum parameters..."
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-4 pt-6 border-t border-border/50">
+                <Button type="submit" disabled={loading} className="flex-grow py-5 text-xl font-display shadow-lg shadow-primary/20">
+                  {loading ? <Loader2 className="animate-spin mx-auto" /> : (data as any)._id ? 'Synchronize Data' : 'Initialize Node'}
+                </Button>
+                <Button variant="outline" type="button" onClick={() => setIsFormOpen(false)} className="px-12 border-white/10">
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
@@ -546,6 +539,8 @@ function ProjectForm() {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState<any[]>([]);
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [isEditingProject, setIsEditingProject] = useState(false);
+  const [tempProject, setTempProject] = useState<any>(null);
   const [data, setData] = useState({
     title: '', description: '', image: '', techStack: '', liveLink: '',
     orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo'
@@ -599,6 +594,13 @@ function ProjectForm() {
       toast.error('Failed to delete');
     }
   };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
+
+  const totalPages = Math.ceil(list.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedList = list.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-12">
@@ -719,10 +721,30 @@ function ProjectForm() {
         </Button>
       </form>
 
-      <div className="space-y-4 pt-12 border-t border-white/5">
-        <h3 className="text-xl font-bold mb-6">Master Project List ({list.length})</h3>
+      <div className="space-y-6 pt-12 border-t border-white/5">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold">Master Project List ({list.length})</h3>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={`p-2 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed`}
+            >
+              <Plus className="rotate-[225deg]" size={16} />
+            </button>
+            <span className="text-xs font-mono text-white/40">Page {currentPage} of {totalPages || 1}</span>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className={`p-2 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed`}
+            >
+              <Plus className="rotate-45" size={16} />
+            </button>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 gap-4">
-          {list.map(item => (
+          {paginatedList.map(item => (
             <div key={item._id} className="flex items-center justify-between p-6 glass rounded-2xl group cursor-pointer hover:border-primary/30 transition-all" onClick={() => setSelectedProject(item)}>
               <div className="flex items-center gap-6">
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/5">
@@ -797,7 +819,26 @@ function ProjectForm() {
             </div>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-8">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`w-8 h-8 rounded-lg text-xs font-mono transition-all ${
+                  currentPage === i + 1 
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                  : 'bg-white/5 text-white/40 hover:bg-white/10'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+
 
       {/* Project Details Modal */}
       <AnimatePresence>
@@ -805,65 +846,248 @@ function ProjectForm() {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-bg/80 backdrop-blur-sm"
-              onClick={() => setSelectedProject(null)}
+              onClick={() => {
+                setSelectedProject(null);
+                setIsEditingProject(false);
+              }}
+              className="absolute inset-0 bg-black/95 backdrop-blur-md"
             />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-5xl glass border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
             >
-              <Card className="p-8 border-white/10 shadow-2xl relative">
+              <div className="md:w-2/5 relative bg-black flex items-center justify-center">
+                <img src={isEditingProject ? tempProject.image : selectedProject.image} className="w-full h-full object-contain" alt={selectedProject.title} />
                 <button 
-                  onClick={() => setSelectedProject(null)}
-                  className="absolute top-6 right-6 text-white/20 hover:text-white transition-colors"
+                  onClick={() => {
+                    setSelectedProject(null);
+                    setIsEditingProject(false);
+                  }}
+                  className="absolute top-6 left-6 p-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full text-white hover:bg-primary transition-colors z-20"
                 >
-                  <Plus className="rotate-45" size={24} />
+                  <Plus size={20} className="rotate-45" />
                 </button>
-                
-                <h2 className="text-3xl font-display font-bold mb-6">{selectedProject.title}</h2>
-                
-                <div className="grid grid-cols-2 gap-8 mb-8 text-sm">
-                  <div>
-                    <h5 className="text-xs font-mono uppercase text-white/20 mb-2">Project Details</h5>
-                    <p><span className="text-white/40">Type:</span> {selectedProject.projectType}</p>
-                    <p><span className="text-white/40">Value:</span> ${selectedProject.value}</p>
-                    <p><span className="text-white/40">Total Value:</span> ${selectedProject.totalValue}</p>
+                {isEditingProject && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      className="hidden" 
+                      id="admin-modal-image-upload"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const formData = new FormData();
+                        formData.append('image', file);
+                        try {
+                          const res = await axios.post('/api/upload', formData);
+                          setTempProject({ ...tempProject, image: res.data.imageUrl });
+                          toast.success('Image updated');
+                        } catch (err) {
+                          toast.error('Upload failed');
+                        }
+                      }}
+                    />
+                    <label htmlFor="admin-modal-image-upload" className="cursor-pointer px-6 py-3 bg-primary text-white rounded-full text-sm font-bold shadow-xl flex items-center gap-2">
+                       <Rocket size={18} /> Replace Image
+                    </label>
                   </div>
-                  <div>
-                    <h5 className="text-xs font-mono uppercase text-white/20 mb-2">Client Info</h5>
-                    <p><span className="text-white/40">Client:</span> {selectedProject.clientName}</p>
-                    <p><span className="text-white/40">Order ID:</span> {selectedProject.orderId}</p>
-                    <p><span className="text-white/40">Profile:</span> {selectedProject.profileName}</p>
+                )}
+              </div>
+              
+              <div className="md:w-3/5 p-10 overflow-y-auto bg-black/20">
+                {!isEditingProject ? (
+                  <div className="space-y-8">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h2 className="text-4xl font-display font-bold text-white mb-2">{selectedProject.title}</h2>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-3 py-1 bg-primary/20 text-primary border border-primary/30 text-[10px] font-bold rounded-full uppercase tracking-widest">{selectedProject.projectType}</span>
+                          <span className="px-3 py-1 bg-white/5 text-white/40 border border-white/10 text-[10px] font-bold rounded-full uppercase tracking-widest">Order: {selectedProject.orderId || 'N/A'}</span>
+                          <span className={`px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-widest ${
+                            selectedProject.status === 'completed' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'
+                          }`}>
+                            {selectedProject.status || 'Todo'}
+                          </span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setIsEditingProject(true);
+                          setTempProject({
+                            ...selectedProject,
+                            techStack: Array.isArray(selectedProject.techStack) ? selectedProject.techStack.join(', ') : selectedProject.techStack
+                          });
+                        }}
+                        className="p-3 bg-primary/20 hover:bg-primary text-primary hover:text-white rounded-xl transition-all border border-primary/30"
+                      >
+                        <ShieldCheck size={20} />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                         <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Developer</h4>
+                         <p className="text-sm font-bold text-white">{selectedProject.developerName || 'Admin'}</p>
+                         <p className="text-[9px] text-white/40 font-mono">User ID: {selectedProject.userId || 'System'}</p>
+                      </div>
+                      <div>
+                         <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Client Details</h4>
+                         <p className="text-sm font-bold text-white">{selectedProject.clientName || 'N/A'}</p>
+                         <p className="text-[9px] text-white/40 font-mono">{selectedProject.profileName || 'Direct'}</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-3">Narrative</h4>
+                      <p className="text-white/60 text-sm leading-relaxed">{selectedProject.description}</p>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-6">
+                      <div>
+                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Investment</h4>
+                        <p className="text-xl font-bold text-white">${selectedProject.value || '0.00'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Total Project</h4>
+                        <p className="text-xl font-bold text-white">${selectedProject.totalValue || '0.00'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Created</h4>
+                        <p className="text-sm font-bold text-white">{new Date(selectedProject.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-3">Tech Arsenal</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.techStack?.map((tech: string) => (
+                          <span key={tech} className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs text-white/80">{tech}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-8 border-t border-white/5 flex gap-4">
+                      {selectedProject.sheetLink && (
+                        <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
+                          <Button className="w-full py-4 flex items-center justify-center gap-2">
+                            Access Sheet <ExternalLink size={18} />
+                          </Button>
+                        </a>
+                      )}
+                      <Button variant="outline" onClick={() => setSelectedProject(null)}>Dismiss</Button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-3xl font-bold">Project Mastery Edit</h2>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => setIsEditingProject(false)}
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-all border border-white/10"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          onClick={async () => {
+                            setLoading(true);
+                            try {
+                              const techStackArray = typeof tempProject.techStack === 'string' 
+                                ? tempProject.techStack.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '')
+                                : tempProject.techStack;
+                              
+                              await axios.put(`/api/projects/${tempProject._id}`, {
+                                ...tempProject,
+                                techStack: techStackArray
+                              });
+                              toast.success('Masterpiece updated');
+                              fetchList();
+                              setSelectedProject({ ...tempProject, techStack: techStackArray });
+                              setIsEditingProject(false);
+                            } catch (err) {
+                              toast.error('Sync failed');
+                            } finally {
+                              setLoading(false);
+                            }
+                          }}
+                          className="px-6 py-2 bg-primary text-white rounded-lg text-xs font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                    </div>
 
-                <div className="mb-8">
-                  <h5 className="text-xs font-mono uppercase text-foreground/20 mb-3">Description</h5>
-                  <p className="text-foreground/60 leading-relaxed italic">"{selectedProject.description}"</p>
-                </div>
-
-                <div className="mb-8">
-                  <h5 className="text-xs font-mono uppercase text-white/20 mb-3">Tech Stack</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProject.techStack?.map((s: string) => (
-                      <span key={s} className="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-mono text-primary border border-white/5">{s}</span>
-                    ))}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-2">
+                        <label className="label-style">Project Title</label>
+                        <input className="input-style" value={tempProject.title} onChange={e => setTempProject({...tempProject, title: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Status</label>
+                        <select className="input-style" value={tempProject.status} onChange={e => setTempProject({...tempProject, status: e.target.value})}>
+                          <option value="todo">Todo</option>
+                          <option value="in-progress">In Progress</option>
+                          <option value="wip">WIP</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="label-style">Project Type</label>
+                        <select className="input-style" value={tempProject.projectType} onChange={e => setTempProject({...tempProject, projectType: e.target.value})}>
+                          <option value="solo">Solo</option>
+                          <option value="combine">Combine</option>
+                          <option value="leader">Leader</option>
+                          <option value="squad">Squad</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="label-style">Developer Name</label>
+                        <input className="input-style" value={tempProject.developerName} onChange={e => setTempProject({...tempProject, developerName: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Order ID</label>
+                        <input className="input-style" value={tempProject.orderId} onChange={e => setTempProject({...tempProject, orderId: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Client Name</label>
+                        <input className="input-style" value={tempProject.clientName} onChange={e => setTempProject({...tempProject, clientName: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Profile Name</label>
+                        <input className="input-style" value={tempProject.profileName} onChange={e => setTempProject({...tempProject, profileName: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Value ($)</label>
+                        <input className="input-style" value={tempProject.value} onChange={e => setTempProject({...tempProject, value: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Total Project Value ($)</label>
+                        <input className="input-style" value={tempProject.totalValue} onChange={e => setTempProject({...tempProject, totalValue: e.target.value})} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="label-style">Tech Stack (comma separated)</label>
+                        <input className="input-style" value={tempProject.techStack} onChange={e => setTempProject({...tempProject, techStack: e.target.value})} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="label-style">Sheet Link</label>
+                        <input className="input-style" value={tempProject.sheetLink} onChange={e => setTempProject({...tempProject, sheetLink: e.target.value})} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="label-style">Live Link</label>
+                        <input className="input-style" value={tempProject.liveLink} onChange={e => setTempProject({...tempProject, liveLink: e.target.value})} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="label-style">Description</label>
+                        <textarea rows={4} className="input-style" value={tempProject.description} onChange={e => setTempProject({...tempProject, description: e.target.value})} />
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex flex-wrap gap-4 pt-6 border-t border-white/5">
-                  {selectedProject.sheetLink && (
-                    <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer">
-                      <Button variant="outline" className="text-xs py-2">View Document</Button>
-                    </a>
-                  )}
-                  {selectedProject.liveLink && (
-                    <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer">
-                      <Button className="text-xs py-2">Live Preview</Button>
-                    </a>
-                  )}
-                </div>
-              </Card>
+                )}
+              </div>
             </motion.div>
           </div>
         )}

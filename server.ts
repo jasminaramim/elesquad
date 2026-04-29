@@ -247,7 +247,16 @@ app.use(async (req, res, next) => {
     try {
       const msg = { ...req.body, timestamp: new Date(), isRead: false };
       await messages.insertOne(msg);
+      
+      // Emit to room
       io.to(msg.room).emit('new_message', msg);
+      
+      // Emit to individual users so they get updates even if not in the specific room
+      const userIds = msg.room.split('_');
+      userIds.forEach(id => {
+        io.to(`user_${id}`).emit('new_message', msg);
+      });
+
       res.json({ success: true });
     } catch (err: any) {
       console.error('Messages Post Error:', err);
@@ -295,9 +304,17 @@ app.use(async (req, res, next) => {
 
     socket.on('send_message', async (data) => {
       try {
-        const msg = { ...data, timestamp: new Date() };
+        const msg = { ...data, timestamp: new Date(), isRead: false };
         await messages.insertOne(msg);
+        
+        // Emit to room
         io.to(data.room).emit('new_message', msg);
+        
+        // Emit to individual users
+        const userIds = data.room.split('_');
+        userIds.forEach(id => {
+          io.to(`user_${id}`).emit('new_message', msg);
+        });
       } catch (err) {
         console.error('Socket message error:', err);
       }
@@ -651,9 +668,41 @@ app.use(async (req, res, next) => {
 
   // Team
   app.get('/api/team', async (req, res) => {
-    // Return all users for chat (Admin + Members)
-    const allSquad = await users.find().toArray();
-    res.json(allSquad);
+    try {
+      const { currentUserId } = req.query;
+      const allSquad = await users.find().toArray();
+      
+      if (currentUserId && typeof currentUserId === 'string') {
+        const enrichedSquad = await Promise.all(allSquad.map(async (u) => {
+          const room = [currentUserId, u._id.toString()].sort().join('_');
+          const lastMsg = await messages.findOne({ room }, { sort: { timestamp: -1 } });
+          const unreadCount = await messages.countDocuments({ 
+            room, 
+            senderId: { $ne: currentUserId }, 
+            isRead: false 
+          });
+          return { 
+            ...u, 
+            lastMessageTimestamp: lastMsg ? lastMsg.timestamp : new Date(0),
+            unreadCount 
+          };
+        }));
+
+        // Sort by lastMessageTimestamp descending
+        enrichedSquad.sort((a, b) => {
+          const timeA = new Date(a.lastMessageTimestamp).getTime();
+          const timeB = new Date(b.lastMessageTimestamp).getTime();
+          return timeB - timeA;
+        });
+
+        return res.json(enrichedSquad);
+      }
+      
+      res.json(allSquad);
+    } catch (err) {
+      console.error('Fetch Team Error:', err);
+      res.status(500).json({ error: 'Failed to fetch team' });
+    }
   });
 
   app.get('/api/team/:id', async (req, res) => {

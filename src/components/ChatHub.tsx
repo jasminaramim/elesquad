@@ -22,9 +22,11 @@ export default function ChatHub() {
 
   useEffect(() => {
     // Fetch all users to chat with
-    axios.get('/api/team').then(res => {
-      setUsers(res.data.filter((u: any) => u._id !== user?.id));
-    });
+    if (user?.id) {
+      axios.get(`/api/team?currentUserId=${user.id}`).then(res => {
+        setUsers(res.data.filter((u: any) => u._id !== user?.id));
+      });
+    }
 
     const isLocal = window.location.hostname === 'localhost';
     if (isLocal) {
@@ -36,6 +38,9 @@ export default function ChatHub() {
       
       socketRef.current.on('connect', () => {
         console.log('Connected to socket server');
+        if (user?.id) {
+          socketRef.current?.emit('join_room', `user_${user.id}`);
+        }
       });
     }
 
@@ -86,7 +91,39 @@ export default function ChatHub() {
     const handleNewMessage = (msg: any) => {
       const room = [user?.id, selectedUser?._id].sort().join('_');
       if (msg.room === room) {
-        setMessages(prev => [...prev, msg]);
+        setMessages(prev => {
+          // Prevent duplicates by ID
+          if (prev.find(m => m._id === msg._id)) return prev;
+          
+          // Replace optimistic message if found (match by text and sender)
+          const optimisticIndex = prev.findIndex(m => 
+            m._id && m._id.toString().startsWith('temp_') && 
+            m.text === msg.text && 
+            m.senderId === msg.senderId
+          );
+          
+          if (optimisticIndex !== -1) {
+            const newMsgs = [...prev];
+            newMsgs[optimisticIndex] = msg;
+            return newMsgs;
+          }
+          
+          return [...prev, msg];
+        });
+        
+        // If this is the active room, mark as read
+        if (user?.id) {
+          axios.post('/api/messages/read', { room, userId: user.id }).then(() => {
+            resetUnread();
+          });
+        }
+      }
+      
+      // Always refresh user list to update sorting and unread dots
+      if (user?.id) {
+        axios.get(`/api/team?currentUserId=${user.id}`).then(res => {
+          setUsers(res.data.filter((u: any) => u._id !== user?.id));
+        });
       }
     };
 
@@ -130,10 +167,8 @@ export default function ChatHub() {
     
     try {
       // Send via HTTP to ensure it hits the serverless function reliably
+      // The server will handle the database insertion and socket emission
       await axios.post('/api/messages', { ...msgData, text: sentText });
-      
-      // Also emit via socket for local/polling speed
-      socketRef.current?.emit('send_message', { ...msgData, text: sentText });
     } catch (err) {
       console.error('Failed to send message:', err);
       // Revert if failed
@@ -155,12 +190,24 @@ export default function ChatHub() {
               selectedUser?._id === u._id ? 'bg-primary border-primary shadow-lg' : 'bg-white/5 border-white/5 hover:bg-white/10'
             }`}
           >
-            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center font-bold">
-              {u.name[0]}
+            <div className="relative">
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center font-bold">
+                {u.name[0]}
+              </div>
+              {u.unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full border-2 border-[#0a0a0a] animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+              )}
             </div>
-            <div className="text-left">
-              <h4 className="text-sm font-bold truncate w-32">{u.name}</h4>
-              <p className="text-[10px] text-white/40">{u.role}</p>
+            <div className="text-left flex-grow min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <h4 className="text-sm font-bold truncate flex-grow">{u.name}</h4>
+                {u.unreadCount > 0 && (
+                  <span className="text-[9px] bg-white text-black px-1.5 py-0.5 rounded-full font-black flex-shrink-0">
+                    {u.unreadCount}
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] text-white/40 truncate">{u.role}</p>
             </div>
           </button>
         ))}

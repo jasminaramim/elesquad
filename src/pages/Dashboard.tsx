@@ -115,6 +115,8 @@ export default function Dashboard() {
   };
 
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [isEditingProject, setIsEditingProject] = useState(false);
+  const [tempProject, setTempProject] = useState<any>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const updateProfile = async (e: React.FormEvent) => {
@@ -957,65 +959,235 @@ export default function Dashboard() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-4xl glass border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
+              className="relative w-full max-w-5xl glass border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
             >
-              <div className="md:w-1/2 relative bg-black">
-                <img src={selectedProject.image} className="w-full h-full object-contain" alt={selectedProject.title} />
+              <div className="md:w-2/5 relative bg-black flex items-center justify-center">
+                <img src={isEditingProject ? tempProject.image : selectedProject.image} className="w-full h-full object-contain" alt={selectedProject.title} />
                 <button 
-                  onClick={() => setSelectedProject(null)}
-                  className="absolute top-6 left-6 p-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full text-white hover:bg-primary transition-colors"
+                  onClick={() => {
+                    setSelectedProject(null);
+                    setIsEditingProject(false);
+                  }}
+                  className="absolute top-6 left-6 p-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full text-white hover:bg-primary transition-colors z-20"
                 >
                   <Plus size={20} className="rotate-45" />
                 </button>
+                {isEditingProject && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      className="hidden" 
+                      id="modal-image-upload"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const formData = new FormData();
+                        formData.append('image', file);
+                        try {
+                          const res = await axios.post('/api/upload', formData);
+                          setTempProject({ ...tempProject, image: res.data.imageUrl });
+                          toast.success('Image updated');
+                        } catch (err) {
+                          toast.error('Upload failed');
+                        }
+                      }}
+                    />
+                    <label htmlFor="modal-image-upload" className="cursor-pointer px-6 py-3 bg-primary text-white rounded-full text-sm font-bold shadow-xl flex items-center gap-2">
+                       <Rocket size={18} /> Replace Image
+                    </label>
+                  </div>
+                )}
               </div>
-              <div className="md:w-1/2 p-10 overflow-y-auto bg-black/20">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h2 className="text-4xl font-display font-bold text-white mb-2">{selectedProject.title}</h2>
-                    <div className="flex gap-2">
-                      <span className="px-3 py-1 bg-primary/20 text-primary border border-primary/30 text-[10px] font-bold rounded-full uppercase tracking-widest">{selectedProject.projectType}</span>
-                      <span className="px-3 py-1 bg-white/5 text-white/40 border border-white/10 text-[10px] font-bold rounded-full uppercase tracking-widest">Order: {selectedProject.orderId || 'N/A'}</span>
+              <div className="md:w-3/5 p-10 overflow-y-auto bg-black/20">
+                {!isEditingProject ? (
+                  <>
+                    <div className="flex justify-between items-start mb-6">
+                      <div>
+                        <h2 className="text-4xl font-display font-bold text-white mb-2">{selectedProject.title}</h2>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-3 py-1 bg-primary/20 text-primary border border-primary/30 text-[10px] font-bold rounded-full uppercase tracking-widest">{selectedProject.projectType}</span>
+                          <span className="px-3 py-1 bg-white/5 text-white/40 border border-white/10 text-[10px] font-bold rounded-full uppercase tracking-widest">Order: {selectedProject.orderId || 'N/A'}</span>
+                          <span className={`px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-widest ${
+                            selectedProject.status === 'completed' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'
+                          }`}>
+                            {selectedProject.status || 'Todo'}
+                          </span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setIsEditingProject(true);
+                          setTempProject({
+                            ...selectedProject,
+                            techStack: Array.isArray(selectedProject.techStack) ? selectedProject.techStack.join(', ') : selectedProject.techStack
+                          });
+                        }}
+                        className="p-3 bg-primary/20 hover:bg-primary text-primary hover:text-white rounded-xl transition-all border border-primary/30"
+                      >
+                        <Edit2 size={20} />
+                      </button>
+                    </div>
+
+                    <div className="space-y-8">
+                      <div className="grid grid-cols-2 gap-6">
+                        <div>
+                           <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Client Identity</h4>
+                           <p className="text-sm font-bold text-white">{selectedProject.clientName || 'Private Client'}</p>
+                           <p className="text-[9px] text-white/40 font-mono">{selectedProject.profileName || 'Direct'}</p>
+                        </div>
+                        <div>
+                           <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Status Insight</h4>
+                           <p className="text-sm font-bold text-white uppercase">{selectedProject.status || 'Active'}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-3">Project Narrative</h4>
+                        <p className="text-white/60 text-sm leading-relaxed">{selectedProject.description}</p>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-6">
+                        <div>
+                          <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">My Value</h4>
+                          <p className="text-xl font-bold text-white">${selectedProject.value || '0.00'}</p>
+                        </div>
+                        <div>
+                          <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Total Project</h4>
+                          <p className="text-xl font-bold text-white">${selectedProject.totalValue || '0.00'}</p>
+                        </div>
+                        <div>
+                          <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Launched</h4>
+                          <p className="text-sm font-bold text-white">{new Date(selectedProject.createdAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-3">Technology Arsenal</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedProject.techStack?.map((tech: string) => (
+                            <span key={tech} className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs text-white/80">{tech}</span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="pt-8 border-t border-white/5 flex gap-4">
+                        {selectedProject.sheetLink && (
+                          <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
+                            <Button className="w-full py-4 flex items-center justify-center gap-2">
+                              Access Project Sheet <ExternalLink size={18} />
+                            </Button>
+                          </a>
+                        )}
+                        {selectedProject.liveLink && (
+                           <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
+                             <Button variant="outline" className="w-full py-4 flex items-center justify-center gap-2">
+                               Live Preview <Rocket size={18} />
+                             </Button>
+                           </a>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-3xl font-bold">Edit Project</h2>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => setIsEditingProject(false)}
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-all border border-white/10"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          onClick={async () => {
+                            setLoading(true);
+                            try {
+                              const techStackArray = typeof tempProject.techStack === 'string' 
+                                ? tempProject.techStack.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '')
+                                : tempProject.techStack;
+                              
+                              await axios.put(`/api/projects/${tempProject._id}`, {
+                                ...tempProject,
+                                techStack: techStackArray
+                              });
+                              toast.success('Project updated successfully');
+                              refreshData();
+                              setSelectedProject({ ...tempProject, techStack: techStackArray });
+                              setIsEditingProject(false);
+                            } catch (err) {
+                              toast.error('Update failed');
+                            } finally {
+                              setLoading(false);
+                            }
+                          }}
+                          className="px-6 py-2 bg-primary text-white rounded-lg text-xs font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-2">
+                        <label className="label-style">Project Title</label>
+                        <input className="input-style" value={tempProject.title} onChange={e => setTempProject({...tempProject, title: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Status</label>
+                        <select className="input-style" value={tempProject.status} onChange={e => setTempProject({...tempProject, status: e.target.value})}>
+                          <option value="todo">Todo</option>
+                          <option value="in-progress">In Progress</option>
+                          <option value="wip">WIP</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="label-style">Project Type</label>
+                        <select className="input-style" value={tempProject.projectType} onChange={e => setTempProject({...tempProject, projectType: e.target.value})}>
+                          <option value="solo">Solo</option>
+                          <option value="combine">Combine</option>
+                          <option value="leader">Leader</option>
+                          <option value="squad">Squad</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="label-style">Order ID</label>
+                        <input className="input-style" value={tempProject.orderId} onChange={e => setTempProject({...tempProject, orderId: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Client Name</label>
+                        <input className="input-style" value={tempProject.clientName} onChange={e => setTempProject({...tempProject, clientName: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">My Value ($)</label>
+                        <input className="input-style" value={tempProject.value} onChange={e => setTempProject({...tempProject, value: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="label-style">Total Project Value ($)</label>
+                        <input className="input-style" value={tempProject.totalValue} onChange={e => setTempProject({...tempProject, totalValue: e.target.value})} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="label-style">Tech Stack (comma separated)</label>
+                        <input className="input-style" value={tempProject.techStack} onChange={e => setTempProject({...tempProject, techStack: e.target.value})} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="label-style">Sheet Link</label>
+                        <input className="input-style" value={tempProject.sheetLink} onChange={e => setTempProject({...tempProject, sheetLink: e.target.value})} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="label-style">Live Link</label>
+                        <input className="input-style" value={tempProject.liveLink} onChange={e => setTempProject({...tempProject, liveLink: e.target.value})} />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="label-style">Description</label>
+                        <textarea rows={4} className="input-style" value={tempProject.description} onChange={e => setTempProject({...tempProject, description: e.target.value})} />
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="space-y-8">
-                  <div>
-                    <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-3">Project Narrative</h4>
-                    <p className="text-white/60 text-sm leading-relaxed">{selectedProject.description}</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Investment</h4>
-                      <p className="text-xl font-bold text-white">${selectedProject.value || '0.00'}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Delivery Date</h4>
-                      <p className="text-sm font-bold text-white">{new Date(selectedProject.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-3">Technology Arsenal</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProject.techStack?.map((tech: string) => (
-                        <span key={tech} className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs text-white/80">{tech}</span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-8 border-t border-white/5 flex gap-4">
-                    {selectedProject.sheetLink && (
-                      <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
-                        <Button className="w-full py-4 flex items-center justify-center gap-2">
-                          Access Project Sheet <ExternalLink size={18} />
-                        </Button>
-                      </a>
-                    )}
-                    <Button variant="outline" onClick={() => setSelectedProject(null)}>Dismiss</Button>
-                  </div>
-                </div>
+                )}
               </div>
             </motion.div>
           </div>
