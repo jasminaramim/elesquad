@@ -23,7 +23,9 @@ import {
   LayoutDashboard,
   Save,
   ShieldCheck,
-  Rocket
+  Rocket,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import ChatHub from '../components/ChatHub';
 
@@ -67,6 +69,7 @@ export default function Dashboard() {
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -606,13 +609,22 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <label className="label-style">Update Password</label>
-                    <input 
-                      type="password"
-                      className="input-style" 
-                      placeholder="Enter new password"
-                      value={profile.password || ''} 
-                      onChange={e => setProfile({...profile, password: e.target.value})}
-                    />
+                    <div className="relative">
+                      <input 
+                        type={showPassword ? "text" : "password"}
+                        className="input-style pr-12" 
+                        placeholder="Enter new password"
+                        value={profile.password || ''} 
+                        onChange={e => setProfile({...profile, password: e.target.value})}
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div>
