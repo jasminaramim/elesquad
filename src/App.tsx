@@ -17,6 +17,7 @@ import Team from './pages/Team';
 import TeamMemberDetails from './pages/TeamMemberDetails';
 import Reviews from './pages/Reviews';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminMemberDetails from './pages/admin/AdminMemberDetails';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import Auth from './pages/Auth';
@@ -84,6 +85,14 @@ export default function App() {
                     element={
                       <ProtectedRoute>
                         <AdminDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/admin/members/:id" 
+                    element={
+                      <ProtectedRoute>
+                        <AdminMemberDetails />
                       </ProtectedRoute>
                     } 
                   />

@@ -10,11 +10,10 @@ import ChatHub from '../../components/ChatHub';
 import { cn } from '../../lib/utils';
 
 const tabs = [
-  { id: 'projects', label: 'Master Projects', icon: LayoutDashboard },
   { id: 'my-projects', label: 'My Projects', icon: Briefcase },
   { id: 'finance', label: 'Finance', icon: BarChart3 },
   { id: 'services', label: 'Services', icon: Rocket },
-  { id: 'team', label: 'Team', icon: Users },
+  { id: 'members', label: 'Members', icon: Users },
   { id: 'reviews', label: 'Reviews', icon: Star },
   { id: 'documents', label: 'Sheets', icon: FileText },
   { id: 'chat', label: 'Squad Chat', icon: MessageCircle },
@@ -25,7 +24,7 @@ export default function AdminDashboard() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'projects';
+    return params.get('tab') || 'my-projects';
   });
   
   useEffect(() => {
@@ -95,11 +94,10 @@ export default function AdminDashboard() {
                 transition={{ duration: 0.3 }}
               >
                 <Card className="p-8 md:p-12" tiltEnabled={false}>
-                  {activeTab === 'projects' && <ProjectForm projects={projects} fetchProjects={fetchProjects} />}
                   {activeTab === 'my-projects' && <ProjectForm projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} fetchProjects={fetchProjects} />}
                   {activeTab === 'finance' && <FinanceTab projects={projects} />}
                   {activeTab === 'services' && <ServiceForm />}
-                  {activeTab === 'team' && <TeamForm />}
+                  {activeTab === 'members' && <TeamForm />}
                   {activeTab === 'chat' && <ChatHub />}
                   {activeTab === 'reviews' && <ReviewForm />}
                   {activeTab === 'documents' && <DocumentForm />}
@@ -926,7 +924,7 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
                   className="p-2 text-white/20 hover:text-primary transition-all"
                   title="Edit Project"
                 >
-                  <Plus className="rotate-45" size={18} />
+                  <Edit2 size={18} />
                 </button>
                 <button onClick={() => handleDelete(item._id)} className="p-2 text-white/20 hover:text-red-500 transition-colors">
                   <Trash2 size={18} />
@@ -1290,24 +1288,6 @@ function TeamForm() {
     }
   };
 
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-
-  const handleUpdateMember = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedUser) return;
-    setLoading(true);
-    try {
-      await axios.put(`/api/admin/users/${selectedUser._id}`, selectedUser);
-      toast.success('Member updated successfully!');
-      setSelectedUser(null);
-      fetchList();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Update failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="space-y-12">
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -1343,9 +1323,14 @@ function TeamForm() {
           {list.map(item => (
             <div 
               key={item._id} 
-              className="flex flex-col md:flex-row md:items-center justify-between p-6 glass rounded-2xl group hover:border-primary/30 transition-all gap-6 cursor-pointer"
-              onClick={() => setSelectedUser(item)}
+              className="flex flex-col md:flex-row md:items-center justify-between p-6 glass rounded-2xl group hover:border-primary/30 transition-all gap-6 cursor-pointer relative overflow-hidden"
+              onClick={() => navigate(`/admin/members/${item._id}`)}
             >
+              {/* Hover Indicator */}
+              <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ExternalLink size={12} className="text-primary" />
+              </div>
+
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center font-bold text-primary relative overflow-hidden">
                   {item.image ? <img src={item.image} className="w-full h-full object-cover" /> : (item.name?.[0] || 'U')}
@@ -1386,76 +1371,6 @@ function TeamForm() {
           ))}
         </div>
       </div>
-
-      {/* Member Details Popup */}
-      <AnimatePresence>
-        {selectedUser && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-bg/90 backdrop-blur-md" onClick={() => setSelectedUser(null)} />
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-xl glass border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-8"
-            >
-              <div className="flex justify-between items-center mb-8">
-                <h3 className="text-2xl font-bold">Edit Member Data</h3>
-                <button onClick={() => setSelectedUser(null)}><Plus className="rotate-45 text-white/20 hover:text-white" /></button>
-              </div>
-
-              <form onSubmit={handleUpdateMember} className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <Input label="Name" value={selectedUser.name || ''} onChange={v => setSelectedUser({...selectedUser, name: v})} />
-                  <Input label="Email" value={selectedUser.email || ''} onChange={() => {}} disabled />
-                  <Input label="Tech ID" value={selectedUser.memberId || ''} onChange={v => setSelectedUser({...selectedUser, memberId: v})} />
-                  <Input label="Designation" value={selectedUser.designation || ''} onChange={v => setSelectedUser({...selectedUser, designation: v})} />
-                  <Input label="Team" value={selectedUser.team || ''} onChange={v => setSelectedUser({...selectedUser, team: v})} />
-                  <Input label="Phone" value={selectedUser.phone || ''} onChange={v => setSelectedUser({...selectedUser, phone: v})} />
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Squad Role</label>
-                    <select 
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"
-                      value={selectedUser.role || 'Member'}
-                      onChange={e => setSelectedUser({...selectedUser, role: e.target.value})}
-                    >
-                      <option value="Member" className="bg-bg">Member</option>
-                      <option value="Leader" className="bg-bg">Leader (Admin)</option>
-                    </select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Verification Status</label>
-                    <button 
-                      type="button"
-                      onClick={() => setSelectedUser({...selectedUser, isVerified: !selectedUser.isVerified})}
-                      className={`w-full py-3 rounded-xl border transition-all text-xs font-bold uppercase tracking-widest ${
-                        selectedUser.isVerified ? 'bg-primary/20 border-primary text-primary' : 'bg-white/5 border-white/10 text-white/40'
-                      }`}
-                    >
-                      {selectedUser.isVerified ? 'Verified Member' : 'Unverified'}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Member Bio</label>
-                  <textarea 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white h-24"
-                    value={selectedUser.bio || ''}
-                    onChange={e => setSelectedUser({...selectedUser, bio: e.target.value})}
-                  />
-                </div>
-
-                <div className="flex gap-4 pt-4">
-                  <Button type="submit" disabled={loading} className="flex-grow flex items-center justify-center gap-2">
-                    {loading ? <Loader2 className="animate-spin" /> : <><ShieldCheck size={18} /> Update Data</>}
-                  </Button>
-                  <Button variant="outline" type="button" onClick={() => setSelectedUser(null)}>Cancel</Button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
