@@ -1218,6 +1218,7 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
 }
 
 function TeamForm() {
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState<any[]>([]);
