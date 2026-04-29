@@ -699,10 +699,14 @@ export default function Dashboard() {
                              <label className="label-style">Total Value</label>
                              <input className="input-style" value={newProject.totalValue} onChange={e => setNewProject({...newProject, totalValue: e.target.value})} />
                           </div>
-                          <div className="md:col-span-2 lg:col-span-3">
-                             <label className="label-style">Sheet Link</label>
-                             <input className="input-style" value={newProject.sheetLink} onChange={e => setNewProject({...newProject, sheetLink: e.target.value})} placeholder="https://docs.google.com/..." />
-                          </div>
+                           <div className="md:col-span-2 lg:col-span-3">
+                              <label className="label-style">Sheet Link</label>
+                              <input className="input-style" value={newProject.sheetLink} onChange={e => setNewProject({...newProject, sheetLink: e.target.value})} placeholder="https://docs.google.com/..." />
+                           </div>
+                           <div className="md:col-span-2 lg:col-span-3">
+                              <label className="label-style">Live Link</label>
+                              <input className="input-style" value={newProject.liveLink} onChange={e => setNewProject({...newProject, liveLink: e.target.value})} placeholder="https://your-project.com" />
+                           </div>
                            <div className="md:col-span-2 lg:col-span-3">
                               <label className="label-style">Project Image</label>
                               <div className="flex items-center gap-6 p-4 bg-white/5 border border-white/10 rounded-xl">
@@ -718,15 +722,37 @@ export default function Dashboard() {
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       if (!file) return;
-                                      const formData = new FormData();
-                                      formData.append('image', file);
-                                      try {
-                                        const res = await axios.post('/api/upload', formData);
-                                        setNewProject({ ...newProject, image: res.data.imageUrl });
-                                        toast.success('Image uploaded!');
-                                      } catch (err) {
-                                        toast.error('Upload failed');
-                                      }
+                                      
+                                      const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0';
+                                      const reader = new FileReader();
+                                      reader.onloadend = async () => {
+                                        const base64String = (reader.result as string).split(',')[1];
+                                        const formDataImgBB = new FormData();
+                                        formDataImgBB.append('image', base64String);
+
+                                        try {
+                                          const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
+                                          if (res.data.success) {
+                                            setNewProject({ ...newProject, image: res.data.data.url });
+                                            toast.success('Project image synced to Cloud');
+                                            return;
+                                          }
+                                        } catch (err) {
+                                          console.warn('ImgBB failed, trying local...', err);
+                                        }
+
+                                        // Local fallback
+                                        const formData = new FormData();
+                                        formData.append('image', file);
+                                        try {
+                                          const res = await axios.post('/api/upload', formData);
+                                          setNewProject({ ...newProject, image: res.data.imageUrl });
+                                          toast.success('Image uploaded locally');
+                                        } catch (err) {
+                                          toast.error('Upload failed');
+                                        }
+                                      };
+                                      reader.readAsDataURL(file);
                                     }}
                                   />
                                   <label htmlFor="dashboard-project-upload" className="cursor-pointer px-6 py-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg text-xs font-bold transition-all uppercase">
@@ -1003,15 +1029,37 @@ export default function Dashboard() {
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        const formData = new FormData();
-                        formData.append('image', file);
-                        try {
-                          const res = await axios.post('/api/upload', formData);
-                          setTempProject({ ...tempProject, image: res.data.imageUrl });
-                          toast.success('Image updated');
-                        } catch (err) {
-                          toast.error('Upload failed');
-                        }
+                        
+                        const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0';
+                        const reader = new FileReader();
+                        reader.onloadend = async () => {
+                          const base64String = (reader.result as string).split(',')[1];
+                          const formDataImgBB = new FormData();
+                          formDataImgBB.append('image', base64String);
+
+                          try {
+                            const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
+                            if (res.data.success) {
+                              setTempProject({ ...tempProject, image: res.data.data.url });
+                              toast.success('Image updated on Cloud');
+                              return;
+                            }
+                          } catch (err) {
+                            console.warn('ImgBB failed, trying local...', err);
+                          }
+
+                          // Local fallback
+                          const formData = new FormData();
+                          formData.append('image', file);
+                          try {
+                            const res = await axios.post('/api/upload', formData);
+                            setTempProject({ ...tempProject, image: res.data.imageUrl });
+                            toast.success('Image updated locally');
+                          } catch (err) {
+                            toast.error('Upload failed');
+                          }
+                        };
+                        reader.readAsDataURL(file);
                       }}
                     />
                     <label htmlFor="modal-image-upload" className="cursor-pointer px-6 py-3 bg-primary text-white rounded-full text-sm font-bold shadow-xl flex items-center gap-2">
@@ -1091,23 +1139,23 @@ export default function Dashboard() {
                           ))}
                         </div>
                       </div>
-
-                      <div className="pt-8 border-t border-white/5 flex gap-4">
+                      <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row gap-4">
                         {selectedProject.sheetLink && (
                           <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
-                            <Button className="w-full py-4 flex items-center justify-center gap-2">
+                            <Button className="w-full py-4 flex items-center justify-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white">
                               Access Project Sheet <ExternalLink size={18} />
                             </Button>
                           </a>
                         )}
                         {selectedProject.liveLink && (
                            <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
-                             <Button variant="outline" className="w-full py-4 flex items-center justify-center gap-2">
-                               Live Preview <Rocket size={18} />
+                             <Button className="w-full py-4 flex items-center justify-center gap-2 bg-primary text-white shadow-lg shadow-primary/20">
+                                View Live Link <Rocket size={18} />
                              </Button>
                            </a>
                         )}
                       </div>
+
                     </div>
                   </>
                 ) : (

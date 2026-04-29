@@ -94,7 +94,7 @@ export default function ProjectDetails() {
           <div className="flex flex-wrap gap-6 pt-6">
             {project.liveLink && (
               <a href={project.liveLink} target="_blank" rel="noreferrer" className="w-full md:w-auto">
-                <Button className="w-full md:px-12 py-6 text-lg">Launch Project <ExternalLink size={20} className="ml-3" /></Button>
+                <Button className="w-full md:px-12 py-6 text-lg">View Live Link <Globe size={20} className="ml-3" /></Button>
               </a>
             )}
             {project.sheetLink && (

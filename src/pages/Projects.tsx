@@ -77,13 +77,23 @@ export default function Projects() {
                       <p className="text-white/40 mb-6 line-clamp-2 leading-relaxed text-sm">
                         {project.description}
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 mb-6">
                         {project.techStack && project.techStack.map((tech: string) => (
                           <span key={tech} className="px-2 py-0.5 glass rounded-md text-[9px] font-mono uppercase tracking-widest text-primary/80">
                             {tech}
                           </span>
                         ))}
                       </div>
+
+                      {project.liveLink && (
+                        <div onClick={e => e.stopPropagation()}>
+                          <a href={project.liveLink} target="_blank" rel="noreferrer">
+                            <Button variant="outline" className="w-full py-2 text-[10px] uppercase font-bold flex items-center justify-center gap-2 border-primary/20 text-primary hover:bg-primary hover:text-white">
+                               View Live Link <Globe size={12} />
+                            </Button>
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </Card>
                 </Link>
