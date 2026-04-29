@@ -287,13 +287,43 @@ export default function AdminMemberDetails() {
                         </div>
                       </div>
 
-                      <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row gap-4">
-                        {selectedProject.liveLink && (
-                          <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
-                             <Button className="w-full py-4 flex items-center justify-center gap-2"><Rocket size={18} /> View Live Link</Button>
+                      <div className="pt-8 border-t border-white/5 flex flex-wrap gap-4">
+                        {selectedProject.sheetLink && (
+                          <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow min-w-[200px]">
+                            <button className="w-full group relative overflow-hidden bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-6 rounded-[2.5rem] transition-all duration-500">
+                               <div className="flex items-center justify-between gap-4">
+                                 <div className="text-left">
+                                   <span className="block text-[8px] uppercase tracking-widest text-white/40 mb-1">Source Data</span>
+                                   <span className="block text-sm font-bold">Access Project Sheet</span>
+                                 </div>
+                                 <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+                                   <ExternalLink size={18} />
+                                 </div>
+                               </div>
+                            </button>
                           </a>
                         )}
-                        <Button variant="outline" onClick={() => setSelectedProject(null)} className="flex-grow">Dismiss</Button>
+                        {selectedProject.liveLink && (
+                          <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow min-w-[200px]">
+                            <button className="w-full group relative overflow-hidden bg-primary text-white px-8 py-6 rounded-[2.5rem] transition-all duration-500 shadow-lg shadow-primary/20 hover:scale-[1.02]">
+                               <div className="flex items-center justify-between gap-4">
+                                 <div className="text-left">
+                                   <span className="block text-[8px] uppercase tracking-widest text-white/20 mb-1">Production Link</span>
+                                   <span className="block text-sm font-bold">View Live Link</span>
+                                 </div>
+                                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-primary transition-all">
+                                   <Rocket size={18} />
+                                 </div>
+                               </div>
+                            </button>
+                          </a>
+                        )}
+                        <button 
+                          onClick={() => setSelectedProject(null)} 
+                          className="flex-grow min-w-[120px] bg-white/5 hover:bg-white/10 border border-white/10 text-white/40 hover:text-white px-8 py-6 rounded-[2.5rem] text-sm font-bold transition-all"
+                        >
+                          Dismiss
+                        </button>
                       </div>
                    </div>
                  ) : (
