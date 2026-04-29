@@ -55,7 +55,7 @@ export default function TeamMemberDetails() {
         <div className="max-w-7xl mx-auto px-5 md:px-10 relative z-10">
           <Link to="/team" className="inline-flex items-center gap-2 text-white/40 hover:text-primary transition-colors mb-12 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-[10px] font-mono uppercase tracking-[0.2em]">Return to Squad</span>
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em]">Return to Team</span>
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
