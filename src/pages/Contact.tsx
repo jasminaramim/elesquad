@@ -81,7 +81,7 @@ export default function Contact() {
                       <a 
                         key={i} 
                         href="#" 
-                        className="w-10 h-10 rounded-full bg-white border border-white flex items-center justify-center text-black hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+                        className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
                       >
                         <Icon size={18} />
                       </a>

@@ -72,8 +72,8 @@ export default function Team() {
                 <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60" />
                 <div className="absolute bottom-6 left-6 flex gap-3">
                    {/* Real icons for wordpress and elementor */}
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Wordpress_Blue_logo.png" alt="WordPress" className="w-8 h-8 rounded-full bg-white p-1 shadow-lg" />
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Elementor_icon.svg" alt="Elementor" className="w-8 h-8 rounded-full bg-white p-1 shadow-lg" />
+                   <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Wordpress_Blue_logo.png" alt="WordPress" className="w-8 h-8 rounded-full bg-white/10 p-1 shadow-lg" />
+                   <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Elementor_icon.svg" alt="Elementor" className="w-8 h-8 rounded-full bg-white/10 p-1 shadow-lg" />
                 </div>
               </div>
               

@@ -160,7 +160,7 @@ export default function ServiceDetails() {
               <p className="text-white/70 text-sm">Our elite squad is ready to transform your vision into reality.</p>
               
               <Link to="/contact">
-                <Button className="w-full bg-white text-primary hover:bg-white/90 py-5 flex items-center justify-center gap-3 group/btn">
+                <Button className="w-full bg-primary text-white hover:bg-white hover:text-primary py-5 flex items-center justify-center gap-3 group/btn">
                   Let's Talk
                   <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center group-hover/btn:translate-x-1 transition-transform">
                     <ArrowRight size={14} />

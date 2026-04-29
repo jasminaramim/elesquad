@@ -53,7 +53,7 @@ export function Button({
       className={cn(
         "relative px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden",
         variant === 'primary' 
-          ? "bg-white text-bg hover:bg-primary hover:text-white shadow-[0_10px_40px_rgba(108,77,246,0.3)]" 
+          ? "bg-primary text-white shadow-[0_10px_40px_rgba(108,77,246,0.3)] hover:bg-white hover:text-primary" 
           : "bg-transparent border border-white/10 text-white hover:border-primary/50 hover:bg-primary/5",
         className
       )}
