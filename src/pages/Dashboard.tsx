@@ -604,6 +604,16 @@ export default function Dashboard() {
                       onChange={e => setProfile({...profile, telegram: e.target.value})}
                     />
                   </div>
+                  <div>
+                    <label className="label-style">Update Password</label>
+                    <input 
+                      type="password"
+                      className="input-style" 
+                      placeholder="Enter new password"
+                      value={profile.password || ''} 
+                      onChange={e => setProfile({...profile, password: e.target.value})}
+                    />
+                  </div>
                 </div>
                 <div>
                    <label className="label-style">Professional Bio</label>

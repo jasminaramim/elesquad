@@ -213,6 +213,7 @@ function AdminProfileTab() {
            <Input label="Phone Number" value={profile.phone || ''} onChange={v => setProfile({...profile, phone: v})} />
           <Input label="Squad Team" value={profile.team || ''} onChange={v => setProfile({...profile, team: v})} />
           <Input label="Squad Role" value={profile.role || ''} onChange={v => setProfile({...profile, role: v})} />
+          <Input label="Update Password" value={profile.password || ''} onChange={v => setProfile({...profile, password: v})} type="password" placeholder="Enter new password" />
           
           <div className="md:col-span-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1 mb-2">Leadership Bio</label>
