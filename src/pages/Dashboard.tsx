@@ -372,9 +372,9 @@ export default function Dashboard() {
                     <p className="text-white/40 text-sm">Track your earnings and monthly project load</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] text-primary uppercase font-mono tracking-widest mb-1">Lifetime Earnings</p>
+                    <p className="text-[10px] text-primary uppercase font-mono tracking-widest mb-1">Lifetime Total Value</p>
                     <h4 className="text-2xl font-bold text-white">
-                      ${projects.reduce((acc, curr) => acc + (parseFloat(curr.value) || 0), 0).toFixed(2)}
+                      ${projects.reduce((acc, curr) => acc + (parseFloat(curr.totalValue) || 0), 0).toFixed(2)}
                     </h4>
                   </div>
                </div>
@@ -423,8 +423,8 @@ export default function Dashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                        {[
                          { label: 'Projects Completed', value: projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).length, icon: Briefcase },
-                         { label: 'Monthly Revenue', value: `$${projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0).toFixed(2)}`, icon: DollarSign },
-                         { label: 'Avg Project Value', value: `$${(projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0) / (projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).length || 1)).toFixed(2)}`, icon: BarChart3 },
+                         { label: 'Monthly Achievement', value: `$${projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0).toFixed(2)}`, icon: DollarSign },
+                         { label: 'Avg Achievement', value: `$${(projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0) / (projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).length || 1)).toFixed(2)}`, icon: BarChart3 },
                        ].map((stat, i) => (
                          <div key={i} className="p-6 bg-white/5 rounded-2xl border border-white/10">
                             <stat.icon size={16} className="text-primary mb-3" />
@@ -1071,7 +1071,7 @@ export default function Dashboard() {
 
                       <div className="grid grid-cols-3 gap-6">
                         <div>
-                          <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">My Value</h4>
+                          <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">My Achievement Value</h4>
                           <p className="text-xl font-bold text-white">${selectedProject.value || '0.00'}</p>
                         </div>
                         <div>
@@ -1184,7 +1184,7 @@ export default function Dashboard() {
                         <input className="input-style" value={tempProject.clientName} onChange={e => setTempProject({...tempProject, clientName: e.target.value})} />
                       </div>
                       <div>
-                        <label className="label-style">My Value ($)</label>
+                        <label className="label-style">My Achievement Value ($)</label>
                         <input className="input-style" value={tempProject.value} onChange={e => setTempProject({...tempProject, value: e.target.value})} />
                       </div>
                       <div>

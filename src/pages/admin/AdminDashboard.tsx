@@ -948,7 +948,7 @@ function ProjectForm() {
 
                     <div className="grid grid-cols-3 gap-6">
                       <div>
-                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Investment</h4>
+                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Achievement Value</h4>
                         <p className="text-xl font-bold text-white">${selectedProject.value || '0.00'}</p>
                       </div>
                       <div>
@@ -1062,7 +1062,7 @@ function ProjectForm() {
                         <input className="input-style" value={tempProject.profileName} onChange={e => setTempProject({...tempProject, profileName: e.target.value})} />
                       </div>
                       <div>
-                        <label className="label-style">Value ($)</label>
+                        <label className="label-style">Achievement Value ($)</label>
                         <input className="input-style" value={tempProject.value} onChange={e => setTempProject({...tempProject, value: e.target.value})} />
                       </div>
                       <div>
