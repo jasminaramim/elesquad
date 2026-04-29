@@ -372,9 +372,9 @@ export default function Dashboard() {
                     <p className="text-white/40 text-sm">Track your earnings and monthly project load</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] text-primary uppercase font-mono tracking-widest mb-1">Lifetime Total Value</p>
+                    <p className="text-[10px] text-primary uppercase font-mono tracking-widest mb-1">Lifetime Achievement</p>
                     <h4 className="text-2xl font-bold text-white">
-                      ${projects.reduce((acc, curr) => acc + (parseFloat(curr.totalValue) || 0), 0).toFixed(2)}
+                      ${projects.reduce((acc, curr) => acc + (parseFloat(curr.value) || 0), 0).toFixed(2)}
                     </h4>
                   </div>
                </div>
@@ -420,11 +420,10 @@ export default function Dashboard() {
                        <h4 className="text-xl font-bold">{selectedMonth} Analysis</h4>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                        {[
                          { label: 'Projects Completed', value: projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).length, icon: Briefcase },
                          { label: 'Monthly Achievement', value: `$${projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0).toFixed(2)}`, icon: DollarSign },
-                         { label: 'Avg Achievement', value: `$${(projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0) / (projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).length || 1)).toFixed(2)}`, icon: BarChart3 },
                        ].map((stat, i) => (
                          <div key={i} className="p-6 bg-white/5 rounded-2xl border border-white/10">
                             <stat.icon size={16} className="text-primary mb-3" />
