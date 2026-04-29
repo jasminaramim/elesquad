@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink, MessageCircle, User, Save, Rocket, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink, MessageCircle, User, Save, Rocket, ShieldCheck, Eye, EyeOff, DollarSign, TrendingUp, BarChart3, Briefcase, Calendar, Edit2 } from 'lucide-react';
 import { Card, Button, SectionHeading } from '../../components/UI';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ChatHub from '../../components/ChatHub';
+import { cn } from '../../lib/utils';
 
 const tabs = [
   { id: 'projects', label: 'Projects', icon: LayoutDashboard },
+  { id: 'finance', label: 'Finance', icon: BarChart3 },
   { id: 'services', label: 'Services', icon: Rocket },
   { id: 'team', label: 'Team', icon: Users },
   { id: 'reviews', label: 'Reviews', icon: Star },
@@ -32,8 +34,22 @@ export default function AdminDashboard() {
   }, [location.search]);
 
   const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = useState<any[]>([]);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get('/api/projects');
+      setProjects(res.data);
+    } catch (err) {
+      console.error('Failed to fetch projects');
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -78,7 +94,8 @@ export default function AdminDashboard() {
                 transition={{ duration: 0.3 }}
               >
                 <Card className="p-8 md:p-12" tiltEnabled={false}>
-                  {activeTab === 'projects' && <ProjectForm />}
+                  {activeTab === 'projects' && <ProjectForm projects={projects} fetchProjects={fetchProjects} />}
+                  {activeTab === 'finance' && <FinanceTab projects={projects} />}
                   {activeTab === 'services' && <ServiceForm />}
                   {activeTab === 'team' && <TeamForm />}
                   {activeTab === 'chat' && <ChatHub />}
@@ -535,24 +552,123 @@ function ServiceForm() {
   );
 }
 
-function ProjectForm() {
+function FinanceTab({ projects }: { projects: any[] }) {
+  const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toLocaleString('default', { month: 'long', year: 'numeric' }));
+
+  const lifetimeAchievement = projects.reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0);
+
+  return (
+    <div className="space-y-12">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+           <h3 className="text-3xl font-display font-bold">Financial Overview</h3>
+           <p className="text-white/40 text-xs uppercase tracking-widest">Platform Achievement Analysis</p>
+        </div>
+        <div className="flex items-center gap-6">
+           <div className="text-right">
+              <p className="text-[10px] uppercase text-white/40 tracking-widest mb-1">Lifetime Achievement</p>
+              <p className="text-3xl font-bold text-primary">${lifetimeAchievement.toFixed(2)}</p>
+           </div>
+           <div className="p-4 bg-primary/20 rounded-2xl border border-primary/30">
+              <TrendingUp size={30} className="text-primary" />
+           </div>
+        </div>
+      </div>
+
+      <Card className="p-8 border-white/5 glass">
+        <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 scrollbar-hide">
+          {Array.from(new Set(projects.map((p: any) => {
+            const d = new Date(p.createdAt);
+            return d.toLocaleString('default', { month: 'long', year: 'numeric' });
+          }))).sort((a: any, b: any) => {
+            return new Date(b).getTime() - new Date(a).getTime();
+          }).map((month: any) => {
+            const monthlyTotal = projects
+              .filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === month)
+              .reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0);
+
+            const monthParts = month.split(' ');
+            return (
+              <button
+                key={month}
+                onClick={() => setSelectedMonth(month)}
+                className={cn(
+                  "flex flex-col items-center justify-center min-w-[120px] p-5 rounded-2xl border transition-all",
+                  selectedMonth === month 
+                    ? "bg-primary/20 border-primary shadow-[0_0_15px_rgba(108,77,246,0.3)]" 
+                    : "bg-white/5 border-white/10 hover:bg-white/10"
+                )}
+              >
+                <span className={cn("text-[10px] font-mono uppercase tracking-widest mb-2", selectedMonth === month ? "text-primary" : "text-white/40")}>
+                  {monthParts[0]?.substring(0, 3)} {monthParts[1]}
+                </span>
+                <span className="text-lg font-bold text-white">${monthlyTotal.toFixed(0)}</span>
+              </button>
+            );
+          })}
+          {projects.length === 0 && <p className="text-white/20 italic text-sm">No project data available.</p>}
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 mb-6">
+             <Calendar size={18} className="text-primary" />
+             <h4 className="text-xl font-bold">{selectedMonth} Analysis</h4>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+             {[
+               { label: 'Projects Completed', value: projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).length, icon: Briefcase },
+               { label: 'Monthly Achievement', value: `$${projects.filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth).reduce((acc: number, curr: any) => acc + (parseFloat(curr.value) || 0), 0).toFixed(2)}`, icon: DollarSign },
+             ].map((stat, i) => (
+               <div key={i} className="p-6 bg-white/5 rounded-2xl border border-white/10">
+                  <stat.icon size={16} className="text-primary mb-3" />
+                  <p className="text-[10px] uppercase text-white/40 tracking-widest mb-1">{stat.label}</p>
+                  <p className="text-xl font-bold">{stat.value}</p>
+               </div>
+             ))}
+          </div>
+
+          <h5 className="text-xs font-mono uppercase text-white/20 tracking-tighter mb-4 pt-4 border-t border-white/5">Projects from {selectedMonth}</h5>
+          <div className="space-y-3">
+            {projects
+              .filter((p: any) => new Date(p.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' }) === selectedMonth)
+              .map((p: any, i: number) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/5 group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/10">
+                      <img src={p.image} className="w-full h-full object-cover" alt="" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-white group-hover:text-primary transition-colors">{p.title}</p>
+                      <p className="text-[10px] text-white/40 font-mono uppercase">{p.projectType} • {new Date(p.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                     <p className="text-md font-bold text-white">${parseFloat(p.value).toFixed(2)}</p>
+                     <p className="text-[9px] text-primary/60 font-mono uppercase">Order ID: {p.orderId || 'N/A'}</p>
+                  </div>
+                </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjects: () => void }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [list, setList] = useState<any[]>([]);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isEditingProject, setIsEditingProject] = useState(false);
   const [tempProject, setTempProject] = useState<any>(null);
   const [data, setData] = useState({
     title: '', description: '', image: '', techStack: '', liveLink: '',
-    orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo'
+    orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo', developerName: ''
   });
 
-  const fetchList = async () => {
-    const res = await axios.get('/api/projects');
-    setList(res.data);
-  };
-
-  React.useEffect(() => { fetchList(); }, []);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -569,15 +685,15 @@ function ProjectForm() {
           ...data,
           techStack: data.techStack.split(',').map(s => s.trim()),
           userId: user?.id,
-          developerName: user?.name || 'Admin'
+          developerName: data.developerName || user?.name || 'Admin'
         });
         toast.success('Project added successfully!');
       }
       setData({ 
         title: '', description: '', image: '', techStack: '', liveLink: '',
-        orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo'
+        orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo', developerName: ''
       });
-      fetchList();
+      fetchProjects();
     } catch (err) {
       toast.error('Failed to save project');
     } finally {
@@ -590,18 +706,15 @@ function ProjectForm() {
     try {
       await axios.delete(`/api/projects/${id}`);
       toast.success('Project deleted');
-      fetchList();
+      fetchProjects();
     } catch (err) {
       toast.error('Failed to delete');
     }
   };
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 5;
-
-  const totalPages = Math.ceil(list.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedList = list.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedList = projects.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-12">
@@ -641,8 +754,8 @@ function ProjectForm() {
           <Input label="Order ID" value={data.orderId || ''} onChange={v => setData({ ...data, orderId: v })} placeholder="ORD-123" />
           <Input label="Client Name" value={data.clientName || ''} onChange={v => setData({ ...data, clientName: v })} placeholder="John Doe" />
           <Input label="Profile Name" value={data.profileName || ''} onChange={v => setData({ ...data, profileName: v })} placeholder="Fiverr / Upwork" />
-          <Input label="Project Value ($)" value={data.value || ''} onChange={v => setData({ ...data, value: v })} placeholder="500" />
-          <Input label="Total Value ($)" value={data.totalValue || ''} onChange={v => setData({ ...data, totalValue: v })} placeholder="1000" />
+          <Input label="My Achievement Value ($)" value={data.value || ''} onChange={v => setData({ ...data, value: v })} placeholder="500" />
+          <Input label="Total Project Value ($)" value={data.totalValue || ''} onChange={v => setData({ ...data, totalValue: v })} placeholder="1000" />
           <Input label="Tech Stack (comma separated)" value={data.techStack || ''} onChange={v => setData({ ...data, techStack: v })} placeholder="React, Node, MongoDB" />
           <Input label="Developer Name" value={data.developerName || ''} onChange={v => setData({ ...data, developerName: v })} placeholder="e.g. John Doe / Admin" />
           <div className="md:col-span-2 lg:col-span-3">
@@ -724,7 +837,7 @@ function ProjectForm() {
 
       <div className="space-y-6 pt-12 border-t border-white/5">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold">Master Project List ({list.length})</h3>
+          <h3 className="text-xl font-bold">Master Project List ({projects.length})</h3>
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
@@ -767,17 +880,17 @@ function ProjectForm() {
                     <span>•</span>
                     <span className="text-primary">${item.value || '0'}</span>
                     <span>•</span>
-                    <span>•</span>
                     <span className="text-foreground/60">Dev: {item.developerName || 'Member'}</span>
                   </div>
                   <div className="flex items-center gap-3 mt-3">
                      <select 
                         value={item.status || 'todo'} 
+                        onClick={(e) => e.stopPropagation()}
                         onChange={async (e) => {
                           try {
                             await axios.put(`/api/projects/${item._id}`, { ...item, status: e.target.value });
                             toast.success('Status updated');
-                            fetchList();
+                            fetchProjects();
                           } catch (err) {
                             toast.error('Failed to update status');
                           }
@@ -948,7 +1061,7 @@ function ProjectForm() {
 
                     <div className="grid grid-cols-3 gap-6">
                       <div>
-                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">Achievement Value</h4>
+                        <h4 className="text-[10px] uppercase font-mono tracking-widest text-primary mb-2">My Achievement Value</h4>
                         <p className="text-xl font-bold text-white">${selectedProject.value || '0.00'}</p>
                       </div>
                       <div>
@@ -970,15 +1083,22 @@ function ProjectForm() {
                       </div>
                     </div>
 
-                    <div className="pt-8 border-t border-white/5 flex gap-4">
+                    <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row gap-4">
                       {selectedProject.sheetLink && (
                         <a href={selectedProject.sheetLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
-                          <Button className="w-full py-4 flex items-center justify-center gap-2">
-                            Access Sheet <ExternalLink size={18} />
+                          <Button className="w-full py-4 flex items-center justify-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white">
+                            Access Project Sheet <ExternalLink size={18} />
                           </Button>
                         </a>
                       )}
-                      <Button variant="outline" onClick={() => setSelectedProject(null)}>Dismiss</Button>
+                      {selectedProject.liveLink && (
+                         <a href={selectedProject.liveLink} target="_blank" rel="noopener noreferrer" className="flex-grow">
+                           <Button className="w-full py-4 flex items-center justify-center gap-2 bg-primary text-white shadow-lg shadow-primary/20">
+                              View Live Link <Rocket size={18} />
+                           </Button>
+                         </a>
+                      )}
+                      <Button variant="outline" onClick={() => setSelectedProject(null)} className="flex-grow">Dismiss</Button>
                     </div>
                   </div>
                 ) : (
@@ -1005,7 +1125,7 @@ function ProjectForm() {
                                 techStack: techStackArray
                               });
                               toast.success('Masterpiece updated');
-                              fetchList();
+                              fetchProjects();
                               setSelectedProject({ ...tempProject, techStack: techStackArray });
                               setIsEditingProject(false);
                             } catch (err) {
@@ -1062,7 +1182,7 @@ function ProjectForm() {
                         <input className="input-style" value={tempProject.profileName} onChange={e => setTempProject({...tempProject, profileName: e.target.value})} />
                       </div>
                       <div>
-                        <label className="label-style">Achievement Value ($)</label>
+                        <label className="label-style">My Achievement Value ($)</label>
                         <input className="input-style" value={tempProject.value} onChange={e => setTempProject({...tempProject, value: e.target.value})} />
                       </div>
                       <div>
