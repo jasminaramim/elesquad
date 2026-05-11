@@ -47,7 +47,7 @@ export default function ServiceDetails() {
   return (
     <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-        
+
         {/* Left Content */}
         <div className="lg:col-span-8 space-y-12">
           <motion.div
@@ -58,7 +58,7 @@ export default function ServiceDetails() {
             <p className="text-xl text-white/50 leading-relaxed max-w-2xl mb-12">
               {service.subtitle || "A website should be more than just beautiful—it should be strategic, high-performing, and built to convert."}
             </p>
-            
+
             <div className="aspect-[16/10] rounded-[3rem] overflow-hidden border border-white/5 shadow-2xl relative group">
               <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -100,16 +100,16 @@ export default function ServiceDetails() {
                     className="w-full h-full object-cover"
                   />
                 </AnimatePresence>
-                
+
                 {/* Carousel Controls */}
                 <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 flex justify-between z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
+                  <button
                     onClick={() => setActiveImage(prev => (prev === 0 ? carouselImages.length - 1 : prev - 1))}
                     className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center hover:bg-primary transition-all"
                   >
                     <ChevronLeft size={24} />
                   </button>
-                  <button 
+                  <button
                     onClick={() => setActiveImage(prev => (prev === carouselImages.length - 1 ? 0 : prev + 1))}
                     className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center hover:bg-primary transition-all"
                   >
@@ -139,8 +139,8 @@ export default function ServiceDetails() {
             <h4 className="text-xl font-bold mb-8">Other Services</h4>
             <div className="space-y-4">
               {otherServices.map((s: any) => (
-                <Link 
-                  key={s._id} 
+                <Link
+                  key={s._id}
                   to={`/services/${s._id}`}
                   className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-transparent hover:border-primary/30 hover:bg-primary/5 transition-all group"
                 >
@@ -158,17 +158,15 @@ export default function ServiceDetails() {
             <div className="relative z-10 text-center space-y-6">
               <h4 className="text-3xl font-display font-bold leading-tight">Any Question? Let's Talk</h4>
               <p className="text-white/70 text-sm">Our elite squad is ready to transform your vision into reality.</p>
-              
+
               <Link to="/contact">
-                <Button className="w-full bg-primary text-white hover:bg-white hover:text-primary py-5 flex items-center justify-center gap-3 group/btn">
+                <Button className="w-full bg-white text-black hover:bg-white hover:text-primary py-5 flex items-center justify-center gap-3 group/btn">
                   Let's Talk
-                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center group-hover/btn:translate-x-1 transition-transform">
-                    <ArrowRight size={14} />
-                  </div>
+
                 </Button>
               </Link>
             </div>
-            
+
             {/* Decorative background element */}
             <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 blur-3xl rounded-full" />
           </Card>

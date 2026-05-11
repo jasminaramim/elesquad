@@ -21,31 +21,35 @@ export default function ProjectDetails() {
 
   return (
     <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative group mb-16"
+      >
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent blur-3xl opacity-30 group-hover:opacity-60 transition-opacity" />
+        <Card className="p-0 overflow-hidden border-white/10 relative" tiltEnabled={true}>
+          <img
+            src={project.image && project.image !== "" ? project.image : undefined}
+            alt={project.title}
+            className="w-full aspect-[16/9] md:aspect-[21/9] object-cover"
+          />
+        </Card>
+      </motion.div>
+
       <Link to="/projects">
         <Button variant="outline" className="mb-12 group">
-          <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={18} /> Return to Gallery
+          <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={18} /> Return to projects
         </Button>
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start mb-32">
+      <div className="w-full mb-32">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative group"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
-          <Card className="p-0 overflow-hidden border-white/10 relative" tiltEnabled={true}>
-            <img src={project.image && project.image !== "" ? project.image : undefined} alt={project.title} className="w-full aspect-[4/5] md:aspect-auto object-cover" />
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-8">
             <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-mono text-primary uppercase tracking-widest">
               {project.projectType || 'Standard'}
             </span>
@@ -54,14 +58,14 @@ export default function ProjectDetails() {
             </span>
             <span className="text-white/20 text-[10px] font-mono">/ ID: {project.orderId || 'UNTRACKED'}</span>
           </div>
-          
-          <h1 className="text-5xl md:text-8xl font-display font-bold mb-8 leading-[0.9] tracking-tighter">
+
+          <h1 className="text-5xl md:text-8xl font-display font-bold mb-10 leading-[0.9] tracking-tighter">
             {project.title.split(' ').map((word: string, i: number) => (
               <span key={i} className={i % 2 !== 0 ? 'text-white/40' : 'text-white'}>{word} </span>
             ))}
           </h1>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-12 py-8 border-y border-white/5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-12 py-10 border-y border-white/5">
             <div>
               <p className="text-[10px] font-mono uppercase text-primary/40 mb-2 tracking-widest">Client</p>
               <p className="font-bold text-lg flex items-center gap-2"><User size={14} className="text-primary" /> {project.clientName || 'Private Client'}</p>
@@ -76,16 +80,18 @@ export default function ProjectDetails() {
             </div>
           </div>
 
-          <p className="text-xl text-white/60 mb-12 leading-relaxed font-light italic">
-             "{project.description}"
+          <p className="text-[18px] text-white/70 mb-16 leading-relaxed font-light italic">
+            "{project.description}"
           </p>
 
-          <div className="space-y-8 mb-12">
+          <div className="space-y-10 mb-16">
             <div>
-              <h4 className="text-white/20 font-mono text-[10px] uppercase tracking-[0.3em] mb-4">Core Technologies</h4>
-              <div className="flex flex-wrap gap-2">
+              <h4 className="text-white/20 font-mono text-[10px] uppercase tracking-[0.3em] mb-6">Core Technologies</h4>
+              <div className="flex flex-wrap gap-3">
                 {project.techStack?.map((tech: string) => (
-                  <span key={tech} className="px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-xs font-mono text-white/50">{tech}</span>
+                  <span key={tech} className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-xs font-mono text-white/60 hover:border-primary/30 hover:text-primary transition-colors cursor-default">
+                    {tech}
+                  </span>
                 ))}
               </div>
             </div>
@@ -94,48 +100,44 @@ export default function ProjectDetails() {
           <div className="flex flex-wrap gap-6 pt-6">
             {project.liveLink && (
               <a href={project.liveLink} target="_blank" rel="noreferrer" className="w-full md:w-auto">
-                <Button className="w-full md:px-12 py-6 text-lg">View Live Link <Globe size={20} className="ml-3" /></Button>
-              </a>
-            )}
-            {project.sheetLink && (
-              <a href={project.sheetLink} target="_blank" rel="noreferrer" className="w-full md:w-auto">
-                <Button variant="outline" className="w-full md:px-10 py-6 text-lg border-primary/20 text-primary hover:bg-primary/5">
-                  Business Sheet <Briefcase size={20} className="ml-3" />
+                <Button className="w-full md:px-16 py-7 text-xl shadow-2xl shadow-primary/20">
+                  View Live Experience
                 </Button>
               </a>
             )}
+
           </div>
         </motion.div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-         <Card className="p-12 md:col-span-2 border-white/5 bg-gradient-to-br from-white/5 to-transparent relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-               <ShieldCheck size={200} strokeWidth={0.5} />
-            </div>
-            <h3 className="text-2xl font-display font-bold mb-6">Strategic Impact</h3>
-            <p className="text-white/50 text-lg leading-relaxed">
-              This project represents a significant milestone in our portfolio, focusing on delivering 
-              tangible value through technical excellence. By leveraging the latest in digital strategy 
-              and architectural best practices, we achieved a result that not only meets but exceeds 
-              market expectations for performance and user retention.
-            </p>
-         </Card>
-         <Card className="p-12 border-primary/20 bg-primary/5">
-            <h3 className="text-xl font-display font-bold mb-6">Key Outcomes</h3>
-            <ul className="space-y-4">
-               {[
-                 'Advanced Performance Optimization',
-                 'Premium User Interface Design',
-                 'Seamless Mobile Responsiveness',
-                 'Enhanced Data Security Protocols'
-               ].map(item => (
-                 <li key={item} className="flex items-center gap-3 text-sm text-white/70">
-                    <CheckCircle size={16} className="text-primary flex-shrink-0" /> {item}
-                 </li>
-               ))}
-            </ul>
-         </Card>
+        <Card className="p-12 md:col-span-2 border-white/5 bg-gradient-to-br from-white/5 to-transparent relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+            <ShieldCheck size={200} strokeWidth={0.5} />
+          </div>
+          <h3 className="text-2xl font-display font-bold mb-6">Strategic Impact</h3>
+          <p className="text-white/50 text-lg leading-relaxed">
+            This project represents a significant milestone in our portfolio, focusing on delivering
+            tangible value through technical excellence. By leveraging the latest in digital strategy
+            and architectural best practices, we achieved a result that not only meets but exceeds
+            market expectations for performance and user retention.
+          </p>
+        </Card>
+        <Card className="p-12 border-primary/20 bg-primary/5">
+          <h3 className="text-xl font-display font-bold mb-6">Key Outcomes</h3>
+          <ul className="space-y-4">
+            {[
+              'Advanced Performance Optimization',
+              'Premium User Interface Design',
+              'Seamless Mobile Responsiveness',
+              'Enhanced Data Security Protocols'
+            ].map(item => (
+              <li key={item} className="flex items-center gap-3 text-sm text-white/70">
+                <CheckCircle size={16} className="text-primary flex-shrink-0" /> {item}
+              </li>
+            ))}
+          </ul>
+        </Card>
       </div>
     </div>
   );

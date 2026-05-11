@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { ArrowLeft, Globe, Mail, Link2, AtSign, Code2, ExternalLink, Star, Loader2 } from 'lucide-react';
 import { Button, Card } from '../components/UI';
 import axios from 'axios';
+import { Facebook, Instagram, Telegram as TelegramIcon } from '../components/BrandIcons';
 
 // Dynamically compute star rating: 1 star per $200 achievement, max 5
 function calcStars(projects: any[]) {
@@ -45,6 +46,9 @@ export default function TeamMemberDetails() {
     { icon: Code2,   href: member.github,    label: 'GitHub' },
     { icon: Link2,   href: member.linkedin,  label: 'LinkedIn' },
     { icon: AtSign,  href: member.twitter,   label: 'Twitter' },
+    { icon: Facebook, href: member.facebook,  label: 'Facebook' },
+    { icon: Instagram, href: member.instagram, label: 'Instagram' },
+    { icon: TelegramIcon, href: member.telegram ? `https://t.me/${member.telegram.replace('@', '')}` : null, label: 'Telegram' },
     { icon: Mail,    href: member.email ? `mailto:${member.email}` : null, label: 'Email' },
   ].filter(l => l.href);
 
@@ -187,7 +191,7 @@ export default function TeamMemberDetails() {
             {/* Bio */}
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
               <h3 className="text-[10px] font-mono uppercase text-primary mb-6 tracking-[0.3em]">Biography</h3>
-              <p className="text-xl md:text-2xl text-white/70 leading-relaxed font-light italic">
+              <p className="text-[18px] text-white/70 leading-relaxed font-light italic">
                 "{member.bio || `Innovation is at the heart of everything I do. As a ${member.designation || member.role}, I strive to create digital experiences that are not only functional but truly transformative.`}"
               </p>
             </motion.div>

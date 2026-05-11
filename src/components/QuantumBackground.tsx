@@ -115,9 +115,8 @@ const QuantumBackground: React.FC = () => {
       group.rotation.y = currentX * 1.2;
       group.rotation.x = currentY * 0.8;
 
-      // Scroll makes the whole group drift upward & tilt
-      group.position.y = -currentScrollOffset * 1.5;
-      group.rotation.z = currentScrollOffset * 0.3;
+      // group.position.y = -currentScrollOffset * 1.5;
+      // group.rotation.z = currentScrollOffset * 0.3;
 
       // Idle animations
       particles.rotation.y += 0.0008;

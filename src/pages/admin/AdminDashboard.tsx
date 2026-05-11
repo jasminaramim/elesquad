@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink, MessageCircle, User, Save, Rocket, ShieldCheck, Eye, EyeOff, DollarSign, TrendingUp, BarChart3, Briefcase, Calendar, Edit2 } from 'lucide-react';
+import { LayoutDashboard, Users, Star, Plus, LogOut, Loader2, Trash2, Mail, FileText, ExternalLink, MessageCircle, User, Save, Rocket, ShieldCheck, Eye, EyeOff, DollarSign, TrendingUp, BarChart3, Briefcase, Calendar, Edit2, Settings } from 'lucide-react';
 import { Card, Button, SectionHeading } from '../../components/UI';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
@@ -18,6 +18,7 @@ const tabs = [
   { id: 'documents', label: 'Sheets', icon: FileText },
   { id: 'chat', label: 'Squad Chat', icon: MessageCircle },
   { id: 'profile', label: 'Profile', icon: User },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
 export default function AdminDashboard() {
@@ -118,6 +119,7 @@ export default function AdminDashboard() {
                 {activeTab === 'reviews' && <ReviewForm />}
                 {activeTab === 'documents' && <DocumentForm />}
                 {activeTab === 'profile' && <AdminProfileTab />}
+                {activeTab === 'settings' && <SettingsTab />}
               </Card>
             </motion.div>
           </AnimatePresence>
@@ -127,9 +129,88 @@ export default function AdminDashboard() {
   );
 }
 
+function SettingsTab() {
+  const [notificationEmail, setNotificationEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get('/api/settings');
+      setNotificationEmail(res.data.notificationEmail || '');
+    } catch (err) {
+      toast.error('Failed to load settings');
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.post('/api/settings', { notificationEmail });
+      toast.success('Settings updated successfully');
+    } catch (err) {
+      toast.error('Failed to save settings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-10">
+      <div>
+        <h3 className="text-3xl font-display font-bold text-white">System Settings</h3>
+        <p className="text-white/40 text-xs uppercase tracking-widest font-mono mt-1">Configure global platform parameters</p>
+      </div>
+
+      <Card className="p-8 border-white/5 glass" tiltEnabled={false}>
+        <form onSubmit={handleSave} className="space-y-8">
+          <div className="space-y-6">
+            <div className="flex items-center gap-4 text-primary">
+              <Mail size={24} />
+              <h4 className="text-xl font-bold">Notification Configuration</h4>
+            </div>
+            
+            <p className="text-white/60 text-sm max-w-2xl leading-relaxed">
+              Set the administrative email address that will receive all platform notifications, 
+              including new contact form submissions and critical system alerts.
+            </p>
+
+            <div className="max-w-md">
+              <Input 
+                label="Admin Notification Email" 
+                value={notificationEmail} 
+                onChange={setNotificationEmail} 
+                placeholder="admin@elesquad.pro"
+                type="email"
+              />
+              <p className="text-[10px] text-white/20 mt-2 font-mono uppercase tracking-wider">
+                Note: Ensure this email is monitored regularly.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-white/5">
+            <Button type="submit" disabled={loading} className="px-10 py-3 flex items-center gap-2">
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+              Save Configuration
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
+  );
+}
+
 function AdminProfileTab() {
   const { user, login } = useAuth();
-  const [profile, setProfile] = useState({ name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '', role: '', website: '', github: '', linkedin: '', twitter: '' });
+  const [profile, setProfile] = useState({ 
+    name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '', role: '', 
+    website: '', github: '', linkedin: '', twitter: '', facebook: '', instagram: '', telegram: '' 
+  });
   const [loading, setLoading] = useState(false);
 
   const fetchProfile = async () => {
@@ -292,6 +373,9 @@ function AdminProfileTab() {
             <Input label="GitHub URL" value={(profile as any).github || ''} onChange={v => setProfile({...profile, github: v} as any)} placeholder="https://github.com/username" />
             <Input label="LinkedIn URL" value={(profile as any).linkedin || ''} onChange={v => setProfile({...profile, linkedin: v} as any)} placeholder="https://linkedin.com/in/username" />
             <Input label="Twitter / X URL" value={(profile as any).twitter || ''} onChange={v => setProfile({...profile, twitter: v} as any)} placeholder="https://twitter.com/username" />
+            <Input label="Facebook URL" value={(profile as any).facebook || ''} onChange={v => setProfile({...profile, facebook: v} as any)} placeholder="https://facebook.com/username" />
+            <Input label="Instagram URL" value={(profile as any).instagram || ''} onChange={v => setProfile({...profile, instagram: v} as any)} placeholder="https://instagram.com/username" />
+            <Input label="Telegram Username" value={(profile as any).telegram || ''} onChange={v => setProfile({...profile, telegram: v} as any)} placeholder="@username" />
           </div>
         </div>
 
@@ -911,26 +995,46 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
                     <span className="text-foreground/60">Dev: {item.developerName || 'Member'}</span>
                   </div>
                   <div className="flex items-center gap-3 mt-3">
-                     <select 
-                        value={item.status || 'todo'} 
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={async (e) => {
-                          try {
-                            await axios.put(`/api/projects/${item._id}`, { ...item, status: e.target.value });
-                            toast.success('Status updated');
-                            fetchProjects();
-                          } catch (err) {
-                            toast.error('Failed to update status');
-                          }
-                        }}
-                        className="bg-white/5 border border-white/10 text-[9px] font-bold text-primary px-3 py-1 rounded-full outline-none cursor-pointer hover:border-primary/50 transition-all uppercase tracking-widest"
-                      >
-                        <option value="todo">Todo</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="wip">WIP</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="completed">Completed</option>
-                      </select>
+                    <select 
+                      value={item.status || 'todo'} 
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={async (e) => {
+                        try {
+                          await axios.put(`/api/projects/${item._id}`, { ...item, status: e.target.value });
+                          toast.success('Status updated');
+                          fetchProjects();
+                        } catch (err) {
+                          toast.error('Failed to update status');
+                        }
+                      }}
+                      className="bg-white/5 border border-white/10 text-[9px] font-bold text-primary px-3 py-1 rounded-full outline-none cursor-pointer hover:border-primary/50 transition-all uppercase tracking-widest"
+                    >
+                      <option value="todo">Todo</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="wip">WIP</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="completed">Completed</option>
+                    </select>
+
+                    <button 
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await axios.put(`/api/projects/${item._id}`, { ...item, isPublished: !item.isPublished });
+                          toast.success(item.isPublished ? 'Unpublished' : 'Published');
+                          fetchProjects();
+                        } catch (err) {
+                          toast.error('Failed to update visibility');
+                        }
+                      }}
+                      className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest transition-all ${
+                        item.isPublished 
+                          ? 'bg-green-500/20 text-green-500 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.1)]' 
+                          : 'bg-white/5 text-white/40 border border-white/10'
+                      }`}
+                    >
+                      {item.isPublished ? 'Published' : 'Draft'}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1455,7 +1559,7 @@ function ReviewForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input label="Review Title" value={data.title} onChange={v => setData({ ...data, title: v })} placeholder="e.g. Amazing Experience" />
           <Input label="Client Name" value={data.clientName} onChange={v => setData({ ...data, clientName: v })} placeholder="Jane Doe" />
-          <Input label="Order ID" value={data.orderId} onChange={v => setData({ ...data, orderId: v })} placeholder="ORD-445" />
+          <Input label="Order ID" value={data.orderId} onChange={v => setData({ ...data, orderId: v })} placeholder="ORD-445" required={false} />
           <div className="space-y-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block mb-2">Rating (1-5)</label>
             <input 
@@ -1570,7 +1674,7 @@ function DocumentForm() {
 
 
 
-function Input({ label, value, onChange, placeholder = '', type = 'text', disabled = false }: { label: string, value: any, onChange: (v: string) => void, placeholder?: string, type?: string, disabled?: boolean }) {
+function Input({ label, value, onChange, placeholder = '', type = 'text', disabled = false, required = true }: { label: string, value: any, onChange: (v: string) => void, placeholder?: string, type?: string, disabled?: boolean, required?: boolean }) {
   const [show, setShow] = useState(false);
   const isPassword = type === 'password';
   const inputType = isPassword ? (show ? 'text' : 'password') : type;
@@ -1581,7 +1685,7 @@ function Input({ label, value, onChange, placeholder = '', type = 'text', disabl
       <div className="relative">
         <input 
           type={inputType}
-          required
+          required={required}
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}

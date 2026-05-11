@@ -21,6 +21,7 @@ const faqs = [
 export default function Home() {
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [team, setTeam] = useState<any[]>([]);
   const [dbServices, setDbServices] = useState<any[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -29,12 +30,13 @@ export default function Home() {
   useEffect(() => {
     axios.get('/api/projects').then(res => {
       const published = res.data.filter((p: any) => p.isPublished);
-      const sorted = published.sort((a: any, b: any) => 
+      const sorted = published.sort((a: any, b: any) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setProjects(sorted.slice(0, 4));
     });
     axios.get('/api/reviews').then(res => setReviews(res.data.slice(0, 15)));
+    axios.get('/api/team').then(res => setTeam(res.data));
     axios.get('/api/services').then(res => {
       setDbServices(res.data);
       setLoadingServices(false);
@@ -53,7 +55,7 @@ export default function Home() {
   return (
     <div className="pb-32">
       {/* ... Hero, Brands, About, Services ... */}
-      
+
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center pt-32 pb-[50px] md:pb-[70px] lg:pb-[120px] overflow-hidden">
         {/* Background Floating Tech Icons */}
@@ -70,13 +72,13 @@ export default function Home() {
             <motion.div
               key={i}
               initial={{ opacity: 0 }}
-              animate={{ 
-                opacity: 1, 
+              animate={{
+                opacity: 1,
                 y: [0, -40, 0],
                 x: [0, 20, 0],
                 rotate: [0, 10, 0]
               }}
-              transition={{ 
+              transition={{
                 y: { duration: 6 + i, repeat: Infinity, ease: "easeInOut", delay: item.delay },
                 x: { duration: 7 + i, repeat: Infinity, ease: "easeInOut", delay: item.delay },
                 rotate: { duration: 10, repeat: Infinity, ease: "easeInOut" },
@@ -89,7 +91,7 @@ export default function Home() {
               </div>
             </motion.div>
           ))}
-          
+
           {/* Subtle Grid Pattern Behind All */}
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         </div>
@@ -103,14 +105,14 @@ export default function Home() {
             <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse shadow-[0_0_12px_#6C4DF6]"></span>
             <span className="text-xs uppercase tracking-[0.3em] font-black text-primary">Elite Engineering Squad</span>
           </motion.div>
-          
+
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 1, ease: [0.22, 1, 0.36, 1] }}
             className="text-[35px] lg:text-[110px] font-bold leading-[0.85] tracking-tighter mb-12 font-display"
           >
-            WordPress Beyond <br/>
+            WordPress Beyond <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-pink-500 drop-shadow-2xl">The Limits.</span>
           </motion.h1>
 
@@ -120,7 +122,7 @@ export default function Home() {
             transition={{ delay: 0.2, duration: 1 }}
             className="text-xl md:text-2xl text-foreground/50 max-w-3xl mb-16 leading-relaxed font-light"
           >
-            Experts in WordPress Frontend & Backend, WooCommerce Functionality, 
+            Experts in WordPress Frontend & Backend, WooCommerce Functionality,
             Woodmart, Gutenberg, and Elementor Pro. We build the impossible.
           </motion.p>
 
@@ -140,7 +142,7 @@ export default function Home() {
             </Link>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -166,18 +168,18 @@ export default function Home() {
             className="relative"
           >
             <div className="relative rounded-[3rem] overflow-hidden group shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop" 
-                alt="Creative Solutions" 
-                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-105" 
+              <img
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop"
+                alt="Creative Solutions"
+                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-105"
               />
-              
+
               {/* Play Button Top Left */}
               <div className="absolute top-8 left-8 z-20">
                 <div className="w-16 h-16 md:w-24 md:h-24 bg-black/40 backdrop-blur-xl rounded-full border border-white/20 flex items-center justify-center group/play">
-                   <div className="w-10 h-10 md:w-16 md:h-16 bg-[#6C4DF6] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(108, 77, 246,0.4)] transition-transform group-hover/play:scale-110">
-                      <div className="w-0 h-0 border-t-[6px] md:border-t-[8px] border-t-transparent border-l-[10px] md:border-l-[12px] border-l-black border-b-[6px] md:border-b-[8px] border-b-transparent ml-1"></div>
-                   </div>
+                  <div className="w-10 h-10 md:w-16 md:h-16 bg-[#6C4DF6] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(108, 77, 246,0.4)] transition-transform group-hover/play:scale-110">
+                    <div className="w-0 h-0 border-t-[6px] md:border-t-[8px] border-t-transparent border-l-[10px] md:border-l-[12px] border-l-black border-b-[6px] md:border-b-[8px] border-b-transparent ml-1"></div>
+                  </div>
                 </div>
               </div>
 
@@ -215,23 +217,23 @@ export default function Home() {
 
             <div className="space-y-8">
               {[
-                { 
-                  num: '01', 
-                  title: 'Tailored Solutions', 
-                  desc: 'Our team customizes strategies to meet the unique needs of your business, ensuring that every solution' 
+                {
+                  num: '01',
+                  title: 'Tailored Solutions',
+                  desc: 'Our team customizes strategies to meet the unique needs of your business, ensuring that every solution'
                 },
-                { 
-                  num: '02', 
-                  title: 'Innovative Strategies', 
-                  desc: 'Adopting the latest digital trends and technologies, ensuring that your brand is always at the forefront of innovation.' 
+                {
+                  num: '02',
+                  title: 'Innovative Strategies',
+                  desc: 'Adopting the latest digital trends and technologies, ensuring that your brand is always at the forefront of innovation.'
                 },
-                { 
-                  num: '03', 
-                  title: 'Collaborative Partnership', 
-                  desc: 'By working closely with you, we build strong relationships based on trust, transparency, and open communication.' 
+                {
+                  num: '03',
+                  title: 'Collaborative Partnership',
+                  desc: 'By working closely with you, we build strong relationships based on trust, transparency, and open communication.'
                 }
               ].map((feature, i) => (
-                <motion.div 
+                <motion.div
                   key={feature.num}
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -261,6 +263,72 @@ export default function Home() {
         </div>
       </section>
 
+
+
+
+
+      {/* Premium Leadership Section */}
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+        <div className="flex items-center gap-4 mb-16">
+          <div className="h-[1px] flex-grow bg-white/10" />
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-primary tracking-[0.3em] uppercase">The Leadership</h2>
+          <div className="h-[1px] flex-grow bg-white/10" />
+        </div>
+
+        <div className="space-y-12">
+          {team.filter(m => m.role === 'Leader' || m.role === 'Admin').map((member, i) => (
+            <motion.div
+              key={member._id}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="relative flex flex-col lg:flex-row items-center gap-12 glass p-8 md:p-16 rounded-[3rem] border border-primary/20 overflow-hidden group"
+            >
+              {/* Image Left */}
+              <div className="w-full lg:w-1/2 relative group rounded-[3rem] overflow-hidden aspect-[4/5] md:aspect-[16/10] lg:aspect-[4/5]">
+                <img
+                  src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/800?u=${member._id}`}
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
+                  alt={member.name}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60" />
+              </div>
+
+              {/* Info Right */}
+              <div className="w-full lg:w-1/2 text-left space-y-8">
+                <div className="inline-flex items-center gap-3 px-5 py-2 bg-primary/10 border border-primary/30 text-primary text-[10px] font-black rounded-full uppercase tracking-[0.3em]">
+                  <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                  SQUAD LEADER
+                </div>
+
+                <div>
+                  <h3 className="text-5xl md:text-8xl font-display font-bold mb-4 text-white leading-tight tracking-tighter">
+                    {member.name}
+                  </h3>
+                  <p className="text-primary font-mono text-lg uppercase tracking-[0.4em] font-black">{member.designation || 'Head of Operations'}</p>
+                </div>
+
+                <p className="text-[18px] text-white/40 leading-relaxed font-light italic border-l-2 border-primary/20 pl-8">
+                  "{member.bio || 'Leading the squad to digital excellence. Specializing in high-performance WordPress and Elementor development, turning complex requirements into seamless digital experiences.'}"
+                </p>
+
+                <div className="flex flex-wrap gap-6 pt-6">
+                  <Link to={`/team/${member._id}`} className="w-full md:w-auto">
+                    <Button className="w-full md:px-12 py-6 text-lg group/btn shadow-2xl shadow-primary/20">
+                      View Full Profile
+                    </Button>
+                  </Link>
+                  <Link to="/team" className="w-full md:w-auto">
+                    <Button variant="outline" className="w-full md:px-10 py-6 text-lg border-white/10 text-white/40 hover:text-white hover:border-white/20">
+                      View All Squad
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* Services Section Redesign */}
       <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -271,12 +339,12 @@ export default function Home() {
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Our Services</span>
             </div>
             <h2 className="text-[35px] md:text-6xl font-bold font-display leading-tight">
-              Building Brands, <br/>
-              Boosting Visibility, <br/>
+              Building Brands, <br />
+              Boosting Visibility, <br />
               and Driving Growth.
             </h2>
             <p className="text-foreground/40 text-sm leading-relaxed max-w-xs">
-              We provide comprehensive digital solutions that transform businesses. 
+              We provide comprehensive digital solutions that transform businesses.
               Our expert squad ensures your brand stands out in the digital landscape.
             </p>
           </div>
@@ -307,10 +375,10 @@ export default function Home() {
                   </Link>
                 </div>
                 <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5">
-                  <img 
-                    src={service.image} 
-                    alt={service.title} 
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
                 </div>
@@ -332,12 +400,12 @@ export default function Home() {
             className="relative order-2 lg:order-1"
           >
             <div className="relative rounded-[3rem] overflow-hidden group shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop" 
-                alt="Our Process" 
-                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-105" 
+              <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop"
+                alt="Our Process"
+                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-105"
               />
-              
+
               {/* Experience Cutout Bottom Left */}
               <div className="absolute bottom-0 left-0 bg-[#0A0A0A] p-8 md:p-12 rounded-tr-[3rem] border-r border-t border-white/5 z-20 shadow-[10px_-10px_30px_rgba(0,0,0,0.5)]">
                 <div className="flex items-center gap-5">
@@ -355,11 +423,11 @@ export default function Home() {
           <div className="space-y-16 order-1 lg:order-2">
             <div>
               <div className="flex items-center gap-3 mb-6">
-                 <div className="w-10 h-[1px] bg-[#6C4DF6]"></div>
-                 <span className="text-[#6C4DF6] font-black uppercase tracking-[0.3em] text-[10px]">Process Step</span>
+                <div className="w-10 h-[1px] bg-[#6C4DF6]"></div>
+                <span className="text-[#6C4DF6] font-black uppercase tracking-[0.3em] text-[10px]">Process Step</span>
               </div>
               <h2 className="text-[35px] md:text-7xl font-bold leading-[1.05] mb-8 tracking-tighter">
-                Refining Concepts <br/>
+                Refining Concepts <br />
                 <span className="text-primary">For Better Outcomes</span>
               </h2>
               <p className="text-xl text-white/40 leading-relaxed max-w-xl font-light italic">
@@ -372,26 +440,26 @@ export default function Home() {
               <div className="absolute left-[23px] top-6 bottom-6 w-[2px] bg-gradient-to-b from-[#6C4DF6] via-primary to-white/5"></div>
 
               {[
-                { 
-                  title: 'Consultation', 
+                {
+                  title: 'Consultation',
                   desc: 'We start with a high-level consultation to understand your business ecosystem and target audience, ensuring a tailored digital solution.',
                   color: '#6C4DF6',
                   icon: MessageSquare
                 },
-                { 
-                  title: 'Planning & Development', 
+                {
+                  title: 'Planning & Development',
                   desc: 'Based on your elite needs, we architect a strategic roadmap covering design, full-stack development, and aggressive marketing.',
                   color: '#6C4DF6',
                   icon: Layout
                 },
-                { 
-                  title: 'Implementation', 
+                {
+                  title: 'Implementation',
                   desc: 'We execute the blueprint, deploy high-performance assets, and continuously monitor performance for peak optimization.',
                   color: '#ffffff',
                   icon: Rocket
                 }
               ].map((step, i) => (
-                <motion.div 
+                <motion.div
                   key={step.title}
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -400,12 +468,12 @@ export default function Home() {
                   className="relative group"
                 >
                   {/* Icon Circle */}
-                  <div 
+                  <div
                     className="absolute -left-[64px] top-0 w-12 h-12 rounded-full border border-white/10 flex items-center justify-center transition-all duration-700 bg-[#0A0A0A] z-10 group-hover:scale-110"
                     style={{ borderColor: step.color + '33' }}
                   >
                     <step.icon size={18} style={{ color: step.color }} className={i === 0 ? "drop-shadow-[0_0_8px_rgba(108, 77, 246,0.5)]" : ""} />
-                    
+
                     {/* Pulsing Aura for the active/first step */}
                     {i === 0 && (
                       <div className="absolute inset-0 rounded-full bg-[#6C4DF6]/20 animate-ping -z-10"></div>
@@ -454,7 +522,7 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="text-[35px] md:text-8xl font-bold font-display leading-[0.9] tracking-tighter"
               >
-                Featured <br/>
+                Featured <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400 italic">Masterpieces.</span>
               </motion.h2>
             </div>
@@ -466,13 +534,13 @@ export default function Home() {
             >
               <Link to="/projects">
                 <Button variant="outline" className="px-10 group">
-                  Explore All Projects 
+                  Explore All Projects
                   <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </motion.div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {projects.slice(0, 4).map((project, i) => (
               <motion.div
@@ -482,22 +550,22 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card 
+                <Card
                   className="p-0 border-white/5 bg-white/[0.02] hover:bg-white/[0.05] group/card overflow-hidden h-full flex flex-col"
                 >
                   {/* Project Visual */}
                   <div className="aspect-[16/10] relative overflow-hidden shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-t from-bg to-transparent z-10 opacity-60" />
-                    
-                    <motion.div 
+
+                    <motion.div
                       className="w-full h-full"
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.8 }}
                     >
-                      <img 
-                        src={project.image && project.image !== "" ? project.image : "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200"} 
-                        alt={project.title} 
-                        className="w-full h-full object-cover transition-all duration-1000" 
+                      <img
+                        src={project.image && project.image !== "" ? project.image : "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200"}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-all duration-1000"
                       />
                     </motion.div>
 
@@ -513,21 +581,21 @@ export default function Home() {
                   <div className="p-10 flex flex-col justify-between flex-grow">
                     <div>
                       <div className="flex items-center gap-3 mb-6">
-                        <span className="text-primary font-mono text-sm">0{i+1}</span>
+                        <span className="text-primary font-mono text-sm">0{i + 1}</span>
                         <div className="h-px w-8 bg-white/10" />
                         <span className="text-[9px] uppercase tracking-widest font-bold text-white/40">
                           Case Study
                         </span>
                       </div>
-                      
+
                       <h3 className="text-3xl font-bold font-display leading-tight mb-4 group-hover/card:text-primary transition-colors duration-500">
                         {project.title}
                       </h3>
-                      
+
                       <p className="text-base text-white/40 leading-relaxed mb-8 line-clamp-2">
                         {project.description}
                       </p>
-                      
+
                       <div className="flex flex-wrap gap-2 mb-10">
                         {project.techStack?.slice(0, 3).map((t: string) => (
                           <span key={t} className="px-3 py-1.5 bg-white/5 border border-white/5 rounded-lg text-[8px] uppercase font-black text-white/40 group-hover/card:border-primary/30 transition-colors">
@@ -536,8 +604,8 @@ export default function Home() {
                         ))}
                       </div>
                     </div>
-                    
-                    <Link 
+
+                    <Link
                       to={`/projects/${project._id}`}
                       className="inline-flex items-center gap-4 group/btn mt-auto"
                     >
@@ -551,7 +619,7 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
-          
+
           {/* Bottom Link for Mobile */}
           <div className="mt-16 text-center md:hidden">
             <Link to="/projects">
@@ -566,48 +634,48 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20">
           <SectionHeading title="Client Testimonials" subtitle="15+ Success Stories" centered />
         </div>
-        
+
         <div className="relative overflow-hidden group">
-          <motion.div 
-            animate={{ 
+          <motion.div
+            animate={{
               x: reviews.length > 0 ? ["0%", `-${(reviews.length * 450) / 15}%`] : "0%"
             }}
-            transition={{ 
-              duration: 40, 
-              repeat: Infinity, 
-              ease: "linear" 
+            transition={{
+              duration: 40,
+              repeat: Infinity,
+              ease: "linear"
             }}
             className="flex gap-8 px-4 pb-20 no-scrollbar select-none"
           >
-             {[...reviews, ...reviews].map((review, i) => (
-               <motion.div
-                 key={`${review._id}-${i}`}
-                 className="min-w-[350px] md:min-w-[450px]"
-               >
-                 <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 transition-all">
-                    <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
-                    
-                    <div className="flex text-primary gap-1">
-                      {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+            {[...reviews, ...reviews].map((review, i) => (
+              <motion.div
+                key={`${review._id}-${i}`}
+                className="min-w-[350px] md:min-w-[450px]"
+              >
+                <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 transition-all">
+                  <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
+
+                  <div className="flex text-primary gap-1">
+                    {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                  </div>
+
+                  <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
+                  <p className="text-white/60 leading-relaxed italic text-lg">"{review.feedback}"</p>
+
+                  <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
+                      {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
                     </div>
-                    
-                    <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
-                    <p className="text-white/60 leading-relaxed italic text-lg">"{review.feedback}"</p>
-                    
-                    <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
-                       <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
-                          {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
-                       </div>
-                       <div>
-                          <h5 className="font-bold">{review.clientName}</h5>
-                          <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
-                       </div>
+                    <div>
+                      <h5 className="font-bold">{review.clientName}</h5>
+                      <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
                     </div>
-                 </Card>
-               </motion.div>
-             ))}
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
           </motion.div>
-          
+
           {/* Subtle gradient fades for the carousel */}
           <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
           <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
@@ -622,7 +690,7 @@ export default function Home() {
         <div className="space-y-4">
           {faqs.map((faq, i) => (
             <div key={i} className="border border-white/5 rounded-2xl overflow-hidden bg-white/5">
-              <button 
+              <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 className="w-full p-8 flex justify-between items-center text-left hover:bg-white/5 transition-colors"
               >
@@ -646,7 +714,7 @@ export default function Home() {
       </section>      {/* New Design-Accurate CTA Section */}
       <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
         <div className="flex flex-col lg:flex-row justify-between items-start mb-20 gap-10">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -655,7 +723,7 @@ export default function Home() {
             Bringing Your Vision <br />
             <span className="text-white/10">To The Digital World</span>
           </motion.h2>
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -672,21 +740,21 @@ export default function Home() {
 
         <div className="relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 items-start">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="lg:col-span-8 rounded-[3rem] overflow-hidden relative group shadow-2xl"
             >
               <div className="aspect-[16/9] w-full overflow-hidden">
-                 <img 
-                   src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop" 
-                   className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105" 
-                   alt="Digital Squad"
-                 />
+                <img
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop"
+                  className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105"
+                  alt="Digital Squad"
+                />
               </div>
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500"></div>
-              
+
               {/* Tags Overlay */}
               <div className="absolute bottom-12 left-12 flex flex-wrap gap-4 z-20">
                 {[
@@ -699,8 +767,8 @@ export default function Home() {
                 ].map((tag) => (
                   <div key={tag.label} className={cn(
                     "px-6 py-2.5 rounded-full border text-[11px] uppercase font-bold tracking-widest transition-all backdrop-blur-md flex items-center gap-2",
-                    tag.active 
-                      ? "bg-[#6C4DF6]/20 border-[#6C4DF6] text-[#6C4DF6]" 
+                    tag.active
+                      ? "bg-[#6C4DF6]/20 border-[#6C4DF6] text-[#6C4DF6]"
                       : "bg-black/40 border-white/10 text-white/60 hover:border-white/30"
                   )}>
                     <Globe size={14} className={tag.active ? "text-[#6C4DF6]" : "text-white/40"} />
@@ -710,7 +778,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -718,10 +786,10 @@ export default function Home() {
               className="lg:col-span-4 lg:-ml-12 lg:mt-24 z-30"
             >
               <div className="bg-[#0A0A0A] p-10 md:p-14 rounded-[2.5rem] border border-white/5 shadow-2xl">
-                 <p className="text-lg md:text-xl leading-relaxed text-white/50 font-light italic">
-                   "We bring your vision to life through innovative design, cutting-edge technology, and strategic digital marketing, ensuring your brand stands out in the digital world."
-                 </p>
-                 <div className="mt-10 h-1 w-20 bg-[#6C4DF6] rounded-full"></div>
+                <p className="text-lg md:text-xl leading-relaxed text-white/50 font-light italic">
+                  "We bring your vision to life through innovative design, cutting-edge technology, and strategic digital marketing, ensuring your brand stands out in the digital world."
+                </p>
+                <div className="mt-10 h-1 w-20 bg-[#6C4DF6] rounded-full"></div>
               </div>
             </motion.div>
           </div>

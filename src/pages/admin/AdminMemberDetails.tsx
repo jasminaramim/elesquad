@@ -166,6 +166,17 @@ export default function AdminMemberDetails() {
                   </select>
                 </div>
 
+                <div className="pt-4 space-y-4 border-t border-white/5">
+                  <h4 className="text-[10px] font-mono uppercase tracking-widest text-white/40">Digital Presence</h4>
+                  <Input label="Website" value={member.website || ''} onChange={v => setMember({ ...member, website: v })} placeholder="https://..." />
+                  <Input label="GitHub" value={member.github || ''} onChange={v => setMember({ ...member, github: v })} placeholder="https://github.com/..." />
+                  <Input label="LinkedIn" value={member.linkedin || ''} onChange={v => setMember({ ...member, linkedin: v })} placeholder="https://linkedin.com/in/..." />
+                  <Input label="Twitter" value={member.twitter || ''} onChange={v => setMember({ ...member, twitter: v })} placeholder="https://twitter.com/..." />
+                  <Input label="Facebook" value={member.facebook || ''} onChange={v => setMember({ ...member, facebook: v })} placeholder="https://facebook.com/..." />
+                  <Input label="Instagram" value={member.instagram || ''} onChange={v => setMember({ ...member, instagram: v })} placeholder="https://instagram.com/..." />
+                  <Input label="Telegram" value={member.telegram || ''} onChange={v => setMember({ ...member, telegram: v })} placeholder="@username" />
+                </div>
+
                 <div className="pt-4 border-t border-white/5">
                   <button 
                     type="button"

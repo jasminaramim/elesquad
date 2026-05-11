@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { SectionHeading, Card } from '../components/UI';
 import { Target, Rocket, Users, ShieldCheck, ChevronDown, Star, MessageSquare, Quote, Layout, Phone, MapPin, Globe } from 'lucide-react';
@@ -27,8 +27,15 @@ const faqs = [
 ];
 
 export default function About() {
+  const [reviews, setReviews] = useState<any[]>([]);
+
+  useEffect(() => {
+    axios.get('/api/reviews').then(res => setReviews(res.data));
+  }, []);
+
   return (
-    <div className="max-w-7xl mx-auto px-5 md:px-10 pb-32 pt-20">
+    <div className="pb-32 pt-20">
+      <div className="max-w-7xl mx-auto px-5 md:px-10">
       {/* Intro */}
       <section className="py-[50px] md:py-[70px] lg:py-[120px] grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <motion.div
@@ -227,10 +234,58 @@ export default function About() {
         </div>
       </section>
 
-      {/* Reviews Section */}
-      <section className="py-[50px] md:py-[70px] lg:py-[120px] pb-20">
-        <SectionHeading title="What Our Clients Say" subtitle="Reviews" />
-        <ReviewsGrid limit={3} />
+    </div>
+      {/* Dynamic Review Carousel (Homepage Design) - FULL WIDTH */}
+      <section className="py-[50px] md:py-[70px] lg:py-[120px] relative overflow-hidden bg-none">
+        <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20">
+          <SectionHeading title="What Our Clients Say" subtitle="Reviews" centered />
+        </div>
+        
+        <div className="relative overflow-hidden group">
+          <motion.div 
+            animate={{ 
+              x: reviews.length > 0 ? ["0%", `-${(reviews.length * 450) / 15}%`] : "0%"
+            }}
+            transition={{ 
+              duration: 40, 
+              repeat: Infinity, 
+              ease: "linear" 
+            }}
+            className="flex gap-8 px-4 pb-20 no-scrollbar select-none"
+          >
+             {[...reviews, ...reviews].map((review, i) => (
+               <motion.div
+                 key={`${review._id}-${i}`}
+                 className="min-w-[350px] md:min-w-[450px]"
+               >
+                 <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 transition-all">
+                    <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
+                    
+                    <div className="flex text-primary gap-1">
+                      {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                    </div>
+                    
+                    <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
+                    <p className="text-white/60 leading-relaxed italic text-lg">"{review.feedback}"</p>
+                    
+                    <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
+                       <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
+                          {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
+                       </div>
+                       <div>
+                          <h5 className="font-bold">{review.clientName}</h5>
+                          <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
+                       </div>
+                    </div>
+                 </Card>
+               </motion.div>
+             ))}
+          </motion.div>
+          
+          {/* Subtle gradient fades for the carousel */}
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+        </div>
       </section>
 
 
@@ -238,56 +293,4 @@ export default function About() {
   );
 }
 
-function ReviewsGrid({ limit }: { limit?: number }) {
-  const [reviews, setReviews] = React.useState<any[]>([]);
-  const [loading, setLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const res = await axios.get('/api/reviews');
-        setReviews(limit ? res.data.slice(0, limit) : res.data);
-      } catch (err) {
-        console.error('Failed to fetch reviews');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReviews();
-  }, [limit]);
-
-  if (loading) return <div className="text-center py-20 text-white/20">Loading elite feedback...</div>;
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {reviews.map((r, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: i * 0.1 }}
-        >
-          <Card className="h-full relative group">
-            <Quote className="absolute top-6 right-6 text-primary/10 group-hover:text-primary/20 transition-colors" size={40} />
-            <div className="flex items-center gap-1 mb-6 text-yellow-500">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={14} fill={i < (r.rating || 5) ? "currentColor" : "none"} />
-              ))}
-            </div>
-            <p className="text-lg italic text-white/70 mb-8 leading-relaxed">"{r.feedback}"</p>
-            <div className="flex items-center gap-4 mt-auto">
-              <div className="w-12 h-12 rounded-full bg-surface border border-border flex items-center justify-center font-bold text-primary">
-                {r.clientName?.[0] || 'C'}
-              </div>
-              <div>
-                <h5 className="font-bold text-white">{r.clientName}</h5>
-                <p className="text-xs text-white/20 uppercase tracking-widest">{r.title || 'Client'}</p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-      ))}
-    </div>
-  );
-}

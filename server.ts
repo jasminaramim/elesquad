@@ -9,6 +9,7 @@ import path from 'path';
 import fs from 'fs';
 import { Server } from 'socket.io';
 import http from 'http';
+import nodemailer from 'nodemailer';
 
 // Dynamic Vite import will be handled in the dev block
 
@@ -64,7 +65,7 @@ const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 const client = new MongoClient(MONGODB_URI);
 
 let db: any = null;
-let users: any, projects: any, reviews: any, documents: any, messages: any, contact: any, services: any;
+let users: any, projects: any, reviews: any, documents: any, messages: any, contact: any, services: any, settings: any;
 
 async function connectToDatabase() {
   if (db) return;
@@ -81,6 +82,7 @@ async function connectToDatabase() {
     messages = db.collection('messages');
     contact = db.collection('contact');
     services = db.collection('services');
+    settings = db.collection('settings');
     
     console.log("Connected to MongoDB successfully");
     
@@ -713,6 +715,85 @@ app.use(async (req, res, next) => {
       res.json(member);
     } catch (err) {
       res.status(500).json({ error: 'Server error' });
+    }
+  });
+
+  // Settings API
+  app.get('/api/settings', async (req, res) => {
+    try {
+      const config = await settings.findOne({ key: 'admin_config' });
+      res.json(config || { notificationEmail: '' });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch settings' });
+    }
+  });
+
+  app.post('/api/settings', async (req, res) => {
+    try {
+      const { notificationEmail } = req.body;
+      await settings.updateOne(
+        { key: 'admin_config' },
+        { $set: { notificationEmail, updatedAt: new Date() } },
+        { upsert: true }
+      );
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update settings' });
+    }
+  });
+
+  // Contact API with Email Notification
+  app.post('/api/contact', async (req, res) => {
+    const { name, email, subject, message } = req.body;
+    try {
+      // 1. Save to database
+      await contact.insertOne({ name, email, subject, message, createdAt: new Date() });
+
+      // 2. Fetch admin notification email
+      const config = await settings.findOne({ key: 'admin_config' });
+      const adminNotifyEmail = config?.notificationEmail;
+
+      if (adminNotifyEmail) {
+        // 3. Send email using Nodemailer
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST || 'smtp.gmail.com',
+          port: parseInt(process.env.SMTP_PORT || '587'),
+          secure: process.env.SMTP_SECURE === 'true',
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
+
+        const mailOptions = {
+          from: `"EleSquad Notifications" <${process.env.SMTP_USER}>`,
+          to: adminNotifyEmail,
+          subject: `New Contact Message: ${subject}`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #6C4DF6;">New Contact Form Submission</h2>
+              <p><strong>From:</strong> ${name} (${email})</p>
+              <p><strong>Subject:</strong> ${subject}</p>
+              <p><strong>Message:</strong></p>
+              <div style="background: #f4f4f4; padding: 15px; border-radius: 8px;">
+                ${message.replace(/\n/g, '<br>')}
+              </div>
+              <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+              <p style="font-size: 12px; color: #888;">This is an automated notification from your EleSquad dashboard.</p>
+            </div>
+          `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Notification email sent to ${adminNotifyEmail}`);
+      }
+
+      res.json({ success: true });
+    } catch (err) {
+      console.error('Contact Submission Error:', err);
+      // Still return success if DB save worked but email failed? 
+      // User expected it to be sent, but we don't want to break the UI.
+      res.json({ success: true, warning: 'Email notification failed' });
     }
   });
 

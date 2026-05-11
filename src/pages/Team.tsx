@@ -70,11 +70,6 @@ export default function Team() {
                   alt={member.name}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60" />
-                <div className="absolute bottom-6 left-6 flex gap-3">
-                   {/* Real icons for wordpress and elementor */}
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Wordpress_Blue_logo.png" alt="WordPress" className="w-8 h-8 rounded-full bg-white/10 p-1 shadow-lg" />
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Elementor_icon.svg" alt="Elementor" className="w-8 h-8 rounded-full bg-white/10 p-1 shadow-lg" />
-                </div>
               </div>
               
               {/* Info Right */}
@@ -115,68 +110,92 @@ export default function Team() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group relative"
+              className="group relative flex flex-col h-full"
             >
-              <Link to={`/team/${member._id}`} className="block">
-                <div className="relative overflow-hidden rounded-[2.5rem] bg-white/5 border border-white/10 group-hover:border-primary/50 transition-colors duration-500">
-                  {/* Image Container */}
-                  <div className="aspect-[4/5] overflow-hidden relative">
-                    <img 
-                      src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/150?u=${member._id}`} 
-                      alt={member.name} 
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" 
-                    />
-                    
-                    {/* Social Hover Overlay */}
-                    <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-bg/90 to-transparent">
-                      <div className="flex justify-center gap-3">
-                        {member.linkedin && (
-                          <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
-                            <Linkedin size={14} />
-                          </a>
-                        )}
-                        {member.facebook && (
-                          <a href={member.facebook} target="_blank" rel="noopener noreferrer" className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
-                            <Facebook size={14} />
-                          </a>
-                        )}
-                        {member.instagram && (
-                          <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
-                            <Instagram size={14} />
-                          </a>
-                        )}
-                        {member.telegram && (
-                          <a href={`https://t.me/${member.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110">
-                            <TelegramIcon size={14} />
-                          </a>
-                        )}
-                        {!member.linkedin && !member.facebook && !member.instagram && !member.telegram && (
-                          <div className="w-9 h-9 glass rounded-full flex items-center justify-center text-white/20">
-                            <Globe size={14} />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+              <div className="relative flex-grow flex flex-col overflow-hidden rounded-[2.5rem] bg-white/5 border border-white/10 group-hover:border-primary/50 transition-colors duration-500 h-full">
+                {/* Image Link */}
+                <Link to={`/team/${member._id}`} className="block aspect-[4/5] overflow-hidden relative">
+                  <img 
+                    src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/150?u=${member._id}`} 
+                    alt={member.name} 
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" 
+                  />
+                </Link>
 
-                  {/* Info Box */}
-                  <div className="p-8 text-center relative z-10">
-                    <div className="w-10 h-[1px] bg-primary/30 mx-auto mb-4 group-hover:w-20 transition-all" />
-                    <h3 className="text-xl font-display font-bold mb-1 group-hover:text-primary transition-colors tracking-tight flex items-center justify-center gap-2 text-white">
-                      {member.name}
-                      {member.isVerified && (
-                        <div className="w-4 h-4 bg-primary text-white rounded-full flex items-center justify-center shadow-lg" title="Verified Member">
-                          <Star size={8} fill="currentColor" />
+                {/* Info Box Link */}
+                <Link to={`/team/${member._id}`} className="p-8 text-center flex-grow flex flex-col justify-center hover:bg-white/[0.02] transition-colors">
+                  <div className="w-10 h-[1px] bg-primary/30 mx-auto mb-4 group-hover:w-20 transition-all" />
+                  <h3 className="text-xl font-display font-bold mb-1 group-hover:text-primary transition-colors tracking-tight flex items-center justify-center gap-2 text-white">
+                    {member.name}
+                    {member.isVerified && (
+                      <div className="w-4 h-4 bg-primary text-white rounded-full flex items-center justify-center shadow-lg" title="Verified Member">
+                        <Star size={8} fill="currentColor" />
+                      </div>
+                    )}
+                  </h3>
+                  <div className="flex flex-col items-center justify-center gap-1">
+                     <p className="text-primary font-mono text-[9px] uppercase tracking-[0.2em]">{member.designation || 'Squad Member'}</p>
+                     <p className="text-white/20 text-[8px] uppercase tracking-widest">{member.team || 'Member'}</p>
+                  </div>
+                </Link>
+
+                {/* Social Hover Overlay - Completely separate from profile Links */}
+                <div className="absolute inset-x-0 top-0 aspect-[4/5] pointer-events-none flex flex-col justify-end overflow-hidden z-20">
+                  <div className="p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-bg/90 to-transparent pointer-events-auto">
+                    <div className="flex justify-center gap-3">
+                      {member.linkedin && (
+                        <a 
+                          href={member.linkedin} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Linkedin size={14} />
+                        </a>
+                      )}
+                      {member.facebook && (
+                        <a 
+                          href={member.facebook} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Facebook size={14} />
+                        </a>
+                      )}
+                      {member.instagram && (
+                        <a 
+                          href={member.instagram} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Instagram size={14} />
+                        </a>
+                      )}
+                      {member.telegram && (
+                        <a 
+                          href={`https://t.me/${member.telegram.replace('@', '')}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="w-9 h-9 glass rounded-full flex items-center justify-center hover:bg-primary text-white/70 hover:text-white transition-all transform hover:scale-110"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <TelegramIcon size={14} />
+                        </a>
+                      )}
+                      {!member.linkedin && !member.facebook && !member.instagram && !member.telegram && (
+                        <div className="w-9 h-9 glass rounded-full flex items-center justify-center text-white/20">
+                          <Globe size={14} />
                         </div>
                       )}
-                    </h3>
-                    <div className="flex flex-col items-center justify-center gap-1">
-                       <p className="text-primary font-mono text-[9px] uppercase tracking-[0.2em]">{member.designation || 'Squad Member'}</p>
-                       <p className="text-white/20 text-[8px] uppercase tracking-widest">{member.team || 'Member'}</p>
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
             </motion.div>
           ))
         )}
