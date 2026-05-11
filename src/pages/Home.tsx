@@ -267,68 +267,6 @@ export default function Home() {
 
 
 
-      {/* Premium Leadership Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
-        <div className="flex items-center gap-4 mb-16">
-          <div className="h-[1px] flex-grow bg-white/10" />
-          <h2 className="text-2xl md:text-3xl font-display font-bold text-primary tracking-[0.3em] uppercase">The Leadership</h2>
-          <div className="h-[1px] flex-grow bg-white/10" />
-        </div>
-
-        <div className="space-y-12">
-          {team.filter(m => m.role === 'Leader' || m.role === 'Admin').map((member, i) => (
-            <motion.div
-              key={member._id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              className="relative flex flex-col lg:flex-row items-center gap-12 glass p-8 md:p-16 rounded-[3rem] border border-primary/20 overflow-hidden group"
-            >
-              {/* Image Left */}
-              <div className="w-full lg:w-1/2 relative group rounded-[3rem] overflow-hidden aspect-[4/5] md:aspect-[16/10] lg:aspect-[4/5]">
-                <img
-                  src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/800?u=${member._id}`}
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
-                  alt={member.name}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60" />
-              </div>
-
-              {/* Info Right */}
-              <div className="w-full lg:w-1/2 text-left space-y-8">
-                <div className="inline-flex items-center gap-3 px-5 py-2 bg-primary/10 border border-primary/30 text-primary text-[10px] font-black rounded-full uppercase tracking-[0.3em]">
-                  <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                  SQUAD LEADER
-                </div>
-
-                <div>
-                  <h3 className="text-5xl md:text-8xl font-display font-bold mb-4 text-white leading-tight tracking-tighter">
-                    {member.name}
-                  </h3>
-                  <p className="text-primary font-mono text-lg uppercase tracking-[0.4em] font-black">{member.designation || 'Head of Operations'}</p>
-                </div>
-
-                <p className="text-[18px] text-white/40 leading-relaxed font-light italic border-l-2 border-primary/20 pl-8">
-                  "{member.bio || 'Leading the squad to digital excellence. Specializing in high-performance WordPress and Elementor development, turning complex requirements into seamless digital experiences.'}"
-                </p>
-
-                <div className="flex flex-wrap gap-6 pt-6">
-                  <Link to={`/team/${member._id}`} className="w-full md:w-auto">
-                    <Button className="w-full md:px-12 py-6 text-lg group/btn shadow-2xl shadow-primary/20">
-                      View Full Profile
-                    </Button>
-                  </Link>
-                  <Link to="/team" className="w-full md:w-auto">
-                    <Button variant="outline" className="w-full md:px-10 py-6 text-lg border-white/10 text-white/40 hover:text-white hover:border-white/20">
-                      View All Squad
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
       {/* Services Section Redesign */}
       <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
