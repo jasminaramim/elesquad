@@ -326,7 +326,7 @@ function AdminProfileTab() {
           <Input label="Designation" value={profile.designation || ''} onChange={v => setProfile({...profile, designation: v})} />
            <Input label="Phone Number" value={profile.phone || ''} onChange={v => setProfile({...profile, phone: v})} />
           <Input label="Squad Team" value={profile.team || ''} onChange={v => setProfile({...profile, team: v})} />
-          <Input label="Squad Role" value={profile.role || ''} onChange={v => setProfile({...profile, role: v})} />
+          <Input label="Squad Role" value={profile.role || ''} onChange={v => setProfile({...profile, role: v})} disabled={user?.role !== 'Leader'} />
           <Input label="Update Password" value={profile.password || ''} onChange={v => setProfile({...profile, password: v})} type="password" placeholder="Enter new password" />
           
           <div className="md:col-span-2">

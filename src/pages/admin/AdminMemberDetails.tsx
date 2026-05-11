@@ -5,6 +5,7 @@ import { ArrowLeft, Mail, Star, Loader2, Trash2, ShieldCheck, Plus, Save, Extern
 import { Button, Card, Input as UIInput } from '../../components/UI';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 
 // Local Input component similar to AdminDashboard for consistency
 function Input({ label, value, onChange, placeholder = '', type = 'text', disabled = false }: { label: string, value: any, onChange: (v: string) => void, placeholder?: string, type?: string, disabled?: boolean }) {
@@ -31,6 +32,8 @@ export default function AdminMemberDetails() {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  
+  const { user: currentUser } = useAuth();
   
   // Project editing state
   const [selectedProject, setSelectedProject] = useState<any>(null);
@@ -160,6 +163,7 @@ export default function AdminMemberDetails() {
                     className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white"
                     value={member.role || 'Member'}
                     onChange={e => setMember({ ...member, role: e.target.value })}
+                    disabled={currentUser?.role !== 'Leader'}
                   >
                     <option value="Member" className="bg-bg">Member</option>
                     <option value="Leader" className="bg-bg">Leader (Admin)</option>
@@ -180,10 +184,11 @@ export default function AdminMemberDetails() {
                 <div className="pt-4 border-t border-white/5">
                   <button 
                     type="button"
+                    disabled={currentUser?.role !== 'Leader'}
                     onClick={() => setMember({ ...member, isVerified: !member.isVerified })}
                     className={`w-full py-3 rounded-xl border transition-all text-xs font-bold uppercase tracking-widest mb-4 ${
                       member.isVerified ? 'bg-primary/20 border-primary text-primary shadow-lg shadow-primary/20' : 'bg-white/5 border-white/10 text-white/40'
-                    }`}
+                    } ${currentUser?.role !== 'Leader' ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {member.isVerified ? 'Verified Member' : 'Set As Verified'}
                   </button>

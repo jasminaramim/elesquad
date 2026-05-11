@@ -366,6 +366,10 @@ app.use(async (req, res, next) => {
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
       await users.deleteOne({ _id: new ObjectId(id) });
+      
+      // Emit force logout to the user's specific room
+      io.to(`user_${id}`).emit('force_logout');
+      
       res.json({ success: true });
     } catch (err) {
       res.status(500).json({ error: 'Deletion failed' });
@@ -418,6 +422,12 @@ app.use(async (req, res, next) => {
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
       console.log('User Updating Profile:', id, 'with:', JSON.stringify(updateData));
+      
+      // Security: Prevent non-admins from changing roles via the general profile update
+      if (updateData.role) {
+        delete updateData.role;
+      }
+      
       const result = await users.updateOne(
         { _id: new ObjectId(id) },
         { $set: updateData }

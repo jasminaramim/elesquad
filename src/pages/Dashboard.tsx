@@ -528,10 +528,11 @@ export default function Dashboard() {
                   <div>
                     <label className="label-style">Squad Role</label>
                     <input 
-                      className="input-style" 
+                      className={cn("input-style", user?.role !== 'Leader' && "opacity-50 cursor-not-allowed")} 
                       placeholder="e.g. Member / Leader"
                       value={profile.role || ''} 
                       onChange={e => setProfile({...profile, role: e.target.value})}
+                      disabled={user?.role !== 'Leader'}
                     />
                   </div>
                   <div>

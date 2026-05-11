@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
+import { toast } from 'react-hot-toast';
 
 interface User {
   id: string;
@@ -26,7 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (savedUser) {
       try {
         const parsed = JSON.parse(savedUser);
-        // Normalize _id to id if necessary
         if (parsed._id && !parsed.id) parsed.id = parsed._id;
         setUser(parsed);
       } catch (e) {
@@ -35,6 +36,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const isLocal = window.location.hostname === 'localhost';
+    const socketUrl = isLocal ? 'http://localhost:3000' : window.location.origin;
+    
+    const socket = io(socketUrl, {
+      transports: ['websocket', 'polling'],
+      reconnectionAttempts: 5
+    });
+
+    socket.on('connect', () => {
+      socket.emit('join_room', `user_${user.id}`);
+    });
+
+    socket.on('force_logout', () => {
+      console.warn('FORCE LOGOUT RECEIVED: Account deleted or suspended.');
+      setUser(null);
+      localStorage.removeItem('elesquad_user');
+      toast.error('Your account has been deleted or suspended by an administrator.', {
+        duration: 6000,
+        icon: '⚠️'
+      });
+      window.location.href = '/';
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [user?.id]);
 
   const login = (userData: any) => {
     // Ensure id is present
