@@ -63,8 +63,19 @@ export default function Dashboard() {
     status: 'todo'
   });
   const [profile, setProfile] = useState({ 
-    name: '', email: '', memberId: '', designation: '', team: '', bio: '', image: '', phone: '', role: '',
-    facebook: '', instagram: '', linkedin: '', telegram: ''
+    name: user?.name || '', 
+    email: user?.email || '', 
+    memberId: '', 
+    designation: '', 
+    team: '', 
+    bio: '', 
+    image: user?.image || '', 
+    phone: '', 
+    role: user?.role || '',
+    facebook: '', 
+    instagram: '', 
+    linkedin: '', 
+    telegram: ''
   });
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -313,8 +324,12 @@ export default function Dashboard() {
       <div className="lg:col-span-3 space-y-4">
         <Card className="p-6 border-white/10 glass sticky top-32">
           <div className="flex items-center gap-4 mb-8 p-2">
-            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-              <User className="text-primary" size={24} />
+            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden">
+              {profile.image ? (
+                <img src={profile.image} className="w-full h-full object-cover" />
+              ) : (
+                <User className="text-primary" size={24} />
+              )}
             </div>
             <div>
               <h3 className="font-bold text-white text-lg tracking-tight">{profile.name || user.email?.split('@')[0] || 'Member'}</h3>
