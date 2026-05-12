@@ -598,7 +598,7 @@ export default function Home() {
 
         <div 
           id="review-slider"
-          className="flex gap-8 px-5 md:px-[100px] overflow-x-auto snap-x snap-mandatory no-scrollbar pb-20 select-none scroll-smooth"
+          className="flex gap-8 px-5 md:px-[100px] overflow-x-auto snap-x snap-mandatory no-scrollbar pb-10 select-none scroll-smooth"
         >
           {reviews.length > 0 ? reviews.map((review, i) => (
             <motion.div
@@ -634,6 +634,23 @@ export default function Home() {
               Sharing success stories soon...
             </div>
           )}
+        </div>
+
+        {/* Pagination Dots */}
+        <div className="flex justify-center gap-2 mt-4 pb-20">
+          {reviews.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                const container = document.getElementById('review-slider');
+                if (container) {
+                  const cardWidth = container.querySelector('.snap-center')?.clientWidth || 450;
+                  container.scrollTo({ left: i * (cardWidth + 32), behavior: 'smooth' });
+                }
+              }}
+              className="w-2 h-2 rounded-full bg-white/10 hover:bg-primary transition-all hover:w-6"
+            />
+          ))}
         </div>
       </section>
 
