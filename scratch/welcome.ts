@@ -19,7 +19,7 @@ async function sendWelcomeMessages() {
     const allUsers = await users.find({}).toArray();
     console.log(`Found ${allUsers.length} total users.`);
 
-    const welcomeText = "Welcome to the EleSquad family! 🚀 We're thrilled to have you with us. This is your premium space to manage projects, collaborate with our elite squad, and track your digital growth. If you need any assistance, feel free to reach out. Let's build something extraordinary together!";
+    const welcomeText = "Welcome to the EleSquad family! 🚀 We're thrilled to have you with us. This is your premium space to manage projects, collaborate with our EleSquad, and track your digital growth. If you need any assistance, feel free to reach out. Let's build something extraordinary together!";
 
     let count = 0;
     for (const user of allUsers) {

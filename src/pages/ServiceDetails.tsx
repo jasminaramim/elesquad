@@ -55,6 +55,7 @@ export default function ServiceDetails() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-6xl md:text-7xl font-display font-bold mb-6 tracking-tighter">{service.title}</h1>
+
             <p className="text-xl text-white/50 leading-relaxed max-w-2xl mb-12">
               {service.subtitle || "A website should be more than just beautiful—it should be strategic, high-performing, and built to convert."}
             </p>
@@ -157,7 +158,7 @@ export default function ServiceDetails() {
           <Card className="p-8 bg-primary border-none shadow-[0_20px_50px_rgba(108,77,246,0.3)] relative overflow-hidden group" tiltEnabled={false}>
             <div className="relative z-10 text-center space-y-6">
               <h4 className="text-3xl font-display font-bold leading-tight">Any Question? Let's Talk</h4>
-              <p className="text-white/70 text-sm">Our elite squad is ready to transform your vision into reality.</p>
+              <p className="text-white/70 text-sm">Our EleSquad is ready to transform your vision into reality.</p>
 
               <Link to="/contact">
                 <Button className="w-full bg-white text-black hover:bg-white hover:text-primary py-5 flex items-center justify-center gap-3 group/btn">

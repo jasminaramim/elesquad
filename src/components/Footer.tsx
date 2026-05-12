@@ -68,12 +68,13 @@ export default function Footer() {
                 Join
               </button>
             </div>
-            <p className="text-[10px] text-white/20 italic">Join our elite squad of innovators.</p>
+
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="mt-24 pt-8 border-t border-white/5 flex flex-col md:row justify-between items-center gap-6">
+          <p className="text-[10px] text-white/20 italic">Join our EleSquad of innovators.</p>
           <p className="text-xs text-white/20 font-mono tracking-wider">
             © {new Date().getFullYear()} ELESQUAD. ENGINEERED FOR EXCELLENCE.
           </p>
