@@ -568,56 +568,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Review Carousel Section */}
+      {/* Review Slider Section */}
       <section className="py-[50px] lg:py-[100px] relative overflow-hidden bg-white/[0.01]">
-        <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20">
-          <SectionHeading title="Client Testimonials" subtitle="15+ Success Stories" centered />
+        <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="text-center md:text-left">
+            <SectionHeading title="Client Testimonials" subtitle="15+ Success Stories" />
+          </div>
+          <div className="flex gap-4">
+            <button 
+              onClick={() => {
+                const container = document.getElementById('review-slider');
+                if (container) container.scrollBy({ left: -450, behavior: 'smooth' });
+              }}
+              className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center hover:bg-primary hover:border-primary transition-all group"
+            >
+              <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+            </button>
+            <button 
+              onClick={() => {
+                const container = document.getElementById('review-slider');
+                if (container) container.scrollBy({ left: 450, behavior: 'smooth' });
+              }}
+              className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center hover:bg-primary hover:border-primary transition-all group"
+            >
+              <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
         </div>
 
-        <div className="relative overflow-hidden group">
-          <motion.div
-            animate={{
-              x: reviews.length > 0 ? ["0%", `-${(reviews.length * 450) / 15}%`] : "0%"
-            }}
-            transition={{
-              duration: 40,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="flex gap-8 px-4 pb-20 no-scrollbar select-none"
-          >
-            {[...reviews, ...reviews].map((review, i) => (
-              <motion.div
-                key={`${review._id}-${i}`}
-                className="min-w-[350px] md:min-w-[450px]"
-              >
-                <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 transition-all">
-                  <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
+        <div 
+          id="review-slider"
+          className="flex gap-8 px-5 md:px-[100px] overflow-x-auto snap-x snap-mandatory no-scrollbar pb-20 select-none scroll-smooth"
+        >
+          {reviews.length > 0 ? reviews.map((review, i) => (
+            <motion.div
+              key={review._id}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="min-w-[320px] md:min-w-[450px] snap-center"
+            >
+              <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 transition-all">
+                <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
 
-                  <div className="flex text-primary gap-1">
-                    {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                <div className="flex text-primary gap-1">
+                  {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                </div>
+
+                <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
+                <p className="text-white/60 leading-relaxed italic text-lg line-clamp-4">"{review.feedback}"</p>
+
+                <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
+                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
+                    {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
                   </div>
-
-                  <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
-                  <p className="text-white/60 leading-relaxed italic text-lg">"{review.feedback}"</p>
-
-                  <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
-                      {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
-                    </div>
-                    <div>
-                      <h5 className="font-bold">{review.clientName}</h5>
-                      <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
-                    </div>
+                  <div>
+                    <h5 className="font-bold">{review.clientName}</h5>
+                    <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
                   </div>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Subtle gradient fades for the carousel */}
-          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+                </div>
+              </Card>
+            </motion.div>
+          )) : (
+            <div className="w-full text-center py-20 text-white/20 italic">
+              Sharing success stories soon...
+            </div>
+          )}
         </div>
       </section>
 
