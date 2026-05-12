@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Code, Layout, Smartphone, Palette, Shield, Globe, Star, Users, CheckCircle, MessageSquare, ChevronDown, ChevronRight, Share2, Mail, Server, ShoppingBag, Phone, MapPin, Rocket } from 'lucide-react';
+import { ArrowRight, Code, Layout, Smartphone, Palette, Shield, Globe, Star, Users, CheckCircle, MessageSquare, ChevronDown, ChevronLeft, ChevronRight, Share2, Mail, Server, ShoppingBag, Phone, MapPin, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button, Card, SectionHeading } from '../components/UI';
 import axios from 'axios';
