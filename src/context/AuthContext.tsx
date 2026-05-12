@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import { ShieldAlert } from 'lucide-react';
+import { Modal } from '../components/UI';
 
 interface User {
   id: string;
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [logoutModal, setLogoutModal] = useState({ show: false, title: '', message: '' });
 
   useEffect(() => {
     const savedUser = localStorage.getItem('elesquad_user');
@@ -54,14 +57,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     socket.on('force_logout', () => {
-      console.warn('FORCE LOGOUT RECEIVED: Account deleted or suspended.');
+      console.warn('FORCE LOGOUT RECEIVED: Account restricted or session terminated.');
+      
+      localStorage.clear();
+      sessionStorage.clear();
       setUser(null);
-      localStorage.removeItem('elesquad_user');
-      toast.error('Your account has been deleted or suspended by an administrator.', {
-        duration: 6000,
-        icon: '⚠️'
+      
+      setLogoutModal({
+        show: true,
+        title: 'Access Restricted',
+        message: 'Your access level has been changed by an administrator. For security reasons, you have been logged out of the squad dashboard.'
       });
-      window.location.href = '/';
     });
 
     return () => {
@@ -76,32 +82,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const validateSession = async () => {
       try {
         // Aggressive Cache busting and explicit check
-        await axios.get(`/api/users/${user.id}?t=${Date.now()}`, {
+        const res = await axios.get(`/api/users/${user.id}?t=${Date.now()}`, {
           headers: {
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',
             'Expires': '0',
           }
         });
-      } catch (err: any) {
-        if (err.response?.status === 404 || err.response?.status === 401) {
-          console.warn('FORCE LOGOUT: User record purged from database.');
+
+        // Instant Logout if role was downgraded
+        if (res.data.role && res.data.role !== 'Leader' && res.data.role !== 'Member') {
+          console.warn('FORCE LOGOUT: Role downgraded to restricted status.');
           
-          // CRITICAL: Clear all traces of identity IMMEDIATELY
           localStorage.clear();
           sessionStorage.clear();
           setUser(null);
 
-          // Native alert to block execution and grab user attention
-          alert('You are no longer a member of EleSquad. Your session has been terminated.');
-
-          toast.error('Session Terminated. Redirecting...', {
-            duration: 5000,
-            icon: '⛔'
+          setLogoutModal({
+            show: true,
+            title: 'Session Terminated',
+            message: "Your profile has been updated to a restricted role. You no longer have access to the EleSquad inner circle."
           });
+        }
+      } catch (err: any) {
+        if (err.response?.status === 404 || err.response?.status === 401) {
+          console.warn('FORCE LOGOUT: User record purged from database.');
           
-          // Force a hard redirect to the home page
-          window.location.href = '/';
+          localStorage.clear();
+          sessionStorage.clear();
+          setUser(null);
+
+          setLogoutModal({
+            show: true,
+            title: 'Account Deactivated',
+            message: "It seems your account is no longer active in the EleSquad database. Please contact leadership if you believe this is an error."
+          });
         }
       }
     };
@@ -141,6 +156,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {!isLoading && children}
+      <Modal 
+        isOpen={logoutModal.show} 
+        onClose={() => window.location.href = '/'} 
+        title={logoutModal.title}
+        icon={ShieldAlert}
+      >
+        {logoutModal.message}
+      </Modal>
     </AuthContext.Provider>
   );
 }

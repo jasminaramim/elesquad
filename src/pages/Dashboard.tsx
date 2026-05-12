@@ -30,7 +30,7 @@ import {
 import ChatHub from '../components/ChatHub';
 
 export default function Dashboard() {
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'reviews' | 'documents' | 'finance' | 'messages'>(() => {
@@ -275,6 +275,13 @@ export default function Dashboard() {
     }
   };
 
+  useEffect(() => {
+    if (!isLoading && user && user.role !== 'Leader' && user.role !== 'Member') {
+      toast.error('You do not have access to the dashboard.');
+      navigate('/');
+    }
+  }, [user, isLoading, navigate]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg relative overflow-hidden">
@@ -297,13 +304,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (!isLoading && user && user.role !== 'Leader' && user.role !== 'Member') {
-      toast.error('You do not have access to the dashboard.');
-      navigate('/');
-    }
-  }, [user, isLoading, navigate]);
 
   if (!user || (user.role !== 'Leader' && user.role !== 'Member')) return null;
 

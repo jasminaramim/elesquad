@@ -94,3 +94,40 @@ export function SectionHeading({ title, subtitle, centered = false }: { title: s
     </div>
   );
 }
+
+export function Modal({ isOpen, onClose, title, children, icon: Icon }: { isOpen: boolean, onClose: () => void, title: string, children: React.ReactNode, icon?: any }) {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/80 backdrop-blur-md" 
+      />
+      <motion.div 
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        className="relative w-full max-w-md bg-card border border-white/10 rounded-[2.5rem] p-10 shadow-2xl overflow-hidden"
+      >
+        {/* Background Glow */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 blur-[80px] rounded-full" />
+        
+        <div className="relative z-10 text-center">
+          {Icon && (
+            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-primary/20">
+              <Icon size={40} className="text-primary" />
+            </div>
+          )}
+          <h3 className="text-3xl font-display font-bold mb-4">{title}</h3>
+          <div className="text-foreground/60 mb-10 leading-relaxed">{children}</div>
+          <Button onClick={onClose} className="w-full">
+            Understood
+          </Button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
