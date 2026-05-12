@@ -8,13 +8,13 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 
 // Local Input component similar to AdminDashboard for consistency
-function Input({ label, value, onChange, placeholder = '', type = 'text', disabled = false }: { label: string, value: any, onChange: (v: string) => void, placeholder?: string, type?: string, disabled?: boolean }) {
+function Input({ label, value, onChange, placeholder = '', type = 'text', disabled = false, required = true }: { label: string, value: any, onChange: (v: string) => void, placeholder?: string, type?: string, disabled?: boolean, required?: boolean }) {
   return (
     <div className="space-y-2">
       <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">{label}</label>
       <input 
         type={type}
-        required
+        required={required}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
@@ -174,13 +174,13 @@ export default function AdminMemberDetails() {
 
                 <div className="pt-4 space-y-4 border-t border-white/5">
                   <h4 className="text-[10px] font-mono uppercase tracking-widest text-white/40">Digital Presence</h4>
-                  <Input label="Website" value={member.website || ''} onChange={v => setMember({ ...member, website: v })} placeholder="https://..." />
-                  <Input label="GitHub" value={member.github || ''} onChange={v => setMember({ ...member, github: v })} placeholder="https://github.com/..." />
-                  <Input label="LinkedIn" value={member.linkedin || ''} onChange={v => setMember({ ...member, linkedin: v })} placeholder="https://linkedin.com/in/..." />
-                  <Input label="Twitter" value={member.twitter || ''} onChange={v => setMember({ ...member, twitter: v })} placeholder="https://twitter.com/..." />
-                  <Input label="Facebook" value={member.facebook || ''} onChange={v => setMember({ ...member, facebook: v })} placeholder="https://facebook.com/..." />
-                  <Input label="Instagram" value={member.instagram || ''} onChange={v => setMember({ ...member, instagram: v })} placeholder="https://instagram.com/..." />
-                  <Input label="Telegram" value={member.telegram || ''} onChange={v => setMember({ ...member, telegram: v })} placeholder="@username" />
+                  <Input label="Website" value={member.website || ''} onChange={v => setMember({ ...member, website: v })} placeholder="https://..." required={false} />
+                  <Input label="GitHub" value={member.github || ''} onChange={v => setMember({ ...member, github: v })} placeholder="https://github.com/..." required={false} />
+                  <Input label="LinkedIn" value={member.linkedin || ''} onChange={v => setMember({ ...member, linkedin: v })} placeholder="https://linkedin.com/in/..." required={false} />
+                  <Input label="Twitter" value={member.twitter || ''} onChange={v => setMember({ ...member, twitter: v })} placeholder="https://twitter.com/..." required={false} />
+                  <Input label="Facebook" value={member.facebook || ''} onChange={v => setMember({ ...member, facebook: v })} placeholder="https://facebook.com/..." required={false} />
+                  <Input label="Instagram" value={member.instagram || ''} onChange={v => setMember({ ...member, instagram: v })} placeholder="https://instagram.com/..." required={false} />
+                  <Input label="Telegram" value={member.telegram || ''} onChange={v => setMember({ ...member, telegram: v })} placeholder="@username" required={false} />
                 </div>
 
                 <div className="pt-4 border-t border-white/5">

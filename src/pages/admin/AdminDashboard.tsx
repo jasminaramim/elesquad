@@ -371,13 +371,13 @@ function AdminProfileTab() {
         <div className="space-y-4 pt-4 border-t border-white/5">
           <h4 className="text-[10px] font-mono uppercase tracking-widest text-white/40">Social Links</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input label="Website URL" value={(profile as any).website || ''} onChange={v => setProfile({...profile, website: v} as any)} placeholder="https://yoursite.com" />
-            <Input label="GitHub URL" value={(profile as any).github || ''} onChange={v => setProfile({...profile, github: v} as any)} placeholder="https://github.com/username" />
-            <Input label="LinkedIn URL" value={(profile as any).linkedin || ''} onChange={v => setProfile({...profile, linkedin: v} as any)} placeholder="https://linkedin.com/in/username" />
-            <Input label="Twitter / X URL" value={(profile as any).twitter || ''} onChange={v => setProfile({...profile, twitter: v} as any)} placeholder="https://twitter.com/username" />
-            <Input label="Facebook URL" value={(profile as any).facebook || ''} onChange={v => setProfile({...profile, facebook: v} as any)} placeholder="https://facebook.com/username" />
-            <Input label="Instagram URL" value={(profile as any).instagram || ''} onChange={v => setProfile({...profile, instagram: v} as any)} placeholder="https://instagram.com/username" />
-            <Input label="Telegram Username" value={(profile as any).telegram || ''} onChange={v => setProfile({...profile, telegram: v} as any)} placeholder="@username" />
+            <Input label="Website URL" value={(profile as any).website || ''} onChange={v => setProfile({...profile, website: v} as any)} placeholder="https://yoursite.com" required={false} />
+            <Input label="GitHub URL" value={(profile as any).github || ''} onChange={v => setProfile({...profile, github: v} as any)} placeholder="https://github.com/username" required={false} />
+            <Input label="LinkedIn URL" value={(profile as any).linkedin || ''} onChange={v => setProfile({...profile, linkedin: v} as any)} placeholder="https://linkedin.com/in/username" required={false} />
+            <Input label="Twitter / X URL" value={(profile as any).twitter || ''} onChange={v => setProfile({...profile, twitter: v} as any)} placeholder="https://twitter.com/username" required={false} />
+            <Input label="Facebook URL" value={(profile as any).facebook || ''} onChange={v => setProfile({...profile, facebook: v} as any)} placeholder="https://facebook.com/username" required={false} />
+            <Input label="Instagram URL" value={(profile as any).instagram || ''} onChange={v => setProfile({...profile, instagram: v} as any)} placeholder="https://instagram.com/username" required={false} />
+            <Input label="Telegram Username" value={(profile as any).telegram || ''} onChange={v => setProfile({...profile, telegram: v} as any)} placeholder="@username" required={false} />
           </div>
         </div>
 
