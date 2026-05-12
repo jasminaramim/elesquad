@@ -304,7 +304,13 @@ export default function Dashboard() {
           <div className="relative inline-block">
             <div className="w-24 h-24 border-2 border-white/5 border-t-primary rounded-full animate-spin"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-12 h-12 bg-primary/20 rounded-full animate-ping"></div>
+              {user?.image ? (
+                <div className="w-16 h-16 rounded-full overflow-hidden border border-white/10 shadow-[0_0_20px_rgba(108,77,246,0.3)] animate-pulse">
+                  <img src={user.image} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-12 h-12 bg-primary/20 rounded-full animate-ping"></div>
+              )}
             </div>
           </div>
           <div className="mt-8 space-y-2">
