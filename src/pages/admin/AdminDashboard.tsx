@@ -220,7 +220,7 @@ function AdminProfileTab() {
     if (!uid) return;
     try {
       setLoading(true);
-      const res = await axios.get(`/api/users/${uid}`);
+      const res = await axios.get(`/api/users/${uid}?t=${Date.now()}`);
       setProfile(prev => ({
         ...prev,
         ...res.data

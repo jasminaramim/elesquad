@@ -108,10 +108,10 @@ export default function Dashboard() {
       setLoading(true);
       console.log(`Dashboard: Fetching data for UID ${uid}`);
       const [uRes, pRes, rRes, dRes] = await Promise.all([
-        axios.get(`/api/users/${uid}`),
-        axios.get(`/api/projects?userId=${uid}`),
-        axios.get('/api/reviews'),
-        axios.get(`/api/documents?userId=${uid}`)
+        axios.get(`/api/users/${uid}?t=${Date.now()}`),
+        axios.get(`/api/projects?userId=${uid}&t=${Date.now()}`),
+        axios.get(`/api/reviews?t=${Date.now()}`),
+        axios.get(`/api/documents?userId=${uid}&t=${Date.now()}`)
       ]);
       setProfile(prev => ({
         ...prev,
