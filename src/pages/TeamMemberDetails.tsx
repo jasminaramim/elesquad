@@ -42,20 +42,20 @@ export default function TeamMemberDetails() {
   const totalAchievement = projects.reduce((acc, p) => acc + (parseFloat(p.value) || 0), 0);
 
   const socialLinks = [
-    { icon: Globe,   href: member.website,   label: 'Website' },
-    { icon: Code2,   href: member.github,    label: 'GitHub' },
-    { icon: Link2,   href: member.linkedin,  label: 'LinkedIn' },
-    { icon: AtSign,  href: member.twitter,   label: 'Twitter' },
-    { icon: Facebook, href: member.facebook,  label: 'Facebook' },
+    { icon: Globe, href: member.website, label: 'Website' },
+    { icon: Code2, href: member.github, label: 'GitHub' },
+    { icon: Link2, href: member.linkedin, label: 'LinkedIn' },
+    { icon: AtSign, href: member.twitter, label: 'Twitter' },
+    { icon: Facebook, href: member.facebook, label: 'Facebook' },
     { icon: Instagram, href: member.instagram, label: 'Instagram' },
     { icon: TelegramIcon, href: member.telegram ? `https://t.me/${member.telegram.replace('@', '')}` : null, label: 'Telegram' },
-    { icon: Mail,    href: member.email ? `mailto:${member.email}` : null, label: 'Email' },
+    { icon: Mail, href: member.email ? `mailto:${member.email}` : null, label: 'Email' },
   ].filter(l => l.href);
 
   return (
-    <div className="min-h-screen pb-32">
+    <div className="">
       {/* Hero Header */}
-      <section className="relative pt-32 pb-16 md:pb-24 overflow-hidden">
+      <section className="relative pt-32 pb-8 md:pb-12 overflow-hidden">
         <div className="max-w-7xl mx-auto px-5 md:px-10 relative z-10">
           <Link to="/team" className="inline-flex items-center gap-2 text-white/40 hover:text-primary transition-colors mb-12 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
@@ -106,38 +106,14 @@ export default function TeamMemberDetails() {
               </motion.div>
             </motion.div>
 
-            {/* Social Links */}
-            {socialLinks.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="pb-6"
-              >
-                <p className="text-[10px] font-mono uppercase tracking-widest text-white/30 mb-4">Connect</p>
-                <div className="flex flex-wrap gap-3">
-                  {socialLinks.map(({ icon: Icon, href, label }) => (
-                    <a
-                      key={label}
-                      href={href!}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={label}
-                      className="w-12 h-12 glass rounded-full flex items-center justify-center text-white/40 hover:text-primary hover:border-primary/50 transition-all"
-                    >
-                      <Icon size={18} />
-                    </a>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+
           </div>
         </div>
         <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
       </section>
 
       {/* Main Content */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-16 md:py-24">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
           {/* Left Column - Profile Card */}
           <motion.div

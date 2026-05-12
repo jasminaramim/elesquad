@@ -28,6 +28,8 @@ import QuantumBackground from './components/QuantumBackground';
 import ServiceDetails from './pages/ServiceDetails';
 import Contact from './pages/Contact';
 
+import ScrollToTop from './components/ScrollToTop';
+
 import { ThemeProvider } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
 
@@ -55,6 +57,7 @@ export default function App() {
       <ThemeProvider>
         <NotificationProvider>
           <Router>
+            <ScrollToTop />
             <div className="relative overflow-x-hidden bg-bg min-h-screen text-foreground transition-colors duration-300">
               <QuantumBackground />
               

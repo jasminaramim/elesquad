@@ -34,10 +34,10 @@ export default function About() {
   }, []);
 
   return (
-    <div className="pb-32 pt-20">
+    <div className="pb-[50px] lg:pb-[100px] pt-20">
       <div className="max-w-7xl mx-auto px-5 md:px-10">
       {/* Intro */}
-      <section className="py-[50px] md:py-[70px] lg:py-[120px] grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="py-[50px] lg:py-[100px] grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <motion.div
            initial={{ opacity: 0, x: -50 }}
            whileInView={{ opacity: 1, x: 0 }}
@@ -83,7 +83,7 @@ export default function About() {
       </section>
 
       {/* Core Values */}
-      <section className="py-[50px] md:py-[70px] lg:py-[120px]">
+      <section className="py-[50px] lg:py-[100px]">
         <SectionHeading title="Our Core Values" subtitle="What Drives Us" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {values.map((v, i) => (
@@ -105,7 +105,7 @@ export default function About() {
       </section>
 
       {/* New Design-Accurate Process Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px] overflow-hidden">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px] overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           {/* Left Column: Image with Experience Cutout */}
           <motion.div
@@ -211,7 +211,7 @@ export default function About() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-[50px] md:py-[70px] lg:py-[120px]">
+      <section className="py-[50px] lg:py-[100px]">
         <SectionHeading title="Frequently Asked Questions" subtitle="Got Questions?" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {faqs.map((faq, i) => (
@@ -236,7 +236,7 @@ export default function About() {
 
     </div>
       {/* Dynamic Review Carousel (Homepage Design) - FULL WIDTH */}
-      <section className="py-[50px] md:py-[70px] lg:py-[120px] relative overflow-hidden bg-none">
+      <section className="py-[50px] lg:py-[100px] relative overflow-hidden bg-none">
         <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20">
           <SectionHeading title="What Our Clients Say" subtitle="Reviews" centered />
         </div>

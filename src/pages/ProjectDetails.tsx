@@ -20,7 +20,7 @@ export default function ProjectDetails() {
   if (!project) return <div className="h-screen flex items-center justify-center text-2xl">Project Not Found</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+    <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

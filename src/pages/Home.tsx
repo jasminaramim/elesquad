@@ -53,11 +53,11 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="pb-32">
+    <div className="pb-[50px] lg:pb-[100px]">
       {/* ... Hero, Brands, About, Services ... */}
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-32 pb-[50px] md:pb-[70px] lg:pb-[120px] overflow-hidden">
+      <section className="relative min-h-[90vh] flex items-center pt-32 pb-[50px] lg:pb-[100px] overflow-hidden">
         {/* Background Floating Tech Icons */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 z-0">
           {[
@@ -158,7 +158,7 @@ export default function Home() {
       </section>
 
       {/* New Design-Accurate About Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px] overflow-hidden">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px]  overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           {/* Left Column: Image with Play Button and Contact Info */}
           <motion.div
@@ -269,7 +269,7 @@ export default function Home() {
 
 
       {/* Services Section Redesign */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Header Block */}
           <div className="lg:col-span-1 py-10 space-y-8">
@@ -329,7 +329,7 @@ export default function Home() {
 
 
       {/* New Design-Accurate Process Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px] overflow-hidden">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px] overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           {/* Left Column: Image with Experience Cutout */}
           <motion.div
@@ -435,7 +435,7 @@ export default function Home() {
       </section>
 
       {/* Projects Showcase Redesign */}
-      <section className="relative py-[50px] md:py-[70px] lg:py-[120px] overflow-hidden bg-bg">
+      <section className="relative py-[50px] lg:py-[100px] overflow-hidden bg-bg">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
           <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full" />
@@ -569,7 +569,7 @@ export default function Home() {
       </section>
 
       {/* Review Carousel Section */}
-      <section className="py-[50px] md:py-[70px] lg:py-[120px] relative overflow-hidden bg-white/[0.01]">
+      <section className="py-[50px] lg:py-[100px] relative overflow-hidden bg-white/[0.01]">
         <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20">
           <SectionHeading title="Client Testimonials" subtitle="15+ Success Stories" centered />
         </div>
@@ -622,7 +622,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="max-w-5xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+      <section className="max-w-5xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
         <div className="text-center mb-20">
           <SectionHeading title="Asked Questions" subtitle="FAQ" centered />
         </div>
@@ -651,7 +651,7 @@ export default function Home() {
           ))}
         </div>
       </section>      {/* New Design-Accurate CTA Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
         <div className="flex flex-col lg:flex-row justify-between items-start mb-20 gap-10">
           <motion.h2
             initial={{ opacity: 0, x: -50 }}

@@ -32,7 +32,7 @@ export default function Projects() {
 
   return (
     <div className="bg-bg">
-      <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+      <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
         <SectionHeading 
           title="Our Creative Projects" 
           subtitle="Portfolio" 
@@ -104,7 +104,7 @@ export default function Projects() {
       </div>
 
       {/* Review Carousel Section */}
-      <section className="py-[50px] md:py-[70px] lg:py-[120px] relative overflow-hidden bg-white/[0.01]">
+      <section className="py-[50px] lg:py-[100px] relative overflow-hidden bg-white/[0.01]">
         <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20">
           <SectionHeading title="Client Testimonials" subtitle="Success Stories" centered />
         </div>
@@ -156,7 +156,7 @@ export default function Projects() {
       </section>
 
       {/* New Design-Accurate CTA Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
         <div className="flex flex-col lg:flex-row justify-between items-start mb-20 gap-10">
           <motion.h2 
             initial={{ opacity: 0, x: -50 }}

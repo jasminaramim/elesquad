@@ -17,7 +17,7 @@ export default function Team() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+    <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
       {/* Page Header - Pipeline Style */}
       <div className="text-center mb-24 relative">
         <motion.div
@@ -206,7 +206,7 @@ export default function Team() {
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="mt-40 py-[50px] md:py-[70px] lg:py-[120px] px-12 md:px-20 glass rounded-[3rem] text-center relative overflow-hidden"
+        className="mt-40 py-[50px] lg:py-[100px] px-12 md:px-20 glass rounded-[3rem] text-center relative overflow-hidden"
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
         <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">Want to work with us?</h2>

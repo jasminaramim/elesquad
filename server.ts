@@ -409,6 +409,9 @@ app.use(async (req, res, next) => {
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID' });
     try {
       const user = await users.findOne({ _id: new ObjectId(id) });
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
       res.json(user);
     } catch (err) {
       console.error('Fetch User Error:', err);

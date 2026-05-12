@@ -28,7 +28,7 @@ export default function Contact() {
 
   return (
     <div className="pt-32 pb-0 bg-bg min-h-screen">
-      <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] md:py-[70px] lg:py-[120px]">
+      <div className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           
           {/* Left Side: Contact Info Sidebar */}

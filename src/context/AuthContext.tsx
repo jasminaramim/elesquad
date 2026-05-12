@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 interface User {
   id: string;
@@ -67,6 +68,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       socket.disconnect();
     };
   }, [user?.id]);
+
+  // Polling fallback for Serverless environments (like Vercel) where Sockets are not persistent
+  useEffect(() => {
+    if (!user?.id || isLoading) return;
+
+    const validateSession = async () => {
+      try {
+        // Aggressive Cache busting and explicit check
+        await axios.get(`/api/users/${user.id}?t=${Date.now()}`, {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          }
+        });
+      } catch (err: any) {
+        if (err.response?.status === 404 || err.response?.status === 401) {
+          console.warn('FORCE LOGOUT: User record purged from database.');
+          
+          // CRITICAL: Clear all traces of identity IMMEDIATELY
+          localStorage.clear();
+          sessionStorage.clear();
+          setUser(null);
+
+          // Native alert to block execution and grab user attention
+          alert('You are no longer a member of EleSquad. Your session has been terminated.');
+
+          toast.error('Session Terminated. Redirecting...', {
+            duration: 5000,
+            icon: '⛔'
+          });
+          
+          // Force a hard redirect to the home page
+          window.location.href = '/';
+        }
+      }
+    };
+
+    // Initial check
+    validateSession();
+
+    // Poll every 1 second for "Instant" feel
+    const interval = setInterval(validateSession, 1000);
+    return () => clearInterval(interval);
+  }, [user?.id, isLoading]);
+
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'elesquad_user' && !e.newValue) {
+        console.log('Detected logout in another tab. Synchronizing...');
+        setUser(null);
+        window.location.href = '/';
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const login = (userData: any) => {
     // Ensure id is present

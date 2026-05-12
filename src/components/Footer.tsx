@@ -5,7 +5,7 @@ import { Facebook, Instagram, Linkedin, Telegram } from './BrandIcons';
 
 export default function Footer() {
   return (
-    <footer className="relative bg-bg border-t border-border pt-32 pb-12 overflow-hidden group/footer">
+    <footer className="relative bg-bg border-t border-border py-[50px] lg:py-[100px] overflow-hidden group/footer">
       {/* 3D Interactive Wave Background */}
       <ThreeWave opacity={0.2} />
 

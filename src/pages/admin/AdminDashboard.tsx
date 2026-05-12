@@ -10,7 +10,8 @@ import ChatHub from '../../components/ChatHub';
 import { cn } from '../../lib/utils';
 
 const tabs = [
-  { id: 'my-projects', label: 'My Projects', icon: Briefcase },
+  { id: 'all-projects', label: 'Member Projects', icon: Briefcase },
+  { id: 'my-projects', label: 'My Projects', icon: LayoutDashboard },
   { id: 'finance', label: 'Finance', icon: BarChart3 },
   { id: 'services', label: 'Services', icon: Rocket },
   { id: 'members', label: 'Members', icon: Users },
@@ -25,7 +26,7 @@ export default function AdminDashboard() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(() => {
     const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'my-projects';
+    return params.get('tab') || 'all-projects';
   });
   
   useEffect(() => {
@@ -111,6 +112,7 @@ export default function AdminDashboard() {
               transition={{ duration: 0.25 }}
             >
               <Card className="p-5 md:p-10" tiltEnabled={false}>
+                {activeTab === 'all-projects' && <ProjectForm projects={projects} fetchProjects={fetchProjects} showUserSelect={true} />}
                 {activeTab === 'my-projects' && <ProjectForm projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} fetchProjects={fetchProjects} />}
                 {activeTab === 'finance' && <FinanceTab projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} />}
                 {activeTab === 'services' && <ServiceForm />}
@@ -768,16 +770,24 @@ function FinanceTab({ projects }: { projects: any[] }) {
   );
 }
 
-function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjects: () => void }) {
+function ProjectForm({ projects, fetchProjects, showUserSelect = false }: { projects: any[], fetchProjects: () => void, showUserSelect?: boolean }) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isEditingProject, setIsEditingProject] = useState(false);
   const [tempProject, setTempProject] = useState<any>(null);
-  const [data, setData] = useState({
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [data, setData] = useState<any>({
     title: '', description: '', image: '', techStack: '', liveLink: '',
-    orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo', developerName: ''
+    orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo', developerName: '',
+    userId: ''
   });
+
+  useEffect(() => {
+    if (showUserSelect) {
+      axios.get('/api/team').then(res => setTeamMembers(res.data));
+    }
+  }, [showUserSelect]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
@@ -795,15 +805,16 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
       } else {
         await axios.post('/api/projects', {
           ...data,
-          techStack: data.techStack.split(',').map(s => s.trim()),
-          userId: user?.id,
+          techStack: data.techStack.split(',').map((s: string) => s.trim()),
+          userId: data.userId || user?.id,
           developerName: data.developerName || user?.name || 'Admin'
         });
         toast.success('Project added successfully!');
       }
       setData({ 
         title: '', description: '', image: '', techStack: '', liveLink: '',
-        orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo', developerName: ''
+        orderId: '', clientName: '', profileName: '', sheetLink: '', value: '', totalValue: '', projectType: 'solo', status: 'todo', developerName: '',
+        userId: ''
       });
       fetchProjects();
     } catch (err) {
@@ -833,9 +844,24 @@ function ProjectForm({ projects, fetchProjects }: { projects: any[], fetchProjec
       <form onSubmit={handleSubmit} className="space-y-6">
         <h3 className="text-2xl font-bold mb-8">Add New Project</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-          <div className="md:col-span-2">
+          <div className={showUserSelect ? "md:col-span-1" : "md:col-span-2"}>
             <Input label="Project Title" value={data.title || ''} onChange={v => setData({ ...data, title: v })} placeholder="e.g. Nexus Dashboard" />
           </div>
+          {showUserSelect && (
+            <div className="space-y-2">
+              <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Assign to Member</label>
+              <select 
+                className="w-full bg-black border border-border rounded-xl px-4 py-3 focus:border-primary/50 outline-none text-foreground"
+                value={data.userId || ''}
+                onChange={e => setData({ ...data, userId: e.target.value })}
+              >
+                <option value="">Current Admin</option>
+                {teamMembers.map(m => (
+                  <option key={m._id} value={m._id}>{m.name} ({m.memberId})</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="space-y-2">
             <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Type</label>
             <select 
