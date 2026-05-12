@@ -1392,7 +1392,11 @@ function TeamForm() {
   React.useEffect(() => { fetchList(); }, []);
 
   const handleRoleChange = async (id: string, currentRole: string) => {
-    const newRole = currentRole === 'Leader' ? 'Member' : 'Leader';
+    const roles = ['Leader', 'Member', 'User', 'Viewer'];
+    const currentIndex = roles.indexOf(currentRole);
+    const nextIndex = (currentIndex + 1) % roles.length;
+    const newRole = roles[nextIndex];
+    
     try {
       await axios.patch(`/api/admin/users/${id}/role`, { role: newRole });
       toast.success(`Role updated to ${newRole}`);
@@ -1467,6 +1471,8 @@ function TeamForm() {
             >
               <option value="Member" className="bg-bg">Member</option>
               <option value="Leader" className="bg-bg">Leader (Admin)</option>
+              <option value="User" className="bg-bg">User</option>
+              <option value="Viewer" className="bg-bg">Viewer</option>
             </select>
           </div>
           <Input label="Default Password" type="text" value={data.password} onChange={v => setData({ ...data, password: v })} />

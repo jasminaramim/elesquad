@@ -350,6 +350,12 @@ app.use(async (req, res, next) => {
       if (updateResult.matchedCount === 0) {
         return res.status(404).json({ error: 'User not found in database' });
       }
+
+      // If role is updated to something that shouldn't have dashboard access, force logout
+      if (updateData.role && updateData.role !== 'Leader' && updateData.role !== 'Member') {
+        io.to(`user_${id}`).emit('force_logout');
+      }
+
       res.json({ success: true, modifiedCount: updateResult.modifiedCount });
     } catch (err: any) {
       console.error('Admin User Update Error:', err);
@@ -383,6 +389,12 @@ app.use(async (req, res, next) => {
     if (!ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid ID format' });
     try {
       await users.updateOne({ _id: new ObjectId(id) }, { $set: { role } });
+      
+      // If role is changed to something restricted, force logout
+      if (role !== 'Leader' && role !== 'Member') {
+        io.to(`user_${id}`).emit('force_logout');
+      }
+      
       res.json({ success: true });
     } catch (err) {
       console.error('Role Update Error:', err);

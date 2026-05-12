@@ -7,7 +7,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   if (isLoading) return null;
 
-  if (!user || user.role !== 'Leader') {
+  if (!user || (user.role !== 'Leader' && user.role !== 'Member')) {
     return <Navigate to="/auth" replace />;
   }
 

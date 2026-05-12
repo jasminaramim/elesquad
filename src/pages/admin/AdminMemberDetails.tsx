@@ -167,6 +167,8 @@ export default function AdminMemberDetails() {
                   >
                     <option value="Member" className="bg-bg">Member</option>
                     <option value="Leader" className="bg-bg">Leader (Admin)</option>
+                    <option value="User" className="bg-bg">User</option>
+                    <option value="Viewer" className="bg-bg">Viewer</option>
                   </select>
                 </div>
 

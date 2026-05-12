@@ -26,8 +26,12 @@ export default function Auth() {
       // If the user is a Leader (Admin), navigate to Admin Dashboard
       if (res.data.user.role === 'Leader') {
         navigate('/admin/dashboard');
-      } else {
+      } else if (res.data.user.role === 'Member') {
         navigate('/dashboard');
+      } else {
+        // User/Viewer role - allowed to log in but no dashboard
+        toast.success(`Logged in as ${res.data.user.role}`);
+        navigate('/');
       }
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Authentication failed');

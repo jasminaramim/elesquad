@@ -298,7 +298,14 @@ export default function Dashboard() {
     );
   }
 
-  if (!user) return null;
+  useEffect(() => {
+    if (!isLoading && user && user.role !== 'Leader' && user.role !== 'Member') {
+      toast.error('You do not have access to the dashboard.');
+      navigate('/');
+    }
+  }, [user, isLoading, navigate]);
+
+  if (!user || (user.role !== 'Leader' && user.role !== 'Member')) return null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-10 py-32 grid grid-cols-1 lg:grid-cols-12 gap-12">
