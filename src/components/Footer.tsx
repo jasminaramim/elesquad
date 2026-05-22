@@ -1,6 +1,7 @@
 import ThreeWave from './ThreeWave';
 import { Link } from 'react-router-dom';
-import { Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, ArrowRight, Send } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Telegram } from './BrandIcons';
 
 export default function Footer() {
   return (
@@ -8,35 +9,30 @@ export default function Footer() {
       {/* 3D Interactive Wave Background */}
       <ThreeWave opacity={0.15} />
 
-      <div className="max-w-7xl mx-auto px-5 md:px-10 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-10 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8">
           {/* Logo & Info */}
-          <div className="lg:col-span-4 space-y-6">
-            <Link to="/" className="flex items-center gap-4 group/logo">
-              <span className="text-3xl font-display font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-pink-500 drop-shadow-[0_0_15px_rgba(108,77,246,0.4)]">
+          <div className="md:col-span-3 space-y-6">
+            <Link to="/" className="inline-block">
+              <span className="text-2xl md:text-3xl font-display font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#6C4DF6] to-pink-500">
                 EleSquad
               </span>
             </Link>
-            <p className="text-base text-white/50 max-w-sm leading-relaxed font-light">
-              We build high-performance digital experiences that help brands grow in the modern world. 
-              Innovative design meets elite engineering.
+            <p className="text-sm text-white/50 leading-relaxed font-light">
+              We build high-performance digital experiences that help brands grow in the modern world. Innovative design meets elite engineering.
             </p>
           </div>
 
           {/* Quick Links */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="space-y-2">
-              <h4 className="text-xl font-bold text-white tracking-tight">Quick Links</h4>
-              <div className="w-12 h-[3px] bg-primary rounded-full"></div>
-            </div>
-            <ul className="space-y-3 pt-2">
+          <div className="md:col-span-3 space-y-6 lg:pl-10">
+            <h4 className="text-lg font-bold text-white flex flex-col items-start">
+              <span className="border-b-[3px] border-[#6C4DF6] pb-2">Quick Links</span>
+            </h4>
+            <ul className="space-y-4">
               {['Home', 'About', 'Projects', 'Team', 'Contact'].map((item) => (
                 <li key={item}>
-                  <Link 
-                    to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} 
-                    className="text-white/50 hover:text-primary transition-colors text-sm flex items-center gap-2.5 font-medium group"
-                  >
-                    <span className="text-primary font-bold group-hover:translate-x-1 transition-transform">»</span> {item}
+                  <Link to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="text-white/40 hover:text-white transition-colors text-sm flex items-center gap-3">
+                    <span className="text-[#6C4DF6] text-xs">{"\u00BB"}</span> {item}
                   </Link>
                 </li>
               ))}
@@ -44,42 +40,37 @@ export default function Footer() {
           </div>
 
           {/* Our Services */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="space-y-2">
-              <h4 className="text-xl font-bold text-white tracking-tight">Our Services</h4>
-              <div className="w-12 h-[3px] bg-primary rounded-full"></div>
-            </div>
-            <ul className="space-y-3 pt-2">
-              {['WordPress', 'Elementor', 'Gutenberg', 'WooCommerce', 'SEO Expert'].map((service) => (
-                <li key={service}>
-                  <a 
-                    href="#" 
-                    className="text-white/50 hover:text-primary transition-colors text-sm flex items-center gap-2.5 font-medium group"
-                  >
-                    <span className="text-primary font-bold group-hover:translate-x-1 transition-transform">»</span> {service}
-                  </a>
+          <div className="md:col-span-3 space-y-6">
+            <h4 className="text-lg font-bold text-white flex flex-col items-start">
+              <span className="border-b-[3px] border-[#6C4DF6] pb-2">Our Services</span>
+            </h4>
+            <ul className="space-y-4">
+              {['WordPress', 'Elementor', 'Gutenberg', 'WooCommerce', 'SEO Expert'].map((item) => (
+                <li key={item}>
+                  <Link to="#" className="text-white/40 hover:text-white transition-colors text-sm flex items-center gap-3">
+                    <span className="text-[#6C4DF6] text-xs">{"\u00BB"}</span> {item}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
           {/* Newsletter */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="space-y-2">
-              <h4 className="text-xl font-bold text-white tracking-tight">Newsletter</h4>
-              <div className="w-12 h-[3px] bg-primary rounded-full"></div>
-            </div>
-            <p className="text-sm text-white/50 leading-relaxed font-light pt-2">
+          <div className="md:col-span-3 space-y-6">
+            <h4 className="text-lg font-bold text-white flex flex-col items-start">
+              <span className="border-b-[3px] border-[#6C4DF6] pb-2">Newsletter</span>
+            </h4>
+            <p className="text-sm text-white/50 leading-relaxed font-light">
               Sign up to our weekly newsletter to get the latest updates.
             </p>
-            <div className="relative flex items-center bg-white/[0.03] border border-white/10 rounded-2xl p-1.5 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+            <div className="relative group/input mt-4">
               <input 
                 type="email" 
                 placeholder="Enter Email Address" 
-                className="w-full bg-transparent px-4 py-3 text-sm focus:outline-none text-white placeholder-white/40"
+                className="w-full bg-transparent border border-white/10 rounded-lg pl-4 pr-14 py-3.5 text-sm focus:outline-none focus:border-[#6C4DF6]/50 transition-colors text-white placeholder-white/20"
               />
-              <button className="bg-primary hover:opacity-90 rounded-xl p-3 text-white flex items-center justify-center transition-all shrink-0 shadow-[0_0_15px_rgba(108,77,246,0.4)]">
-                <Send size={16} />
+              <button className="absolute right-2 top-2 bottom-2 w-10 bg-[#6C4DF6] rounded-md flex items-center justify-center hover:opacity-90 transition-opacity">
+                <Send size={16} className="text-white -ml-0.5" />
               </button>
             </div>
           </div>

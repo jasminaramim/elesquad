@@ -18,6 +18,7 @@ const tabs = [
   { id: 'documents', label: 'Sheets', icon: FileText },
   { id: 'chat', label: 'Squad Chat', icon: MessageCircle },
   { id: 'profile', label: 'Profile', icon: User },
+  { id: 'about-us', label: 'About Us', icon: Eye },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -119,6 +120,7 @@ export default function AdminDashboard() {
                 {activeTab === 'reviews' && <ReviewForm />}
                 {activeTab === 'documents' && <DocumentForm />}
                 {activeTab === 'profile' && <AdminProfileTab />}
+                {activeTab === 'about-us' && <AboutUsTab />}
                 {activeTab === 'settings' && <SettingsTab />}
               </Card>
             </motion.div>
@@ -190,6 +192,215 @@ function SettingsTab() {
               <p className="text-[10px] text-white/20 mt-2 font-mono uppercase tracking-wider">
                 Note: Ensure this email is monitored regularly.
               </p>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-white/5">
+            <Button type="submit" disabled={loading} className="px-10 py-3 flex items-center gap-2">
+              {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+              Save Configuration
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
+  );
+}
+
+function AboutUsTab() {
+  const [aboutUsTitle, setAboutUsTitle] = useState('');
+  const [aboutUsDescription, setAboutUsDescription] = useState('');
+  const [aboutUsImage, setAboutUsImage] = useState('');
+  const [foundedYear, setFoundedYear] = useState('');
+  const [projectsCount, setProjectsCount] = useState('');
+  const [totalClients, setTotalClients] = useState('');
+  const [totalReviews, setTotalReviews] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get('/api/about');
+      setAboutUsTitle(res.data.aboutUsTitle || '');
+      setAboutUsDescription(res.data.aboutUsDescription || '');
+      setAboutUsImage(res.data.aboutUsImage || '');
+      setFoundedYear(res.data.foundedYear || '');
+      setProjectsCount(res.data.projectsCount || '');
+      setTotalClients(res.data.totalClients || '');
+      setTotalReviews(res.data.totalReviews || '');
+    } catch (err) {
+      toast.error('Failed to load About Us details');
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.post('/api/about', { 
+        aboutUsTitle, 
+        aboutUsDescription, 
+        aboutUsImage,
+        foundedYear,
+        projectsCount,
+        totalClients,
+        totalReviews
+      });
+      toast.success('About Us updated successfully');
+    } catch (err) {
+      toast.error('Failed to save settings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    toast.loading('Uploading image...', { id: 'about-img-upload' });
+
+    const readerForBase64 = new FileReader();
+    readerForBase64.onloadend = async () => {
+      const base64String = (readerForBase64.result as string).split(',')[1];
+      const formDataImgBB = new FormData();
+      formDataImgBB.append('image', base64String);
+      const IMGBB_KEY = 'd0a7e8a0e9b16541d7071e4625452bd0';
+      
+      try {
+        const res = await axios.post(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, formDataImgBB);
+        if (res.data.success) {
+          setAboutUsImage(res.data.data.url);
+          toast.success('Image hosted on Cloud!', { id: 'about-img-upload' });
+          setUploadingImage(false);
+          return;
+        }
+      } catch (err) {
+        console.warn('ImgBB failed, trying local fallback...', err);
+      }
+
+      const formDataLocal = new FormData();
+      formDataLocal.append('image', file);
+      try {
+        const resLocal = await axios.post('/api/upload', formDataLocal);
+        if (resLocal.data.imageUrl) {
+          setAboutUsImage(resLocal.data.imageUrl);
+          toast.success('Image hosted Locally!', { id: 'about-img-upload' });
+        }
+      } catch (localErr) {
+        toast.error('Image upload failed', { id: 'about-img-upload' });
+      } finally {
+        setUploadingImage(false);
+      }
+    };
+    readerForBase64.readAsDataURL(file);
+  };
+
+  return (
+    <div className="space-y-10">
+      <div>
+        <h3 className="text-3xl font-display font-bold text-white">About Us Content</h3>
+        <p className="text-white/40 text-xs uppercase tracking-widest font-mono mt-1">Manage homepage introduction</p>
+      </div>
+
+      <Card className="p-8 border-white/5 glass" tiltEnabled={false}>
+        <form onSubmit={handleSave} className="space-y-8">
+          <div className="space-y-6">
+            <div className="flex items-center gap-4 text-primary">
+              <Eye size={24} />
+              <h4 className="text-xl font-bold">Text Content</h4>
+            </div>
+
+            <div className="space-y-4 max-w-2xl">
+              <Input 
+                label="Section Title" 
+                value={aboutUsTitle} 
+                onChange={setAboutUsTitle} 
+                placeholder="Creative Solutions For Every Digital Challenge"
+              />
+              
+              <div className="space-y-2">
+                <label className="text-xs font-mono uppercase tracking-widest text-white/40 block pl-1">Description</label>
+                <textarea 
+                  className="w-full bg-black/40 border border-white/10 rounded-xl p-4 focus:border-primary/50 outline-none h-32 text-white placeholder-white/20 transition-all"
+                  value={aboutUsDescription}
+                  onChange={e => setAboutUsDescription(e.target.value)}
+                  placeholder="With innovative strategies and a results-driven approach..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 space-y-6">
+            <div className="flex items-center gap-4 text-primary">
+              <BarChart3 size={24} />
+              <h4 className="text-xl font-bold">Statistics</h4>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+              <Input 
+                label="Founded Year" 
+                value={foundedYear} 
+                onChange={setFoundedYear} 
+                placeholder="e.g. 2022"
+              />
+              <Input 
+                label="Projects Numbers" 
+                value={projectsCount} 
+                onChange={setProjectsCount} 
+                placeholder="e.g. 150+"
+              />
+              <Input 
+                label="Total Clients" 
+                value={totalClients} 
+                onChange={setTotalClients} 
+                placeholder="e.g. 100+"
+              />
+              <Input 
+                label="Total Reviews" 
+                value={totalReviews} 
+                onChange={setTotalReviews} 
+                placeholder="e.g. 12"
+              />
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 space-y-6">
+            <div className="flex items-center gap-4 text-primary">
+              <Users size={24} />
+              <h4 className="text-xl font-bold">Featured Image</h4>
+            </div>
+
+            <p className="text-white/60 text-sm max-w-2xl leading-relaxed">
+              Upload the dynamic image to be displayed alongside the text.
+            </p>
+            
+            <div className="flex items-center gap-6 p-6 bg-black/20 border border-white/5 rounded-2xl max-w-2xl">
+              <div className="w-32 h-32 bg-black/40 rounded-xl overflow-hidden flex items-center justify-center border border-border/50 relative">
+                 {aboutUsImage ? <img src={aboutUsImage} className="w-full h-full object-cover" /> : <Users size={32} className="text-foreground/10" />}
+                 {uploadingImage && <div className="absolute inset-0 bg-primary/40 flex items-center justify-center"><Loader2 size={24} className="animate-spin text-white" /></div>}
+              </div>
+              <div className="flex-grow">
+                 <input 
+                   type="file" 
+                   accept="image/*"
+                   className="hidden" 
+                   id="about-us-upload"
+                   onChange={handleImageUpload}
+                   disabled={uploadingImage}
+                 />
+                 <label htmlFor="about-us-upload" className={cn("cursor-pointer inline-flex items-center gap-2 px-6 py-2.5 bg-primary/20 text-primary rounded-xl text-xs font-bold transition-all uppercase tracking-widest border border-primary/20", uploadingImage ? "opacity-50 pointer-events-none" : "hover:bg-primary/30")}>
+                    <Plus size={14} /> Upload New Image
+                 </label>
+                 <p className="text-[10px] text-white/20 mt-3 font-mono uppercase tracking-wider">
+                   Recommended format: 4:5 vertical ratio
+                 </p>
+              </div>
             </div>
           </div>
 

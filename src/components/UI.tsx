@@ -87,7 +87,7 @@ export function SectionHeading({ title, subtitle, centered = false }: { title: s
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ delay: 0.1 }}
-        className="text-4xl md:text-6xl font-display font-bold leading-tight"
+        className="text-[25px] md:text-[35px] font-display font-bold leading-tight"
       >
         {title}
       </motion.h2>

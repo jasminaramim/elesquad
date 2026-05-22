@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Globe, Mail, MessageSquare, Star } from 'lucide-react';
+import CTASection from '../components/CTASection';
 import { Card, SectionHeading, Button } from '../components/UI';
 import axios from 'axios';
 import { Facebook, Instagram, Linkedin, Telegram as TelegramIcon } from '../components/BrandIcons';
@@ -200,25 +201,8 @@ export default function Team() {
         </div>
       )}
 
-      {/* CTA Section */}
-      <motion.div 
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="mt-40 py-[50px] lg:py-[100px] px-12 md:px-20 glass rounded-[3rem] text-center relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
-        <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">Want to work with us?</h2>
-        <p className="text-white/60 mb-10 max-w-xl mx-auto">
-          We’re always looking for talented individuals who share our passion 
-          for building the future of the digital world.
-        </p>
-        <div className="flex justify-center">
-          <Link to="/contact">
-            <Button className="px-10">Get In Touch</Button>
-          </Link>
-        </div>
-      </motion.div>
+      {/* Reusable CTA Section */}
+      <CTASection />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { ArrowRight, Code, Layout, Smartphone, Palette, Shield, Globe, Star, Users, CheckCircle, MessageSquare, ChevronDown, ChevronLeft, ChevronRight, Share2, Mail, Server, ShoppingBag, Phone, MapPin, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button, Card, SectionHeading } from '../components/UI';
+import CTASection from '../components/CTASection';
 import axios from 'axios';
 
 const brands = ['Logoisum', 'Logoisum', 'Logoisum', 'Logoisum', 'Logoisum'];
@@ -21,6 +22,10 @@ export default function Home() {
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [team, setTeam] = useState<any[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+  const [aboutUsImage, setAboutUsImage] = useState<string>('/team.jpg');
+  const [aboutUsTitle, setAboutUsTitle] = useState<string>('');
+  const [aboutUsDescription, setAboutUsDescription] = useState<string>('');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -34,6 +39,17 @@ export default function Home() {
     });
     axios.get('/api/reviews').then(res => setReviews(res.data.slice(0, 15)));
     axios.get('/api/team').then(res => setTeam(res.data));
+    axios.get('/api/services').then(res => {
+      setLoadingServices(false);
+    }).catch(() => setLoadingServices(false));
+
+    axios.get('/api/about').then(res => {
+      if (res.data?.aboutUsImage) {
+        setAboutUsImage(res.data.aboutUsImage);
+      }
+      if (res.data?.aboutUsTitle) setAboutUsTitle(res.data.aboutUsTitle);
+      if (res.data?.aboutUsDescription) setAboutUsDescription(res.data.aboutUsDescription);
+    }).catch(console.error);
 
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({
@@ -46,11 +62,11 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="pb-[50px] lg:pb-[100px]">
+    <div>
       {/* ... Hero, Brands, About, Services ... */}
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-32 pb-0 overflow-hidden">
+      <section className="relative min-h-[90vh] flex items-center  overflow-hidden">
         {/* Background Floating Tech Icons */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 z-0">
           {[
@@ -103,7 +119,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[35px] lg:text-[110px] font-bold leading-[0.85] tracking-tighter mb-12 font-display"
+            className="text-[50px] md:text-[70px] lg:text-[110px] font-bold leading-[1.0] tracking-tighter mb-12 font-display"
           >
             WordPress Beyond <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-400 to-pink-500 drop-shadow-2xl">The Limits.</span>
@@ -113,7 +129,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 1 }}
-            className="text-xl md:text-2xl text-foreground/50 max-w-3xl mb-16 leading-relaxed font-light"
+            className="text-[14px] md:text-[18px] text-foreground/50 max-w-3xl mb-16 leading-relaxed font-light"
           >
             Experts in WordPress Frontend & Backend, WooCommerce Functionality,
             Woodmart, Gutenberg, and Elementor Pro. We build the impossible.
@@ -139,8 +155,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Design-Accurate About Section */}
-      <section className="max-w-7xl mx-auto px-6 md:px-12 pt-[50px] pb-20 relative overflow-hidden z-10">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 pt-[70px] overflow-hidden z-10 relative">
         {/* Glow & Wireframe Sphere Background decoration */}
         <div className="absolute right-[-100px] top-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#6C4DF6]/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
         <div className="absolute right-[-80px] top-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none opacity-[0.08] z-0">
@@ -179,9 +194,9 @@ export default function Home() {
           >
             <div className="relative rounded-[2.5rem] overflow-hidden group shadow-2xl border border-white/5">
               <img
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop"
-                alt="Creative Solutions"
-                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-103"
+                src={aboutUsImage}
+                alt="Our Team"
+                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-105"
               />
             </div>
           </motion.div>
@@ -190,54 +205,15 @@ export default function Home() {
           <div className=" flex flex-col justify-center h-full">
             <div>
               <span className="text-[#6C4DF6] font-bold uppercase tracking-[0.3em] text-xs mb-3.5 block font-mono">About Us</span>
-              <h2 className="text-white text-[32px] md:text-[46px] font-bold leading-[1.15] mb-5 tracking-tight font-display">
-                Creative Solutions For Every Digital Challenge
+              <h2 className="text-[25px] md:text-[35px] font-bold leading-[1.1] mb-8 whitespace-pre-wrap">
+                {aboutUsTitle || "Creative Solutions For Every Digital Challenge"}
               </h2>
-              <p className="text-white/60 text-sm md:text-base leading-relaxed max-w-xl font-light">
-                With innovative strategies and a results-driven approach, we help you overcome obstacles and achieve long-term success.
+              <p className="text-[14px] md:text-[18px] text-white/40 leading-relaxed max-w-xl whitespace-pre-wrap">
+                {aboutUsDescription || "With innovative strategies and a results-driven approach, we help you overcome obstacles and achieve long-term success."}
               </p>
             </div>
 
-            <div className="space-y-6">
-              {[
-                {
-                  num: '01',
-                  title: 'Tailored Solutions',
-                  desc: 'Our team customizes strategies to meet the unique needs of your business, ensuring that every solution'
-                },
-                {
-                  num: '02',
-                  title: 'Innovative Strategies',
-                  desc: 'Adopting the latest digital trends and technologies, ensuring that your brand is always at the forefront of innovation.'
-                },
-                {
-                  num: '03',
-                  title: 'Collaborative Partnership',
-                  desc: 'By working closely with you, we build strong relationships based on trust, transparency, and open communication.'
-                }
-              ].map((feature, i) => (
-                <motion.div
-                  key={feature.num}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1, duration: 0.6 }}
-                  className="flex gap-6 group items-start"
-                >
-                  <span className="text-5xl md:text-6xl font-extrabold text-[#6C4DF6]/15 group-hover:text-[#6C4DF6]/30 transition-colors duration-500 font-display shrink-0 -mt-1 select-none">
-                    {feature.num}
-                  </span>
-                  <div>
-                    <h4 className="text-lg font-bold text-[#6C4DF6] mb-1.5 transition-colors group-hover:text-[#8b5cf6] duration-300">
-                      {feature.title}
-                    </h4>
-                    <p className="text-white/40 text-xs md:text-sm leading-relaxed max-w-md">
-                      {feature.desc}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+
 
             <Link to="/about" className="inline-block w-max pt-2">
               <button className="bg-[#6C4DF6] text-white hover:bg-[#5b3ed6] px-8 py-3.5 rounded-full flex items-center gap-3 font-bold transition-all shadow-[0_4px_20px_rgba(108,77,246,0.25)] hover:shadow-[0_4px_25px_rgba(108,77,246,0.45)] transform hover:-translate-y-0.5 text-xs uppercase tracking-wider font-mono">
@@ -250,7 +226,7 @@ export default function Home() {
 
 
       {/* Projects Showcase Redesign */}
-      <section className="relative py-[50px] lg:py-[100px] overflow-hidden bg-bg">
+      <section className="relative py-[100px] overflow-hidden bg-bg">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
           <div className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full" />
@@ -383,60 +359,113 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Review Marquee Section */}
-      <section className="py-[50px] lg:py-[100px] relative overflow-hidden bg-white/[0.01]">
-        <div className="max-w-7xl mx-auto px-5 md:px-10 mb-16">
-          <div className="text-center md:text-left">
-            <SectionHeading title="Client Testimonials" subtitle="15+ Success Stories" />
-          </div>
+      {/* Dynamic Review Carousel (Homepage Design) - FULL WIDTH */}
+      <section className="pt-[100px] pb-0 relative overflow-hidden bg-none">
+        <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20">
+          <SectionHeading title="What Our Clients Say" subtitle="Reviews" centered />
         </div>
 
-        {/* Full-width marquee track */}
-        <div className="w-full overflow-hidden relative py-4 select-none">
-          {/* Ambient Fade Gradients */}
-          <div className="absolute left-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-r from-[#020205] to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-l from-[#020205] to-transparent z-10 pointer-events-none" />
+        <div className="relative overflow-hidden group">
+          <motion.div
+            animate={{
+              x: reviews.length > 0 ? ["0%", `-${(reviews.length * 450) / 15}%`] : "0%"
+            }}
+            transition={{
+              duration: 40,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="flex gap-8 px-4 pb-20 no-scrollbar select-none"
+          >
+            {[...reviews, ...reviews].map((review, i) => (
+              <motion.div
+                key={`${review._id}-${i}`}
+                className="min-w-[350px] md:min-w-[450px]"
+              >
+                <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 transition-all">
+                  <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
 
-          <div className="flex gap-8 animate-marquee">
-            {reviews.length > 0 ? (
-              (reviews.length < 5 ? [...reviews, ...reviews, ...reviews, ...reviews] : [...reviews, ...reviews]).map((review, idx) => (
-                <div
-                  key={`${review._id}-${idx}`}
-                  className="w-[320px] md:w-[450px] shrink-0"
-                >
-                  <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 hover:bg-white/[0.05] transition-all duration-300">
-                    <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10" />
+                  <div className="flex text-primary gap-1">
+                    {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                  </div>
 
-                    <div className="flex text-primary gap-1">
-                      {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                  <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
+                  <p className="text-white/60 leading-relaxed italic text-lg line-clamp-4">"{review.feedback}"</p>
+
+                  <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
+                      {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
                     </div>
-
-                    <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
-                    <p className="text-white/60 leading-relaxed italic text-lg line-clamp-4">"{review.feedback}"</p>
-
-                    <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
-                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
-                        {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
-                      </div>
-                      <div>
-                        <h5 className="font-bold">{review.clientName}</h5>
-                        <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
-                      </div>
+                    <div>
+                      <h5 className="font-bold">{review.clientName}</h5>
+                      <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
                     </div>
-                  </Card>
-                </div>
-              ))
-            ) : (
-              <div className="w-full text-center py-20 text-white/20 italic">
-                Sharing success stories soon...
-              </div>
-            )}
-          </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Subtle gradient fades for the carousel */}
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+        </div>
+      </section>
+
+      {/* Dynamic Team Carousel */}
+      <section className="pt-0 pb-[100px] relative overflow-hidden bg-none">
+        <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20 flex flex-col items-center gap-2">
+          <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary">THE ELITE SQUAD</span>
+          <h2 className="text-4xl md:text-6xl font-bold font-display">Meet Our Experts</h2>
+        </div>
+
+        <div className="relative overflow-hidden group">
+          <motion.div
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{
+              duration: 80,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className="flex pb-10 w-max"
+          >
+            {Array(8).fill(team).flat().map((member, i) => (
+              <Link
+                key={`${member._id}-${i}`}
+                to={`/team/${member._id}`}
+                className="w-[304px] shrink-0 px-3 block cursor-pointer"
+              >
+                <Card className="p-0 h-[420px] flex flex-col bg-[#0A0A0A] border-white/5 relative overflow-hidden group/card hover:border-white/20 transition-all rounded-[1.5rem]">
+                  <div className="h-[340px] w-full overflow-hidden shrink-0">
+                    <img
+                      src={member.image && member.image !== "" ? member.image : `https://i.pravatar.cc/300?u=${member._id}`}
+                      alt={member.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
+                    />
+                  </div>
+                  <div className="flex-1 flex flex-col items-center justify-center p-4 bg-[#0A0A0A]">
+                    <h4 className="text-[15px] font-bold text-white mb-1.5">{member.name}</h4>
+                    <p className="text-[9px] uppercase font-black tracking-[0.25em] text-white/40">{member.role || 'Member'}</p>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </motion.div>
+
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+        </div>
+
+        <div className="flex justify-center mt-12">
+          <Link to="/team" className="inline-flex items-center gap-3 px-8 py-3.5 bg-transparent border border-white/10 hover:border-white/30 rounded-full text-sm font-semibold text-white transition-all hover:bg-white/5 group">
+            View All Squad Members
+            <ArrowRight size={16} className="text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all" />
+          </Link>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="max-w-5xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
+      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[100px] overflow-hidden">
         <div className="text-center mb-20">
           <SectionHeading title="Asked Questions" subtitle="FAQ" centered />
         </div>
@@ -465,89 +494,7 @@ export default function Home() {
           ))}
         </div>
       </section>      {/* New Design-Accurate CTA Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
-        <div className="flex flex-col lg:flex-row justify-between items-start mb-20 gap-10">
-          <motion.h2
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="text-[35px] md:text-[100px] font-black tracking-tighter leading-[0.85] max-w-5xl uppercase"
-          >
-            Bringing Your Vision <br />
-            <span className="text-white/10">To The Digital World</span>
-          </motion.h2>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="shrink-0"
-          >
-            <Link to="/contact">
-              <Button className="px-12 py-6 text-xl">
-                Let's Talk Now
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-
-        <div className="relative">
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-start">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="lg:col-span-8 rounded-[3rem] overflow-hidden relative group shadow-2xl"
-            >
-              <div className="aspect-[16/9] w-full overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop"
-                  className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105"
-                  alt="Digital Squad"
-                />
-              </div>
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500"></div>
-
-              {/* Tags Overlay */}
-              <div className="absolute bottom-12 left-12 flex flex-wrap gap-4 z-20">
-                {[
-                  { label: 'Design', active: true },
-                  { label: 'Development', active: false },
-                  { label: 'Digital Marketing', active: false },
-                  { label: 'Branding & Identity', active: false },
-                  { label: 'SEO', active: false },
-                  { label: 'E-commerce Solutions', active: false }
-                ].map((tag) => (
-                  <div key={tag.label} className={cn(
-                    "px-6 py-2.5 rounded-full border text-[11px] uppercase font-bold tracking-widest transition-all backdrop-blur-md flex items-center gap-2",
-                    tag.active
-                      ? "bg-[#6C4DF6]/20 border-[#6C4DF6] text-[#6C4DF6]"
-                      : "bg-black/40 border-white/10 text-white/60 hover:border-white/30"
-                  )}>
-                    <Globe size={14} className={tag.active ? "text-[#6C4DF6]" : "text-white/40"} />
-                    {tag.label}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="lg:col-span-4 lg:-ml-12 lg:mt-24 z-30"
-            >
-              <div className="bg-[#0A0A0A] p-10 md:p-14 rounded-[2.5rem] border border-white/5 shadow-2xl">
-                <p className="text-lg md:text-xl leading-relaxed text-white/50 font-light italic">
-                  "We bring your vision to life through innovative design, cutting-edge technology, and strategic digital marketing, ensuring your brand stands out in the digital world."
-                </p>
-                <div className="mt-10 h-1 w-20 bg-[#6C4DF6] rounded-full"></div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <CTASection />
     </div>
   );
 }

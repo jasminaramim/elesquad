@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import CTASection from '../components/CTASection';
 import { Link } from 'react-router-dom';
 import { Card, SectionHeading, Button } from '../components/UI';
 import { ArrowRight, MessageSquare, Star, Globe, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -157,89 +158,8 @@ export default function Projects() {
         </div>
       </section>
 
-      {/* New Design-Accurate CTA Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
-        <div className="flex flex-col lg:flex-row justify-between items-start mb-20 gap-10">
-          <motion.h2 
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="text-[35px] md:text-[100px] font-black tracking-tighter leading-[0.85] max-w-5xl uppercase"
-          >
-            Bringing Your Vision <br />
-            <span className="text-white/10">To The Digital World</span>
-          </motion.h2>
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="shrink-0"
-          >
-            <Link to="/contact">
-              <Button className="px-12 py-6 text-xl">
-                Let's Talk Now
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-
-        <div className="relative">
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-start">
-            <motion.div 
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="lg:col-span-8 rounded-[3rem] overflow-hidden relative group shadow-2xl"
-            >
-              <div className="aspect-[16/9] w-full overflow-hidden">
-                 <img 
-                   src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop" 
-                   className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105" 
-                   alt="Digital Squad"
-                 />
-              </div>
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-500"></div>
-              
-              <div className="absolute bottom-12 left-12 flex flex-wrap gap-4 z-20">
-                {[
-                  { label: 'Design', active: true },
-                  { label: 'Development', active: false },
-                  { label: 'Digital Marketing', active: false },
-                  { label: 'Branding & Identity', active: false },
-                  { label: 'SEO', active: false },
-                  { label: 'E-commerce Solutions', active: false }
-                ].map((tag) => (
-                  <div key={tag.label} className={cn(
-                    "px-6 py-2.5 rounded-full border text-[11px] uppercase font-bold tracking-widest transition-all backdrop-blur-md flex items-center gap-2",
-                    tag.active 
-                      ? "bg-[#6C4DF6]/20 border-[#6C4DF6] text-[#6C4DF6]" 
-                      : "bg-black/40 border-white/10 text-white/60 hover:border-white/30"
-                  )}>
-                    <Globe size={14} className={tag.active ? "text-[#6C4DF6]" : "text-white/40"} />
-                    {tag.label}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="lg:col-span-4 lg:-ml-12 lg:mt-24 z-30"
-            >
-              <div className="bg-[#0A0A0A] p-10 md:p-14 rounded-[2.5rem] border border-white/5 shadow-2xl">
-                 <p className="text-lg md:text-xl leading-relaxed text-white/50 font-light italic">
-                   "We bring your vision to life through innovative design, cutting-edge technology, and strategic digital marketing, ensuring your brand stands out in the digital world."
-                 </p>
-                 <div className="mt-10 h-1 w-20 bg-[#6C4DF6] rounded-full"></div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      {/* Reusable CTA Section */}
+      <CTASection />
     </div>
   );
 }

@@ -65,7 +65,7 @@ const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 const client = new MongoClient(MONGODB_URI);
 
 let db: any = null;
-let users: any, projects: any, reviews: any, documents: any, messages: any, contact: any, services: any, settings: any;
+let users: any, projects: any, reviews: any, documents: any, messages: any, contact: any, services: any, settings: any, about: any;
 
 async function connectToDatabase() {
   if (db) return;
@@ -83,6 +83,7 @@ async function connectToDatabase() {
     contact = db.collection('contact');
     services = db.collection('services');
     settings = db.collection('settings');
+    about = db.collection('about');
     
     console.log("Connected to MongoDB successfully");
     
@@ -764,6 +765,30 @@ app.use(async (req, res, next) => {
       res.json({ success: true });
     } catch (err) {
       res.status(500).json({ error: 'Failed to update settings' });
+    }
+  });
+
+  // About API
+  app.get('/api/about', async (req, res) => {
+    try {
+      const config = await about.findOne({ key: 'about_config' });
+      res.json(config || { aboutUsImage: '', aboutUsTitle: '', aboutUsDescription: '', foundedYear: '', projectsCount: '', totalClients: '', totalReviews: '' });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch about data' });
+    }
+  });
+
+  app.post('/api/about', async (req, res) => {
+    try {
+      const { aboutUsImage, aboutUsTitle, aboutUsDescription, foundedYear, projectsCount, totalClients, totalReviews } = req.body;
+      await about.updateOne(
+        { key: 'about_config' },
+        { $set: { aboutUsImage, aboutUsTitle, aboutUsDescription, foundedYear, projectsCount, totalClients, totalReviews, updatedAt: new Date() } },
+        { upsert: true }
+      );
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to update about data' });
     }
   });
 
