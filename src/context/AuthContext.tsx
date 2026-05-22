@@ -108,6 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (err.response?.status === 404 || err.response?.status === 401) {
           console.warn('FORCE LOGOUT: User record purged from database.');
           
+          // CRITICAL: Clear all traces of identity IMMEDIATELY
           localStorage.clear();
           sessionStorage.clear();
           setUser(null);

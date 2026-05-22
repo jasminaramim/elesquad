@@ -4,7 +4,6 @@ import { ArrowRight, Code, Layout, Smartphone, Palette, Shield, Globe, Star, Use
 import { Link } from 'react-router-dom';
 import { Button, Card, SectionHeading } from '../components/UI';
 import axios from 'axios';
-import { Facebook, Instagram, Linkedin, Telegram } from '../components/BrandIcons';
 
 const brands = ['Logoisum', 'Logoisum', 'Logoisum', 'Logoisum', 'Logoisum'];
 
@@ -22,8 +21,6 @@ export default function Home() {
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [team, setTeam] = useState<any[]>([]);
-  const [dbServices, setDbServices] = useState<any[]>([]);
-  const [loadingServices, setLoadingServices] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -37,10 +34,6 @@ export default function Home() {
     });
     axios.get('/api/reviews').then(res => setReviews(res.data.slice(0, 15)));
     axios.get('/api/team').then(res => setTeam(res.data));
-    axios.get('/api/services').then(res => {
-      setDbServices(res.data);
-      setLoadingServices(false);
-    }).catch(() => setLoadingServices(false));
 
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({
@@ -57,7 +50,7 @@ export default function Home() {
       {/* ... Hero, Brands, About, Services ... */}
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-32 pb-[50px] lg:pb-[100px] overflow-hidden">
+      <section className="relative min-h-[90vh] flex items-center pt-32 pb-0 overflow-hidden">
         {/* Background Floating Tech Icons */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 z-0">
           {[
@@ -130,7 +123,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-8 mb-20"
+            className="flex flex-col sm:flex-row gap-8 mb-0"
           >
             <Link to="/contact">
               <Button className="w-full sm:w-auto px-12 py-5 text-xl">
@@ -142,80 +135,70 @@ export default function Home() {
             </Link>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex gap-6"
-          >
-            {[Telegram, Facebook, Linkedin, Instagram].map((Icon, i) => (
-              <a key={i} href="#" className="w-14 h-14 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-primary/20 hover:border-primary transition-all text-white/30 hover:text-white group backdrop-blur-xl">
-                <Icon size={24} className="group-hover:scale-110 transition-transform" />
-              </a>
-            ))}
-          </motion.div>
+
         </div>
       </section>
 
-      {/* New Design-Accurate About Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px]  overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          {/* Left Column: Image with Play Button and Contact Info */}
+      {/* Design-Accurate About Section */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 pt-[50px] pb-20 relative overflow-hidden z-10">
+        {/* Glow & Wireframe Sphere Background decoration */}
+        <div className="absolute right-[-100px] top-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#6C4DF6]/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
+        <div className="absolute right-[-80px] top-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none opacity-[0.08] z-0">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-[#6C4DF6] animate-[spin_60s_linear_infinite]" fill="none" stroke="currentColor" strokeWidth="0.25">
+            <circle cx="50" cy="50" r="45" />
+            <circle cx="50" cy="50" r="40" />
+            <ellipse cx="50" cy="50" rx="45" ry="15" />
+            <ellipse cx="50" cy="50" rx="15" ry="45" />
+            <ellipse cx="50" cy="50" rx="45" ry="28" />
+            <ellipse cx="50" cy="50" rx="28" ry="45" />
+            <line x1="5" y1="50" x2="95" y2="50" />
+            <line x1="50" y1="5" x2="50" y2="95" />
+            <circle cx="50" cy="5" r="1.2" fill="currentColor" />
+            <circle cx="50" cy="95" r="1.2" fill="currentColor" />
+            <circle cx="5" cy="50" r="1.2" fill="currentColor" />
+            <circle cx="95" cy="50" r="1.2" fill="currentColor" />
+            <circle cx="14" cy="22" r="0.9" fill="currentColor" />
+            <circle cx="86" cy="22" r="0.9" fill="currentColor" />
+            <circle cx="14" cy="78" r="0.9" fill="currentColor" />
+            <circle cx="86" cy="78" r="0.9" fill="currentColor" />
+            <circle cx="28" cy="14" r="0.9" fill="currentColor" />
+            <circle cx="72" cy="14" r="0.9" fill="currentColor" />
+            <circle cx="28" cy="86" r="0.9" fill="currentColor" />
+            <circle cx="72" cy="86" r="0.9" fill="currentColor" />
+          </svg>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-10">
+          {/* Left Column: Image with premium rounded corners */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="relative"
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="w-full max-w-[520px] mx-auto lg:mx-0"
           >
-            <div className="relative rounded-[3rem] overflow-hidden group shadow-2xl">
+            <div className="relative rounded-[2.5rem] overflow-hidden group shadow-2xl border border-white/5">
               <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop"
                 alt="Creative Solutions"
-                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-105"
+                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-103"
               />
-
-              {/* Play Button Top Left */}
-              <div className="absolute top-8 left-8 z-20">
-                <div className="w-16 h-16 md:w-24 md:h-24 bg-black/40 backdrop-blur-xl rounded-full border border-white/20 flex items-center justify-center group/play">
-                  <div className="w-10 h-10 md:w-16 md:h-16 bg-[#6C4DF6] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(108, 77, 246,0.4)] transition-transform group-hover/play:scale-110">
-                    <div className="w-0 h-0 border-t-[6px] md:border-t-[8px] border-t-transparent border-l-[10px] md:border-l-[12px] border-l-black border-b-[6px] md:border-b-[8px] border-b-transparent ml-1"></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact Info Cutout Bottom Right */}
-              <div className="absolute bottom-0 right-0 bg-[#0A0A0A] p-6 md:p-10 rounded-tl-[3rem] border-l border-t border-white/5 z-20 hidden sm:block">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4 text-white/60">
-                    <Phone size={14} className="text-[#6C4DF6]" />
-                    <span className="text-xs md:text-sm font-medium">0761-8523-398</span>
-                  </div>
-                  <div className="flex items-center gap-4 text-white/60">
-                    <Globe size={14} className="text-[#6C4DF6]" />
-                    <span className="text-xs md:text-sm font-medium">www.hellodomainsite.com</span>
-                  </div>
-                  <div className="flex items-center gap-4 text-white/60">
-                    <MapPin size={14} className="text-[#6C4DF6]" />
-                    <span className="text-xs md:text-sm font-medium">KLLG St, No.99, Pku City, ID 28289</span>
-                  </div>
-                </div>
-              </div>
             </div>
           </motion.div>
 
-          {/* Right Column: Content and Feature List */}
-          <div className="space-y-10">
+          {/* Right Column: Narrative and Features */}
+          <div className=" flex flex-col justify-center h-full">
             <div>
-              <span className="text-[#6C4DF6] font-bold uppercase tracking-[0.2em] text-sm mb-4 block">About Us</span>
-              <h2 className="text-[35px] md:text-7xl font-bold leading-[1.1] mb-8">
+              <span className="text-[#6C4DF6] font-bold uppercase tracking-[0.3em] text-xs mb-3.5 block font-mono">About Us</span>
+              <h2 className="text-white text-[32px] md:text-[46px] font-bold leading-[1.15] mb-5 tracking-tight font-display">
                 Creative Solutions For Every Digital Challenge
               </h2>
-              <p className="text-lg text-white/40 leading-relaxed max-w-xl">
+              <p className="text-white/60 text-sm md:text-base leading-relaxed max-w-xl font-light">
                 With innovative strategies and a results-driven approach, we help you overcome obstacles and achieve long-term success.
               </p>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6">
               {[
                 {
                   num: '01',
@@ -238,15 +221,17 @@ export default function Home() {
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ delay: i * 0.1, duration: 0.6 }}
                   className="flex gap-6 group items-start"
                 >
-                  <span className="text-5xl md:text-6xl font-black text-white/5 group-hover:text-[#6C4DF6]/10 transition-colors duration-500 font-display shrink-0 -mt-2">
+                  <span className="text-5xl md:text-6xl font-extrabold text-[#6C4DF6]/15 group-hover:text-[#6C4DF6]/30 transition-colors duration-500 font-display shrink-0 -mt-1 select-none">
                     {feature.num}
                   </span>
                   <div>
-                    <h4 className="text-xl font-bold text-[#6C4DF6] mb-2">{feature.title}</h4>
-                    <p className="text-white/40 text-sm leading-relaxed max-w-md">
+                    <h4 className="text-lg font-bold text-[#6C4DF6] mb-1.5 transition-colors group-hover:text-[#8b5cf6] duration-300">
+                      {feature.title}
+                    </h4>
+                    <p className="text-white/40 text-xs md:text-sm leading-relaxed max-w-md">
                       {feature.desc}
                     </p>
                   </div>
@@ -254,185 +239,15 @@ export default function Home() {
               ))}
             </div>
 
-            <Link to="/about">
-              <Button>
-                Read More
-              </Button>
+            <Link to="/about" className="inline-block w-max pt-2">
+              <button className="bg-[#6C4DF6] text-white hover:bg-[#5b3ed6] px-8 py-3.5 rounded-full flex items-center gap-3 font-bold transition-all shadow-[0_4px_20px_rgba(108,77,246,0.25)] hover:shadow-[0_4px_25px_rgba(108,77,246,0.45)] transform hover:-translate-y-0.5 text-xs uppercase tracking-wider font-mono">
+                Read More <ArrowRight size={14} className="stroke-[2.5]" />
+              </button>
             </Link>
           </div>
         </div>
       </section>
 
-
-
-
-
-
-      {/* Services Section Redesign */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px]">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* Header Block */}
-          <div className="lg:col-span-1 py-10 space-y-8">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary rounded-full"></div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Our Services</span>
-            </div>
-            <h2 className="text-[35px] md:text-6xl font-bold font-display leading-tight">
-              Building Brands, <br />
-              Boosting Visibility, <br />
-              and Driving Growth.
-            </h2>
-            <p className="text-foreground/40 text-sm leading-relaxed max-w-xs">
-              We provide comprehensive digital solutions that transform businesses.
-              Our expert squad ensures your brand stands out in the digital landscape.
-            </p>
-          </div>
-
-          {/* Services Grid Items */}
-          {loadingServices ? (
-            <div className="lg:col-span-2 flex items-center justify-center py-20 text-white/20 uppercase tracking-widest font-mono">Synchronizing Elite Services...</div>
-          ) : (
-            dbServices.map((service, i) => (
-              <motion.div
-                key={service._id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex flex-col gap-6 group"
-              >
-                <div className="space-y-4">
-                  <div className="flex justify-between items-start gap-4">
-                    <span className="text-xl font-bold tracking-tight text-white group-hover:text-primary transition-colors block">{service.title}</span>
-                    <Link to={`/services/${service._id}`} className="shrink-0 w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
-                      <ArrowRight size={16} />
-                    </Link>
-                  </div>
-                  <p className="text-xs text-foreground/40 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all duration-500">{service.description}</p>
-                  <Link to={`/services/${service._id}`} className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                    Show more details <ChevronRight size={12} />
-                  </Link>
-                </div>
-                <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
-                </div>
-              </motion.div>
-            ))
-          )}
-        </div>
-      </section>
-
-
-      {/* New Design-Accurate Process Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[50px] lg:py-[100px] overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          {/* Left Column: Image with Experience Cutout */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative order-2 lg:order-1"
-          >
-            <div className="relative rounded-[3rem] overflow-hidden group shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop"
-                alt="Our Process"
-                className="w-full aspect-[4/5] object-cover transition-transform duration-1000 group-hover:scale-105"
-              />
-
-              {/* Experience Cutout Bottom Left */}
-              <div className="absolute bottom-0 left-0 bg-[#0A0A0A] p-8 md:p-12 rounded-tr-[3rem] border-r border-t border-white/5 z-20 shadow-[10px_-10px_30px_rgba(0,0,0,0.5)]">
-                <div className="flex items-center gap-5">
-                  <span className="text-6xl md:text-8xl font-black text-[#6C4DF6] tracking-tighter drop-shadow-[0_0_20px_rgba(108, 77, 246,0.3)]">25+</span>
-                  <div className="flex flex-col">
-                    <span className="text-xs md:text-sm font-black text-white uppercase tracking-widest leading-tight">Years Of</span>
-                    <span className="text-xs md:text-sm font-black text-white/40 uppercase tracking-widest leading-tight mt-1">Experience</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Right Column: Process Steps */}
-          <div className="space-y-16 order-1 lg:order-2">
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-[1px] bg-[#6C4DF6]"></div>
-                <span className="text-[#6C4DF6] font-black uppercase tracking-[0.3em] text-[10px]">Process Step</span>
-              </div>
-              <h2 className="text-[35px] md:text-7xl font-bold leading-[1.05] mb-8 tracking-tighter">
-                Refining Concepts <br />
-                <span className="text-primary">For Better Outcomes</span>
-              </h2>
-              <p className="text-xl text-white/40 leading-relaxed max-w-xl font-light italic">
-                "We test every element for quality, user experience, and performance to ensure it aligns perfectly with your elite business goals."
-              </p>
-            </div>
-
-            <div className="relative space-y-12 pl-12">
-              {/* Vertical Line Connector */}
-              <div className="absolute left-[23px] top-6 bottom-6 w-[2px] bg-gradient-to-b from-[#6C4DF6] via-primary to-white/5"></div>
-
-              {[
-                {
-                  title: 'Consultation',
-                  desc: 'We start with a high-level consultation to understand your business ecosystem and target audience, ensuring a tailored digital solution.',
-                  color: '#6C4DF6',
-                  icon: MessageSquare
-                },
-                {
-                  title: 'Planning & Development',
-                  desc: 'Based on your elite needs, we architect a strategic roadmap covering design, full-stack development, and aggressive marketing.',
-                  color: '#6C4DF6',
-                  icon: Layout
-                },
-                {
-                  title: 'Implementation',
-                  desc: 'We execute the blueprint, deploy high-performance assets, and continuously monitor performance for peak optimization.',
-                  color: '#ffffff',
-                  icon: Rocket
-                }
-              ].map((step, i) => (
-                <motion.div
-                  key={step.title}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15 }}
-                  className="relative group"
-                >
-                  {/* Icon Circle */}
-                  <div
-                    className="absolute -left-[64px] top-0 w-12 h-12 rounded-full border border-white/10 flex items-center justify-center transition-all duration-700 bg-[#0A0A0A] z-10 group-hover:scale-110"
-                    style={{ borderColor: step.color + '33' }}
-                  >
-                    <step.icon size={18} style={{ color: step.color }} className={i === 0 ? "drop-shadow-[0_0_8px_rgba(108, 77, 246,0.5)]" : ""} />
-
-                    {/* Pulsing Aura for the active/first step */}
-                    {i === 0 && (
-                      <div className="absolute inset-0 rounded-full bg-[#6C4DF6]/20 animate-ping -z-10"></div>
-                    )}
-                  </div>
-
-                  <div>
-                    <h4 className="text-2xl font-bold mb-3 transition-all duration-500 group-hover:translate-x-2" style={{ color: 'white' }}>
-                      {step.title}
-                    </h4>
-                    <p className="text-white/40 text-sm leading-relaxed max-w-md group-hover:text-white/60 transition-colors">
-                      {step.desc}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Projects Showcase Redesign */}
       <section className="relative py-[50px] lg:py-[100px] overflow-hidden bg-bg">
@@ -568,89 +383,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Review Slider Section */}
+      {/* Review Marquee Section */}
       <section className="py-[50px] lg:py-[100px] relative overflow-hidden bg-white/[0.01]">
-        <div className="max-w-7xl mx-auto px-5 md:px-10 mb-20 flex flex-col md:flex-row justify-between items-center gap-8">
+        <div className="max-w-7xl mx-auto px-5 md:px-10 mb-16">
           <div className="text-center md:text-left">
             <SectionHeading title="Client Testimonials" subtitle="15+ Success Stories" />
           </div>
-          <div className="flex gap-4">
-            <button 
-              onClick={() => {
-                const container = document.getElementById('review-slider');
-                if (container) container.scrollBy({ left: -450, behavior: 'smooth' });
-              }}
-              className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center hover:bg-primary hover:border-primary transition-all group"
-            >
-              <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
-            </button>
-            <button 
-              onClick={() => {
-                const container = document.getElementById('review-slider');
-                if (container) container.scrollBy({ left: 450, behavior: 'smooth' });
-              }}
-              className="w-14 h-14 rounded-full border border-white/10 flex items-center justify-center hover:bg-primary hover:border-primary transition-all group"
-            >
-              <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
-            </button>
+        </div>
+
+        {/* Full-width marquee track */}
+        <div className="w-full overflow-hidden relative py-4 select-none">
+          {/* Ambient Fade Gradients */}
+          <div className="absolute left-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-r from-[#020205] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-l from-[#020205] to-transparent z-10 pointer-events-none" />
+
+          <div className="flex gap-8 animate-marquee">
+            {reviews.length > 0 ? (
+              (reviews.length < 5 ? [...reviews, ...reviews, ...reviews, ...reviews] : [...reviews, ...reviews]).map((review, idx) => (
+                <div
+                  key={`${review._id}-${idx}`}
+                  className="w-[320px] md:w-[450px] shrink-0"
+                >
+                  <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 hover:bg-white/[0.05] transition-all duration-300">
+                    <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10" />
+
+                    <div className="flex text-primary gap-1">
+                      {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                    </div>
+
+                    <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
+                    <p className="text-white/60 leading-relaxed italic text-lg line-clamp-4">"{review.feedback}"</p>
+
+                    <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
+                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
+                        {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
+                      </div>
+                      <div>
+                        <h5 className="font-bold">{review.clientName}</h5>
+                        <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              ))
+            ) : (
+              <div className="w-full text-center py-20 text-white/20 italic">
+                Sharing success stories soon...
+              </div>
+            )}
           </div>
-        </div>
-
-        <div 
-          id="review-slider"
-          className="flex gap-8 px-5 md:px-[100px] overflow-x-auto snap-x snap-mandatory no-scrollbar pb-10 select-none scroll-smooth"
-        >
-          {reviews.length > 0 ? reviews.map((review, i) => (
-            <motion.div
-              key={review._id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="min-w-[320px] md:min-w-[450px] snap-center"
-            >
-              <Card className="p-10 h-full flex flex-col gap-6 bg-white/[0.03] border-white/5 relative hover:border-primary/30 transition-all">
-                <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
-
-                <div className="flex text-primary gap-1">
-                  {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
-                </div>
-
-                <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>
-                <p className="text-white/60 leading-relaxed italic text-lg line-clamp-4">"{review.feedback}"</p>
-
-                <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary overflow-hidden">
-                    {review.image ? <img src={review.image} className="w-full h-full object-cover" /> : (review.clientName || 'C')[0]}
-                  </div>
-                  <div>
-                    <h5 className="font-bold">{review.clientName}</h5>
-                    <p className="text-[10px] uppercase text-white/20 tracking-widest">Verified Client</p>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          )) : (
-            <div className="w-full text-center py-20 text-white/20 italic">
-              Sharing success stories soon...
-            </div>
-          )}
-        </div>
-
-        {/* Pagination Dots */}
-        <div className="flex justify-center gap-2 mt-4 pb-20">
-          {reviews.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                const container = document.getElementById('review-slider');
-                if (container) {
-                  const cardWidth = container.querySelector('.snap-center')?.clientWidth || 450;
-                  container.scrollTo({ left: i * (cardWidth + 32), behavior: 'smooth' });
-                }
-              }}
-              className="w-2 h-2 rounded-full bg-white/10 hover:bg-primary transition-all hover:w-6"
-            />
-          ))}
         </div>
       </section>
 

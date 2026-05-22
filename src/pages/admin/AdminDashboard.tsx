@@ -13,7 +13,6 @@ const tabs = [
   { id: 'all-projects', label: 'Member Projects', icon: Briefcase },
   { id: 'my-projects', label: 'My Projects', icon: LayoutDashboard },
   { id: 'finance', label: 'Finance', icon: BarChart3 },
-  { id: 'services', label: 'Services', icon: Rocket },
   { id: 'members', label: 'Members', icon: Users },
   { id: 'reviews', label: 'Reviews', icon: Star },
   { id: 'documents', label: 'Sheets', icon: FileText },
@@ -115,7 +114,6 @@ export default function AdminDashboard() {
                 {activeTab === 'all-projects' && <ProjectForm projects={projects} fetchProjects={fetchProjects} showUserSelect={true} />}
                 {activeTab === 'my-projects' && <ProjectForm projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} fetchProjects={fetchProjects} />}
                 {activeTab === 'finance' && <FinanceTab projects={projects.filter(p => p.userId === (user?.id || (user as any)?._id))} />}
-                {activeTab === 'services' && <ServiceForm />}
                 {activeTab === 'members' && <TeamForm />}
                 {activeTab === 'chat' && <ChatHub />}
                 {activeTab === 'reviews' && <ReviewForm />}
@@ -608,7 +606,7 @@ function ServiceForm() {
                          className="hidden" 
                          id="service-images-upload"
                          onChange={async (e) => {
-                           const files = Array.from(e.target.files || []);
+                           const files = Array.from(e.target.files || []) as File[];
                            if (!files.length) return;
                            toast.loading('Uploading matrix nodes...', { id: 'multi-upload' });
                            let newUrls: string[] = [];
