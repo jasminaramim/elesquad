@@ -203,8 +203,8 @@ export default function Home() {
 
           {/* Right Column: Narrative and Features */}
           <div className=" flex flex-col justify-center h-full">
-            <div>
-              <span className="text-[#6C4DF6] font-bold uppercase tracking-[0.3em] text-xs mb-3.5 block font-mono">About Us</span>
+            <div className="pb-8">
+              <span className="text-[#6C4DF6] font-bold uppercase tracking-[0.2em] text-sm mb-4 block">About Us</span>
               <h2 className="text-[25px] md:text-[35px] font-bold leading-[1.1] mb-8 whitespace-pre-wrap">
                 {aboutUsTitle || "Creative Solutions For Every Digital Challenge"}
               </h2>
@@ -464,36 +464,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="max-w-7xl mx-auto px-5 md:px-10 py-[100px] overflow-hidden">
-        <div className="text-center mb-20">
-          <SectionHeading title="Asked Questions" subtitle="FAQ" centered />
-        </div>
-        <div className="space-y-4">
-          {faqs.map((faq, i) => (
-            <div key={i} className="border border-white/5 rounded-2xl overflow-hidden bg-white/5">
-              <button
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="w-full p-8 flex justify-between items-center text-left hover:bg-white/5 transition-colors"
-              >
-                <span className="text-lg font-bold">{faq.q}</span>
-                <div className={cn("transition-transform duration-300", openFaq === i ? "rotate-180" : "")}>
-                  <ChevronDown className={openFaq === i ? "text-primary" : "text-white/20"} />
-                </div>
-              </button>
-              <motion.div
-                initial={false}
-                animate={{ height: openFaq === i ? 'auto' : 0, opacity: openFaq === i ? 1 : 0 }}
-                className="overflow-hidden"
-              >
-                <div className="p-8 pt-0 text-white/40 font-light leading-relaxed">
-                  {faq.a}
-                </div>
-              </motion.div>
-            </div>
-          ))}
-        </div>
-      </section>      {/* New Design-Accurate CTA Section */}
+      {/* New Design-Accurate CTA Section */}
       <CTASection />
     </div>
   );
