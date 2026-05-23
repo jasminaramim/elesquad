@@ -66,7 +66,7 @@ export default function Home() {
       {/* ... Hero, Brands, About, Services ... */}
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center  overflow-hidden">
+      <section className="relative min-h-[80vh] pt-24 flex items-center  overflow-hidden">
         {/* Background Floating Tech Icons */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 z-0">
           {[
@@ -155,42 +155,17 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-5 md:px-10 pt-[70px] overflow-hidden z-10 relative">
+      <section className="max-w-7xl pb-[100px] mx-auto px-5 md:px-10 pt-[70px] overflow-hidden z-10 relative">
         {/* Glow & Wireframe Sphere Background decoration */}
-        <div className="absolute right-[-100px] top-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#6C4DF6]/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
-        <div className="absolute right-[-80px] top-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none opacity-[0.08] z-0">
-          <svg viewBox="0 0 100 100" className="w-full h-full text-[#6C4DF6] animate-[spin_60s_linear_infinite]" fill="none" stroke="currentColor" strokeWidth="0.25">
-            <circle cx="50" cy="50" r="45" />
-            <circle cx="50" cy="50" r="40" />
-            <ellipse cx="50" cy="50" rx="45" ry="15" />
-            <ellipse cx="50" cy="50" rx="15" ry="45" />
-            <ellipse cx="50" cy="50" rx="45" ry="28" />
-            <ellipse cx="50" cy="50" rx="28" ry="45" />
-            <line x1="5" y1="50" x2="95" y2="50" />
-            <line x1="50" y1="5" x2="50" y2="95" />
-            <circle cx="50" cy="5" r="1.2" fill="currentColor" />
-            <circle cx="50" cy="95" r="1.2" fill="currentColor" />
-            <circle cx="5" cy="50" r="1.2" fill="currentColor" />
-            <circle cx="95" cy="50" r="1.2" fill="currentColor" />
-            <circle cx="14" cy="22" r="0.9" fill="currentColor" />
-            <circle cx="86" cy="22" r="0.9" fill="currentColor" />
-            <circle cx="14" cy="78" r="0.9" fill="currentColor" />
-            <circle cx="86" cy="78" r="0.9" fill="currentColor" />
-            <circle cx="28" cy="14" r="0.9" fill="currentColor" />
-            <circle cx="72" cy="14" r="0.9" fill="currentColor" />
-            <circle cx="28" cy="86" r="0.9" fill="currentColor" />
-            <circle cx="72" cy="86" r="0.9" fill="currentColor" />
-          </svg>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-10 items-center relative z-10">
           {/* Left Column: Image with premium rounded corners */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-full max-w-[520px] mx-auto lg:mx-0"
+            className="w-full max-w-[620px] mx-auto lg:mx-0"
           >
             <div className="relative rounded-[2.5rem] overflow-hidden group shadow-2xl border border-white/5">
               <img
