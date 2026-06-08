@@ -382,7 +382,7 @@ export default function Dashboard() {
       </div>
 
       {/* Content Area */}
-      <div className="lg:col-span-9">
+      <div className="lg:col-span-9 min-w-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -921,7 +921,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <label className="label-style">Rating (1-5)</label>
-                      <input type="number" min="1" max="5" className="input-style" value={newReview.rating} onChange={e => setNewReview({...newReview, rating: parseInt(e.target.value)})} />
+                      <input type="number" min="1" max="5" step="0.1" className="input-style" value={newReview.rating} onChange={e => setNewReview({...newReview, rating: parseFloat(e.target.value) || 0})} />
                     </div>
                     <div>
                       <label className="label-style">Client Name</label>
@@ -999,18 +999,29 @@ export default function Dashboard() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                    {documents.map((doc: any) => (
-                     <Link key={doc.id} to={`/editor/${doc.id}`}>
-                        <Card className="group hover:border-primary/50 transition-all p-8 flex flex-col items-center text-center">
+                     <Card key={doc._id || doc.id} className="group relative hover:border-primary/50 transition-all p-8 flex flex-col items-center text-center">
+                        <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                           <Link to={`/editor/${doc._id || doc.id}`} className="p-2 bg-primary/20 hover:bg-primary text-primary hover:text-white rounded-lg transition-colors">
+                             <Edit2 size={14} />
+                           </Link>
+                           <button 
+                             onClick={(e) => { 
+                               e.preventDefault(); 
+                               deleteItem('documents', doc._id || doc.id); 
+                             }} 
+                             className="p-2 bg-red-500/20 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-colors"
+                           >
+                             <Trash2 size={14} />
+                           </button>
+                        </div>
+                        <Link to={`/editor/${doc._id || doc.id}`} className="flex flex-col items-center w-full mt-4">
                            <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-6 border border-white/10 group-hover:bg-primary transition-colors">
                               <FileText className="text-primary group-hover:text-white" size={32} />
                            </div>
                            <h4 className="font-bold mb-2 group-hover:text-primary transition-colors">{doc.title}</h4>
                            <p className="text-[10px] uppercase text-white/40 font-mono">Updated: {new Date(doc.updatedAt).toLocaleDateString()}</p>
-                           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <ChevronRight className="text-primary" />
-                           </div>
-                        </Card>
-                     </Link>
+                        </Link>
+                     </Card>
                    ))}
                 </div>
               )}

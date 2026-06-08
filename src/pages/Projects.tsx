@@ -10,6 +10,11 @@ export default function Projects() {
   const [projects, setProjects] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
+
+  const totalPages = Math.ceil(projects.length / ITEMS_PER_PAGE);
+  const paginatedProjects = projects.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,7 +54,7 @@ export default function Projects() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project, i) => (
+            {paginatedProjects.map((project, i) => (
               <motion.div
                 key={project._id}
                 initial={{ opacity: 0, y: 30 }}
@@ -104,6 +109,46 @@ export default function Projects() {
             ))}
           </div>
         )}
+
+        {/* Pagination Controls */}
+        {!loading && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-16">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-12 h-12 rounded-full flex items-center justify-center border border-white/10 text-white/60 hover:text-white hover:border-primary/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            
+            <div className="flex gap-2">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setCurrentPage(i + 1);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
+                    currentPage === i + 1 
+                      ? 'bg-primary text-white shadow-[0_0_20px_rgba(108,77,246,0.3)]' 
+                      : 'bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-primary/50 hover:bg-white/10'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-12 h-12 rounded-full flex items-center justify-center border border-white/10 text-white/60 hover:text-white hover:border-primary/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Review Marquee Section */}
@@ -131,7 +176,7 @@ export default function Projects() {
                     <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10" />
 
                     <div className="flex text-primary gap-1">
-                      {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                      {[...Array(Math.floor(review.rating || 5))].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
                     </div>
 
                     <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>

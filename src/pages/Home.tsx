@@ -361,7 +361,7 @@ export default function Home() {
                   <MessageSquare size={40} className="absolute top-6 right-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
 
                   <div className="flex text-primary gap-1">
-                    {[...Array(review.rating || 5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                    {[...Array(Math.floor(review.rating || 5))].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
                   </div>
 
                   <h4 className="text-xl font-bold">{review.title || 'Exceptional Results'}</h4>

@@ -9,6 +9,7 @@ export default function ProjectDetails() {
   const { id } = useParams();
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showFullDesc, setShowFullDesc] = useState(false);
 
   useEffect(() => {
     axios.get(`/api/projects/${id}`)
@@ -37,11 +38,16 @@ export default function ProjectDetails() {
         </Card>
       </motion.div>
 
-      <Link to="/projects">
-        <Button variant="outline" className="mb-12 group">
-          <ArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" size={18} /> Return to projects
-        </Button>
-      </Link>
+      <div className="flex items-center justify-between mb-12">
+
+        {project.liveLink && (
+          <a href={project.liveLink} target="_blank" rel="noreferrer">
+            <Button className="py-2 px-6 text-sm flex items-center gap-2">
+              View Live <ExternalLink size={14} />
+            </Button>
+          </a>
+        )}
+      </div>
 
       <div className="w-full mb-32">
         <motion.div
@@ -80,9 +86,21 @@ export default function ProjectDetails() {
             </div>
           </div>
 
-          <p className="text-[18px] text-white/70 mb-16 leading-relaxed font-light italic">
-            "{project.description}"
-          </p>
+          <div className="mb-16">
+            <p className="text-[18px] text-white/70 leading-relaxed font-light italic">
+              "{showFullDesc || project.description?.length <= 400
+                ? project.description
+                : project.description?.substring(0, 400) + '...'}"
+            </p>
+            {project.description?.length > 400 && (
+              <button
+                onClick={() => setShowFullDesc(!showFullDesc)}
+                className="mt-4 text-primary text-sm font-bold hover:text-primary/80 transition-colors flex items-center gap-1 group"
+              >
+                {showFullDesc ? 'View Less ↑' : 'View More ↓'}
+              </button>
+            )}
+          </div>
 
           <div className="space-y-10 mb-16">
             <div>
@@ -98,14 +116,11 @@ export default function ProjectDetails() {
           </div>
 
           <div className="flex flex-wrap gap-6 pt-6">
-            {project.liveLink && (
-              <a href={project.liveLink} target="_blank" rel="noreferrer" className="w-full md:w-auto">
-                <Button className="w-full md:px-16 py-7 text-xl shadow-2xl shadow-primary/20">
-                  View Live Experience
-                </Button>
-              </a>
-            )}
-
+            <Link to="/projects">
+              <Button variant="outline" className="group flex items-center gap-2">
+                <ArrowLeft className="group-hover:-translate-x-1 transition-transform" size={18} /> Back to Projects
+              </Button>
+            </Link>
           </div>
         </motion.div>
       </div>

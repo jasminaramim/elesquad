@@ -178,9 +178,9 @@ export default function ChatHub() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-[600px] gap-6">
+    <div className="flex flex-col md:flex-row h-[600px] gap-6 min-w-0">
       {/* Users List */}
-      <div className="w-full md:w-72 flex flex-col gap-4 overflow-y-auto pr-2 no-scrollbar">
+      <div className="w-full md:w-72 flex-shrink-0 flex flex-col gap-4 overflow-y-auto pr-2 no-scrollbar">
         <h3 className="text-xs font-mono uppercase text-white/40 tracking-widest px-2 mb-2">Team Members</h3>
         {users.map(u => (
           <button
@@ -191,8 +191,8 @@ export default function ChatHub() {
             }`}
           >
             <div className="relative">
-              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center font-bold">
-                {u.name[0]}
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center font-bold overflow-hidden border border-white/10">
+                {u.image ? <img src={u.image} alt={u.name} className="w-full h-full object-cover" /> : u.name[0]}
               </div>
               {u.unreadCount > 0 && (
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full border-2 border-[#0a0a0a] animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
@@ -214,13 +214,13 @@ export default function ChatHub() {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-grow flex flex-col bg-surface border border-border rounded-[2rem] overflow-hidden">
+      <div className="flex-grow min-w-0 flex flex-col bg-surface border border-border rounded-[2rem] overflow-hidden">
         {selectedUser ? (
           <>
             <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/5">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-primary/20 text-primary rounded-xl flex items-center justify-center font-bold">
-                  {selectedUser.name[0]}
+                <div className="w-10 h-10 bg-primary/20 text-primary rounded-xl flex items-center justify-center font-bold overflow-hidden border border-primary/20">
+                  {selectedUser.image ? <img src={selectedUser.image} alt={selectedUser.name} className="w-full h-full object-cover" /> : selectedUser.name[0]}
                 </div>
                 <div>
                   <h4 className="font-bold">{selectedUser.name}</h4>
@@ -241,7 +241,7 @@ export default function ChatHub() {
               ) : (
                 messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.senderId === user?.id ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${
+                    <div className={`max-w-[80%] p-4 rounded-2xl text-sm break-words whitespace-pre-wrap ${
                       msg.senderId === user?.id ? 'bg-primary text-white rounded-tr-none' : 'bg-white/10 text-white rounded-tl-none'
                     }`}>
                       <p>{msg.text}</p>

@@ -65,7 +65,7 @@ export default function CTASection() {
             </Link>
             <Link to="/projects">
               <button className="px-8 py-4 bg-transparent hover:bg-white/5 border border-white/10 hover:border-white/20 text-white rounded-full text-sm font-bold transition-all backdrop-blur-sm">
-                Check Our Case Studies
+                Projects
               </button>
             </Link>
           </motion.div>
